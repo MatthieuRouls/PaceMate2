@@ -368,3 +368,118 @@ export async function getUserTeam(userId: string) {
     return null;
   }
 }
+
+// ============================================
+// PROFILE ACTIONS
+// ============================================
+
+/**
+ * Récupérer le profil complet de l'utilisateur avec ses statistiques
+ */
+export async function getUserProfile(userId: string) {
+  try {
+    // 1. Récupérer le profil
+    const { data: profile, error: profileError } = await supabase
+      .from('profiles')
+      .select('*')
+      .eq('id', userId)
+      .single();
+
+    if (profileError || !profile) {
+      console.error('Error fetching profile:', profileError);
+      return null;
+    }
+
+    // 2. Récupérer l'équipe si team_id existe
+    let team = null;
+    if (profile.team_id) {
+      const { data: teamData } = await supabase
+        .from('teams')
+        .select('*')
+        .eq('id', profile.team_id)
+        .single();
+
+      team = teamData;
+    }
+
+    // 3. Compter les sessions complétées
+    const { count } = await supabase
+      .from('session_participants')
+      .select('*', { count: 'exact', head: true })
+      .eq('user_id', userId)
+      .eq('status', 'completed');
+
+    return {
+      ...profile,
+      team,
+      completed_sessions_count: count || 0,
+    };
+  } catch (error) {
+    console.error('Error in getUserProfile:', error);
+    return null;
+  }
+}
+
+/**
+ * Récupérer les prochaines sessions de l'utilisateur
+ */
+export async function getUserUpcomingSessions(userId: string) {
+  try {
+    const { data, error } = await supabase
+      .from('session_participants')
+      .select(`
+        *,
+        session:sessions(*)
+      `)
+      .eq('user_id', userId)
+      .eq('status', 'confirmed')
+      .gte('sessions.start_time', new Date().toISOString())
+      .order('sessions.start_time', { ascending: true })
+      .limit(3);
+
+    if (error) {
+      console.error('Error fetching upcoming sessions:', error);
+      throw error;
+    }
+
+    // Filtrer et mapper pour ne garder que les sessions
+    const sessions = (data || [])
+      .filter((participant) => participant.session)
+      .map((participant) => participant.session);
+
+    return sessions;
+  } catch (error) {
+    console.error('Error in getUserUpcomingSessions:', error);
+    throw error;
+  }
+}
+
+/**
+ * Récupérer l'historique des sessions complétées de l'utilisateur
+ */
+export async function getUserSessionHistory(userId: string) {
+  try {
+    const { data, error } = await supabase
+      .from('session_participants')
+      .select(`
+        *,
+        session:sessions(*)
+      `)
+      .eq('user_id', userId)
+      .eq('status', 'completed')
+      .lt('sessions.start_time', new Date().toISOString())
+      .order('sessions.start_time', { ascending: false })
+      .limit(5);
+
+    if (error) {
+      console.error('Error fetching session history:', error);
+      throw error;
+    }
+
+    // Retourner les participations avec les sessions
+    return (data || []).filter((participant) => participant.session);
+  } catch (error) {
+    console.error('Error in getUserSessionHistory:', error);
+    throw error;
+  }
+}

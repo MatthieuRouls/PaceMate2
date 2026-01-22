@@ -21,6 +21,9 @@ export default function Home() {
             <Link href="/teams" className="btn-primary">
               🏆 Équipes
             </Link>
+            <Link href="/profile" className="btn-primary">
+              👤 Profil
+            </Link>
             <button
               onClick={toggleTheme}
               className="btn-primary"

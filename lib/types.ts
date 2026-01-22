@@ -3,8 +3,16 @@ export interface Profile {
   username: string;
   running_level: number; // 1-5
   avatar_url?: string;
+  bio?: string;
   team_id?: string;
+  total_distance_km?: number;
+  xp_points?: number;
+  best_times?: string; // JSON string with best times, ex: {"5k": "00:25:30", "10k": "00:52:15"}
   created_at?: string;
+
+  // Relations (populated via joins)
+  team?: Team;
+  completed_sessions_count?: number;
 }
 
 export interface Session {
@@ -31,8 +39,12 @@ export interface SessionParticipant {
   id: string;
   session_id: string;
   user_id: string;
-  status: 'pending' | 'confirmed' | 'cancelled';
+  status: 'pending' | 'confirmed' | 'cancelled' | 'completed';
+  rating?: number; // 1-5 stars
   created_at?: string;
+
+  // Relations (populated via joins)
+  session?: Session;
 }
 
 export interface Team {
