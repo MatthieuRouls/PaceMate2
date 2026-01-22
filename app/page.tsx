@@ -1,6 +1,7 @@
 'use client';
 
 import { useTheme } from '../components/providers/ThemeProvider';
+import Link from 'next/link';
 
 export default function Home() {
   const { theme, toggleTheme } = useTheme();
@@ -13,12 +14,17 @@ export default function Home() {
           <h1 className="text-4xl font-bold">
             PaceMate
           </h1>
-          <button
-            onClick={toggleTheme}
-            className="btn-primary"
-          >
-            Thème : {theme === 'discovery' ? '🌞 Débutant' : '⚡ Expert'}
-          </button>
+          <div className="flex gap-4 items-center">
+            <Link href="/sessions" className="btn-primary">
+              🏃 Sessions
+            </Link>
+            <button
+              onClick={toggleTheme}
+              className="btn-primary"
+            >
+              Thème : {theme === 'discovery' ? '🌞 Débutant' : '⚡ Expert'}
+            </button>
+          </div>
         </div>
 
         {/* Demo Cards */}
