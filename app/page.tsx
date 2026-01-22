@@ -14,9 +14,12 @@ export default function Home() {
           <h1 className="text-4xl font-bold">
             PaceMate
           </h1>
-          <div className="flex gap-4 items-center">
+          <div className="flex gap-4 items-center flex-wrap">
             <Link href="/sessions" className="btn-primary">
               🏃 Sessions
+            </Link>
+            <Link href="/teams" className="btn-primary">
+              🏆 Équipes
             </Link>
             <button
               onClick={toggleTheme}

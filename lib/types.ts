@@ -3,6 +3,7 @@ export interface Profile {
   username: string;
   running_level: number; // 1-5
   avatar_url?: string;
+  team_id?: string;
   created_at?: string;
 }
 
@@ -38,6 +39,18 @@ export interface Team {
   id: string;
   name: string;
   description?: string;
-  city: string;
+  city?: string;
+  total_distance?: number;
+  created_at?: string;
+
+  // Relations (populated via joins)
+  members_count?: number;
+}
+
+export interface TeamMembership {
+  id: string;
+  team_id: string;
+  user_id: string;
+  role: 'captain' | 'member';
   created_at?: string;
 }
