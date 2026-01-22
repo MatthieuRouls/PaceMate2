@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import Link from 'next/link';
 import { supabase } from '@/lib/supabase';
 import { Session } from '@/lib/types';
 import SessionCard from '@/components/ui/SessionCard';
@@ -110,9 +111,9 @@ export default function SessionsPage() {
               Trouve ta prochaine sortie et rejoins la communauté
             </p>
           </div>
-          <button className="btn-primary whitespace-nowrap">
+          <Link href="/sessions/create" className="btn-primary whitespace-nowrap">
             ➕ Créer une sortie
-          </button>
+          </Link>
         </div>
 
         {/* Filtres */}

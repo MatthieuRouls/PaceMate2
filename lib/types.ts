@@ -17,7 +17,7 @@ export interface Session {
   distance_km: number;
   level_required: number; // 1-5
   max_participants: number;
-  session_type?: 'training' | 'race' | 'social';
+  session_type?: 'casual' | 'recovery' | 'tempo' | 'long_run' | 'intervals';
   walk_breaks_ok: boolean;
   created_at?: string;
 
