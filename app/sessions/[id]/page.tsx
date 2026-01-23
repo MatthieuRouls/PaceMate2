@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useParams, useRouter } from 'next/navigation';
+import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { useTheme } from '@/components/providers/ThemeProvider';
 import { Session, Profile } from '@/lib/types';
@@ -26,8 +26,12 @@ interface SessionWithDetails extends Session {
 export default function SessionDetailsPage() {
   const params = useParams();
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { theme } = useTheme();
   const sessionId = params.id as string;
+
+  // Mode debug pour tester la notation (ajoutez ?testRating=true à l'URL)
+  const debugTestRating = searchParams.get('testRating') === 'true';
 
   // State
   const [session, setSession] = useState<SessionWithDetails | null>(null);
@@ -149,6 +153,8 @@ export default function SessionDetailsPage() {
   // Vérifier si la session est passée
   const isSessionPast = () => {
     if (!session) return false;
+    // Mode debug : forcer "session passée" pour tester la notation
+    if (debugTestRating) return true;
     return new Date(session.start_time) < new Date();
   };
 
@@ -219,12 +225,27 @@ export default function SessionDetailsPage() {
     <div className="min-h-screen p-4 md:p-8">
       <div className="max-w-4xl mx-auto">
         {/* Bouton retour */}
-        <Link
-          href="/sessions"
-          className="inline-flex items-center gap-2 mb-6 opacity-75 hover:opacity-100 transition-opacity"
-        >
-          ← Retour aux sessions
-        </Link>
+        <div className="flex items-center gap-4 mb-6">
+          <Link
+            href="/sessions"
+            className="inline-flex items-center gap-2 opacity-75 hover:opacity-100 transition-opacity"
+          >
+            ← Retour aux sessions
+          </Link>
+          {debugTestRating && (
+            <span
+              className="px-3 py-1 rounded-full text-sm font-medium border-2"
+              style={{
+                borderRadius: 'var(--radius)',
+                borderColor: 'orange',
+                backgroundColor: 'rgba(255, 165, 0, 0.1)',
+                color: 'orange',
+              }}
+            >
+              🧪 Mode Test Notation
+            </span>
+          )}
+        </div>
 
         {/* Loading */}
         {loading && (
