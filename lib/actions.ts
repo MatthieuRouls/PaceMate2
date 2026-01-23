@@ -378,10 +378,10 @@ export async function getUserTeam(userId: string) {
  */
 export async function getUserProfile(userId: string) {
   try {
-    // 1. Récupérer le profil
+    // 1. Récupérer le profil - sélectionner seulement les champs de base qui existent
     const { data: profile, error: profileError } = await supabase
       .from('profiles')
-      .select('*')
+      .select('id, username, running_level, avatar_url, team_id, created_at')
       .eq('id', userId)
       .single();
 
@@ -393,13 +393,15 @@ export async function getUserProfile(userId: string) {
     // 2. Récupérer l'équipe si team_id existe
     let team = null;
     if (profile.team_id) {
-      const { data: teamData } = await supabase
+      const { data: teamData, error: teamError } = await supabase
         .from('teams')
         .select('*')
         .eq('id', profile.team_id)
         .single();
 
-      team = teamData;
+      if (!teamError && teamData) {
+        team = teamData;
+      }
     }
 
     // 3. Compter les sessions complétées
@@ -409,8 +411,13 @@ export async function getUserProfile(userId: string) {
       .eq('user_id', userId)
       .eq('status', 'completed');
 
+    // 4. Retourner le profil avec valeurs par défaut pour les champs manquants
     return {
       ...profile,
+      bio: undefined,
+      total_distance_km: 0,
+      xp_points: 0,
+      best_times: undefined,
       team,
       completed_sessions_count: count || 0,
     };
@@ -425,32 +432,41 @@ export async function getUserProfile(userId: string) {
  */
 export async function getUserUpcomingSessions(userId: string) {
   try {
-    const { data, error } = await supabase
+    // 1. Récupérer les IDs des sessions confirmées de l'utilisateur
+    const { data: participations, error: participationsError } = await supabase
       .from('session_participants')
-      .select(`
-        *,
-        session:sessions(*)
-      `)
+      .select('session_id')
       .eq('user_id', userId)
-      .eq('status', 'confirmed')
-      .gte('sessions.start_time', new Date().toISOString())
-      .order('sessions.start_time', { ascending: true })
-      .limit(3);
+      .eq('status', 'confirmed');
 
-    if (error) {
-      console.error('Error fetching upcoming sessions:', error);
-      throw error;
+    if (participationsError) {
+      console.error('Error fetching participations:', participationsError);
+      return [];
     }
 
-    // Filtrer et mapper pour ne garder que les sessions
-    const sessions = (data || [])
-      .filter((participant) => participant.session)
-      .map((participant) => participant.session);
+    if (!participations || participations.length === 0) {
+      return [];
+    }
 
-    return sessions;
+    // 2. Récupérer les sessions correspondantes
+    const sessionIds = participations.map((p) => p.session_id);
+    const { data: sessions, error: sessionsError } = await supabase
+      .from('sessions')
+      .select('*')
+      .in('id', sessionIds)
+      .gte('start_time', new Date().toISOString())
+      .order('start_time', { ascending: true })
+      .limit(3);
+
+    if (sessionsError) {
+      console.error('Error fetching sessions:', sessionsError);
+      return [];
+    }
+
+    return sessions || [];
   } catch (error) {
     console.error('Error in getUserUpcomingSessions:', error);
-    throw error;
+    return [];
   }
 }
 
@@ -459,27 +475,53 @@ export async function getUserUpcomingSessions(userId: string) {
  */
 export async function getUserSessionHistory(userId: string) {
   try {
-    const { data, error } = await supabase
+    // 1. Récupérer les participations complétées avec les session_ids
+    const { data: participations, error: participationsError } = await supabase
       .from('session_participants')
-      .select(`
-        *,
-        session:sessions(*)
-      `)
+      .select('*')
       .eq('user_id', userId)
       .eq('status', 'completed')
-      .lt('sessions.start_time', new Date().toISOString())
-      .order('sessions.start_time', { ascending: false })
+      .order('created_at', { ascending: false })
       .limit(5);
 
-    if (error) {
-      console.error('Error fetching session history:', error);
-      throw error;
+    if (participationsError) {
+      console.error('Error fetching participations:', participationsError);
+      return [];
     }
 
-    // Retourner les participations avec les sessions
-    return (data || []).filter((participant) => participant.session);
+    if (!participations || participations.length === 0) {
+      return [];
+    }
+
+    // 2. Récupérer les sessions correspondantes
+    const sessionIds = participations.map((p) => p.session_id);
+    const { data: sessions, error: sessionsError } = await supabase
+      .from('sessions')
+      .select('*')
+      .in('id', sessionIds)
+      .lt('start_time', new Date().toISOString())
+      .order('start_time', { ascending: false });
+
+    if (sessionsError) {
+      console.error('Error fetching sessions:', sessionsError);
+      return [];
+    }
+
+    // 3. Joindre les sessions aux participations
+    const participationsWithSessions = participations
+      .map((participation) => {
+        const session = sessions?.find((s) => s.id === participation.session_id);
+        if (!session) return null;
+        return {
+          ...participation,
+          session,
+        };
+      })
+      .filter((p) => p !== null);
+
+    return participationsWithSessions;
   } catch (error) {
     console.error('Error in getUserSessionHistory:', error);
-    throw error;
+    return [];
   }
 }
