@@ -378,10 +378,10 @@ export async function getUserTeam(userId: string) {
  */
 export async function getUserProfile(userId: string) {
   try {
-    // 1. Récupérer le profil - sélectionner seulement les champs de base qui existent
+    // 1. Récupérer le profil avec tous les champs
     const { data: profile, error: profileError } = await supabase
       .from('profiles')
-      .select('id, username, running_level, avatar_url, team_id, created_at')
+      .select('*')
       .eq('id', userId)
       .single();
 
@@ -411,13 +411,9 @@ export async function getUserProfile(userId: string) {
       .eq('user_id', userId)
       .eq('status', 'completed');
 
-    // 4. Retourner le profil avec valeurs par défaut pour les champs manquants
+    // 4. Retourner le profil avec l'équipe et le compteur de sessions
     return {
       ...profile,
-      bio: undefined,
-      total_distance_km: 0,
-      xp_points: 0,
-      best_times: undefined,
       team,
       completed_sessions_count: count || 0,
     };
