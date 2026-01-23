@@ -812,3 +812,94 @@ export async function rateSession(
     };
   }
 }
+
+// ============================================
+// HOMEPAGE ACTIONS
+// ============================================
+
+/**
+ * Récupérer les prochaines sessions pour la homepage
+ */
+export async function getUpcomingSessions(limit: number = 3) {
+  try {
+    const { data: sessions, error } = await supabase
+      .from('sessions')
+      .select('*')
+      .gte('start_time', new Date().toISOString())
+      .order('start_time', { ascending: true })
+      .limit(limit);
+
+    if (error) {
+      console.error('Error fetching upcoming sessions:', error);
+      return [];
+    }
+
+    // Récupérer les créateurs et compter les participants
+    const sessionsWithDetails = await Promise.all(
+      (sessions || []).map(async (session) => {
+        // Créateur
+        const { data: creator } = await supabase
+          .from('profiles')
+          .select('id, username, running_level, avatar_url')
+          .eq('id', session.creator_id)
+          .single();
+
+        // Compter les participants
+        const { count } = await supabase
+          .from('session_participants')
+          .select('*', { count: 'exact', head: true })
+          .eq('session_id', session.id)
+          .eq('status', 'confirmed');
+
+        return {
+          ...session,
+          creator,
+          participants_count: count || 0,
+        };
+      })
+    );
+
+    return sessionsWithDetails;
+  } catch (error) {
+    console.error('Error in getUpcomingSessions:', error);
+    return [];
+  }
+}
+
+/**
+ * Récupérer le top des équipes pour la homepage
+ */
+export async function getTopTeams(limit: number = 3) {
+  try {
+    const { data: teams, error } = await supabase
+      .from('teams')
+      .select('*')
+      .order('total_distance', { ascending: false })
+      .limit(limit);
+
+    if (error) {
+      console.error('Error fetching top teams:', error);
+      return [];
+    }
+
+    // Compter les membres de chaque équipe
+    const teamsWithCounts = await Promise.all(
+      (teams || []).map(async (team) => {
+        const { count } = await supabase
+          .from('team_memberships')
+          .select('*', { count: 'exact', head: true })
+          .eq('team_id', team.id);
+
+        return {
+          ...team,
+          members_count: count || 0,
+        };
+      })
+    );
+
+    return teamsWithCounts;
+  } catch (error) {
+    console.error('Error in getTopTeams:', error);
+    return [];
+  }
+}

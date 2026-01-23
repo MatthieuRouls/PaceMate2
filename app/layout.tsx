@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { ThemeProvider } from "../components/providers/ThemeProvider";
+import Navbar from "../components/layout/Navbar";
 
 export const metadata: Metadata = {
   title: "PaceMate - Trouve ton binôme running",
@@ -16,7 +17,10 @@ export default function RootLayout({
     <html lang="fr">
       <body>
         <ThemeProvider>
-          {children}
+          <Navbar />
+          <main className="pt-16">
+            {children}
+          </main>
         </ThemeProvider>
       </body>
     </html>
