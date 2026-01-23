@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import { Session } from '@/lib/types';
 import { useTheme } from '../providers/ThemeProvider';
 
@@ -56,55 +57,57 @@ export default function SessionCard({ session }: SessionCardProps) {
   const spotsText = `${session.participants_count || 0}/${session.max_participants} places`;
 
   return (
-    <div className="card hover:shadow-lg cursor-pointer transition-all">
-      {/* Header avec titre */}
-      <div className="mb-3">
-        <h3 className="text-xl font-semibold mb-1">{session.title}</h3>
-        {session.description && (
-          <p className="text-sm opacity-75">{session.description}</p>
-        )}
+    <Link href={`/sessions/${session.id}`} className="block">
+      <div className="card hover:shadow-lg cursor-pointer transition-all">
+        {/* Header avec titre */}
+        <div className="mb-3">
+          <h3 className="text-xl font-semibold mb-1">{session.title}</h3>
+          {session.description && (
+            <p className="text-sm opacity-75 line-clamp-2">{session.description}</p>
+          )}
+        </div>
+
+        {/* Informations principales */}
+        <div className="space-y-2 mb-4">
+          {/* Date et heure */}
+          <div className="flex items-center gap-2">
+            <span className="text-sm">📅</span>
+            <span className="font-medium">{formatDate(session.start_time)}</span>
+          </div>
+
+          {/* Lieu */}
+          <div className="flex items-center gap-2">
+            <span className="text-sm">📍</span>
+            <span>{session.location_name}</span>
+          </div>
+
+          {/* Allure */}
+          <div className="flex items-center gap-2">
+            <span className="text-sm">⚡</span>
+            <span style={{ color: 'var(--color-primary)' }} className="font-semibold">
+              {getPaceDisplay()}
+            </span>
+          </div>
+
+          {/* Distance */}
+          <div className="flex items-center gap-2">
+            <span className="text-sm">🏃</span>
+            <span>{session.distance_km} km</span>
+          </div>
+        </div>
+
+        {/* Footer avec niveau et places */}
+        <div className="flex items-center justify-between pt-3 border-t border-gray-200"
+             style={{ borderColor: theme === 'elite' ? 'rgba(167, 139, 250, 0.2)' : 'rgba(0, 0, 0, 0.1)' }}>
+          <div className="flex items-center gap-2">
+            <span className="text-sm">Niveau :</span>
+            <span>{renderStars()}</span>
+          </div>
+          <div className={`text-sm font-semibold ${spotsLeft === 0 ? 'text-red-500' : ''}`}>
+            {spotsLeft === 0 ? 'Complet' : spotsText}
+          </div>
+        </div>
       </div>
-
-      {/* Informations principales */}
-      <div className="space-y-2 mb-4">
-        {/* Date et heure */}
-        <div className="flex items-center gap-2">
-          <span className="text-sm">📅</span>
-          <span className="font-medium">{formatDate(session.start_time)}</span>
-        </div>
-
-        {/* Lieu */}
-        <div className="flex items-center gap-2">
-          <span className="text-sm">📍</span>
-          <span>{session.location_name}</span>
-        </div>
-
-        {/* Allure */}
-        <div className="flex items-center gap-2">
-          <span className="text-sm">⚡</span>
-          <span style={{ color: 'var(--color-primary)' }} className="font-semibold">
-            {getPaceDisplay()}
-          </span>
-        </div>
-
-        {/* Distance */}
-        <div className="flex items-center gap-2">
-          <span className="text-sm">🏃</span>
-          <span>{session.distance_km} km</span>
-        </div>
-      </div>
-
-      {/* Footer avec niveau et places */}
-      <div className="flex items-center justify-between pt-3 border-t border-gray-200"
-           style={{ borderColor: theme === 'elite' ? 'rgba(167, 139, 250, 0.2)' : 'rgba(0, 0, 0, 0.1)' }}>
-        <div className="flex items-center gap-2">
-          <span className="text-sm">Niveau :</span>
-          <span>{renderStars()}</span>
-        </div>
-        <div className={`text-sm font-semibold ${spotsLeft === 0 ? 'text-red-500' : ''}`}>
-          {spotsLeft === 0 ? 'Complet' : spotsText}
-        </div>
-      </div>
-    </div>
+    </Link>
   );
 }

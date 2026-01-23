@@ -521,3 +521,294 @@ export async function getUserSessionHistory(userId: string) {
     return [];
   }
 }
+
+// ============================================
+// SESSION PARTICIPATION ACTIONS
+// ============================================
+
+/**
+ * Récupérer les détails complets d'une session
+ */
+export async function getSessionDetails(sessionId: string) {
+  try {
+    // 1. Récupérer la session
+    const { data: session, error: sessionError } = await supabase
+      .from('sessions')
+      .select('*')
+      .eq('id', sessionId)
+      .single();
+
+    if (sessionError || !session) {
+      console.error('Error fetching session:', sessionError);
+      return null;
+    }
+
+    // 2. Récupérer le créateur
+    const { data: creator } = await supabase
+      .from('profiles')
+      .select('id, username, running_level, avatar_url')
+      .eq('id', session.creator_id)
+      .single();
+
+    // 3. Récupérer les participants confirmés
+    const { data: participations } = await supabase
+      .from('session_participants')
+      .select('user_id')
+      .eq('session_id', sessionId)
+      .eq('status', 'confirmed');
+
+    const participantIds = (participations || []).map((p) => p.user_id);
+
+    let participants: any[] = [];
+    if (participantIds.length > 0) {
+      const { data: participantProfiles } = await supabase
+        .from('profiles')
+        .select('id, username, avatar_url')
+        .in('id', participantIds);
+
+      participants = participantProfiles || [];
+    }
+
+    return {
+      ...session,
+      creator,
+      participants,
+      participants_count: participants.length,
+    };
+  } catch (error) {
+    console.error('Error in getSessionDetails:', error);
+    return null;
+  }
+}
+
+/**
+ * Vérifier le statut de participation de l'utilisateur à une session
+ */
+export async function getUserSessionStatus(sessionId: string, userId: string) {
+  try {
+    const { data, error } = await supabase
+      .from('session_participants')
+      .select('status, rating')
+      .eq('session_id', sessionId)
+      .eq('user_id', userId)
+      .maybeSingle();
+
+    if (error) {
+      console.error('Error fetching user session status:', error);
+      return null;
+    }
+
+    return data;
+  } catch (error) {
+    console.error('Error in getUserSessionStatus:', error);
+    return null;
+  }
+}
+
+/**
+ * Rejoindre une session
+ */
+export async function joinSession(sessionId: string, userId: string): Promise<ActionResult> {
+  try {
+    // 1. Vérifier que la session existe et n'est pas passée
+    const { data: session, error: sessionError } = await supabase
+      .from('sessions')
+      .select('start_time, max_participants')
+      .eq('id', sessionId)
+      .single();
+
+    if (sessionError || !session) {
+      return {
+        success: false,
+        error: 'Session introuvable',
+      };
+    }
+
+    // Vérifier que la session n'est pas passée
+    if (new Date(session.start_time) < new Date()) {
+      return {
+        success: false,
+        error: 'Cette session est déjà passée',
+      };
+    }
+
+    // 2. Vérifier que l'utilisateur n'est pas déjà inscrit
+    const { data: existing } = await supabase
+      .from('session_participants')
+      .select('id, status')
+      .eq('session_id', sessionId)
+      .eq('user_id', userId)
+      .maybeSingle();
+
+    if (existing && existing.status === 'confirmed') {
+      return {
+        success: false,
+        error: 'Vous participez déjà à cette session',
+      };
+    }
+
+    // 3. Vérifier que la session n'est pas complète
+    const { count } = await supabase
+      .from('session_participants')
+      .select('*', { count: 'exact', head: true })
+      .eq('session_id', sessionId)
+      .eq('status', 'confirmed');
+
+    if (count && count >= session.max_participants) {
+      return {
+        success: false,
+        error: 'Cette session est complète',
+      };
+    }
+
+    // 4. Créer ou mettre à jour la participation
+    if (existing) {
+      // Réactiver une participation annulée
+      const { error: updateError } = await supabase
+        .from('session_participants')
+        .update({ status: 'confirmed' })
+        .eq('id', existing.id);
+
+      if (updateError) {
+        console.error('Error updating participation:', updateError);
+        return {
+          success: false,
+          error: 'Erreur lors de la mise à jour de la participation',
+        };
+      }
+    } else {
+      // Créer une nouvelle participation
+      const { error: insertError } = await supabase
+        .from('session_participants')
+        .insert({
+          session_id: sessionId,
+          user_id: userId,
+          status: 'confirmed',
+        });
+
+      if (insertError) {
+        console.error('Error creating participation:', insertError);
+        return {
+          success: false,
+          error: 'Erreur lors de l\'inscription à la session',
+        };
+      }
+    }
+
+    return {
+      success: true,
+    };
+  } catch (error) {
+    console.error('Unexpected error in joinSession:', error);
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'Une erreur inattendue s\'est produite',
+    };
+  }
+}
+
+/**
+ * Quitter une session
+ */
+export async function leaveSession(sessionId: string, userId: string): Promise<ActionResult> {
+  try {
+    // Mettre le statut à 'cancelled' au lieu de supprimer
+    const { error } = await supabase
+      .from('session_participants')
+      .update({ status: 'cancelled' })
+      .eq('session_id', sessionId)
+      .eq('user_id', userId);
+
+    if (error) {
+      console.error('Error leaving session:', error);
+      return {
+        success: false,
+        error: 'Erreur lors du désistement',
+      };
+    }
+
+    return {
+      success: true,
+    };
+  } catch (error) {
+    console.error('Unexpected error in leaveSession:', error);
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'Une erreur inattendue s\'est produite',
+    };
+  }
+}
+
+/**
+ * Noter une session et gagner des XP
+ */
+export async function rateSession(
+  sessionId: string,
+  userId: string,
+  rating: number,
+  comment?: string
+): Promise<ActionResult> {
+  try {
+    // 1. Mettre à jour la participation avec la note
+    const { error: updateError } = await supabase
+      .from('session_participants')
+      .update({
+        status: 'completed',
+        rating,
+        // Note: si vous voulez stocker le commentaire, ajoutez ce champ à la table
+      })
+      .eq('session_id', sessionId)
+      .eq('user_id', userId);
+
+    if (updateError) {
+      console.error('Error rating session:', updateError);
+      return {
+        success: false,
+        error: 'Erreur lors de l\'enregistrement de la note',
+      };
+    }
+
+    // 2. Calculer les XP à ajouter
+    let xpToAdd = 10; // XP de base
+    if (rating >= 4) {
+      xpToAdd += 5; // Bonus pour bonne note
+    }
+
+    // 3. Récupérer les XP actuels
+    const { data: profile, error: profileError } = await supabase
+      .from('profiles')
+      .select('xp_points')
+      .eq('id', userId)
+      .single();
+
+    if (profileError || !profile) {
+      console.error('Error fetching profile for XP:', profileError);
+      // Continuer quand même, la note a été enregistrée
+      return {
+        success: true,
+      };
+    }
+
+    // 4. Mettre à jour les XP
+    const newXp = (profile.xp_points || 0) + xpToAdd;
+    const { error: xpError } = await supabase
+      .from('profiles')
+      .update({ xp_points: newXp })
+      .eq('id', userId);
+
+    if (xpError) {
+      console.error('Error updating XP:', xpError);
+      // La note a été enregistrée, c'est l'essentiel
+    }
+
+    return {
+      success: true,
+    };
+  } catch (error) {
+    console.error('Unexpected error in rateSession:', error);
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'Une erreur inattendue s\'est produite',
+    };
+  }
+}
