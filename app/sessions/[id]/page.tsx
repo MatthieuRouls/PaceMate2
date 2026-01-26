@@ -5,7 +5,6 @@ import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { useTheme } from '@/components/providers/ThemeProvider';
 import { Session, Profile } from '@/lib/types';
-import { supabase } from '@/lib/supabase';
 import {
   getSessionDetails,
   getUserSessionStatus,
@@ -35,7 +34,6 @@ export default function SessionDetailsPage() {
 
   // State
   const [session, setSession] = useState<SessionWithDetails | null>(null);
-  const [userId, setUserId] = useState<string | null>(null);
   const [userStatus, setUserStatus] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -49,20 +47,6 @@ export default function SessionDetailsPage() {
         setLoading(true);
         setError(null);
 
-        // Récupérer le user ID
-        const { data: profiles, error: profileError } = await supabase
-          .from('profiles')
-          .select('id')
-          .limit(1)
-          .single();
-
-        if (profileError || !profiles) {
-          throw new Error('Impossible de récupérer le profil utilisateur');
-        }
-
-        const currentUserId = profiles.id;
-        setUserId(currentUserId);
-
         // Récupérer les détails de la session
         const sessionData = await getSessionDetails(sessionId);
         if (!sessionData) {
@@ -71,7 +55,7 @@ export default function SessionDetailsPage() {
         setSession(sessionData);
 
         // Récupérer le statut de l'utilisateur
-        const status = await getUserSessionStatus(sessionId, currentUserId);
+        const status = await getUserSessionStatus(sessionId);
         setUserStatus(status);
       } catch (err) {
         console.error('Error fetching session details:', err);
@@ -166,16 +150,16 @@ export default function SessionDetailsPage() {
 
   // Actions
   const handleJoin = async () => {
-    if (!userId || !session) return;
+    if (!session) return;
 
     setActionLoading(true);
-    const result = await joinSession(sessionId, userId);
+    const result = await joinSession(sessionId);
 
     if (result.success) {
       // Recharger les données
       const updatedSession = await getSessionDetails(sessionId);
       setSession(updatedSession);
-      const status = await getUserSessionStatus(sessionId, userId);
+      const status = await getUserSessionStatus(sessionId);
       setUserStatus(status);
     } else {
       alert(result.error || 'Erreur lors de l\'inscription');
@@ -185,19 +169,19 @@ export default function SessionDetailsPage() {
   };
 
   const handleLeave = async () => {
-    if (!userId || !session) return;
+    if (!session) return;
 
     const confirmed = window.confirm('Êtes-vous sûr de vouloir vous désister de cette session ?');
     if (!confirmed) return;
 
     setActionLoading(true);
-    const result = await leaveSession(sessionId, userId);
+    const result = await leaveSession(sessionId);
 
     if (result.success) {
       // Recharger les données
       const updatedSession = await getSessionDetails(sessionId);
       setSession(updatedSession);
-      const status = await getUserSessionStatus(sessionId, userId);
+      const status = await getUserSessionStatus(sessionId);
       setUserStatus(status);
     } else {
       alert(result.error || 'Erreur lors du désistement');
@@ -207,13 +191,11 @@ export default function SessionDetailsPage() {
   };
 
   const handleRating = async (rating: number, comment: string) => {
-    if (!userId) return;
-
-    const result = await rateSession(sessionId, userId, rating, comment);
+    const result = await rateSession(sessionId, rating, comment);
 
     if (result.success) {
       // Recharger le statut
-      const status = await getUserSessionStatus(sessionId, userId);
+      const status = await getUserSessionStatus(sessionId);
       setUserStatus(status);
       alert('Merci pour votre note ! Vous avez gagné des XP 🎉');
     } else {

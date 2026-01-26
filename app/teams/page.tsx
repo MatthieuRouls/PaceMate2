@@ -4,7 +4,6 @@ import { useEffect, useState, FormEvent } from 'react';
 import { useTheme } from '@/components/providers/ThemeProvider';
 import { Team } from '@/lib/types';
 import TeamCard from '@/components/ui/TeamCard';
-import { supabase } from '@/lib/supabase';
 import {
   getUserTeam,
   getTeamsLeaderboard,
@@ -33,9 +32,6 @@ export default function TeamsPage() {
   // État de quitter l'équipe
   const [leavingTeam, setLeavingTeam] = useState(false);
 
-  // Récupérer l'ID utilisateur (premier profil en dur pour l'instant)
-  const [userId, setUserId] = useState<string | null>(null);
-
   // Récupérer les données
   useEffect(() => {
     async function fetchData() {
@@ -43,22 +39,8 @@ export default function TeamsPage() {
         setLoading(true);
         setError(null);
 
-        // Récupérer le premier profil comme userId
-        const { data: profiles, error: profileError } = await supabase
-          .from('profiles')
-          .select('id')
-          .limit(1)
-          .single();
-
-        if (profileError || !profiles) {
-          throw new Error('Impossible de récupérer le profil utilisateur');
-        }
-
-        const currentUserId = profiles.id;
-        setUserId(currentUserId);
-
         // Récupérer l'équipe de l'utilisateur
-        const userTeamData = await getUserTeam(currentUserId);
+        const userTeamData = await getUserTeam();
         setUserTeam(userTeamData);
 
         // Récupérer le classement des équipes
@@ -78,17 +60,16 @@ export default function TeamsPage() {
   // Créer une équipe
   const handleCreateTeam = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (!userId) return;
 
     setCreatingTeam(true);
     setCreateError(null);
 
     try {
-      const result = await createTeam(teamName, teamDescription, userId);
+      const result = await createTeam(teamName, teamDescription);
 
       if (result.success && result.team_id) {
         // Récupérer l'équipe créée
-        const newTeam = await getUserTeam(userId);
+        const newTeam = await getUserTeam();
         setUserTeam(newTeam);
 
         // Rafraîchir le classement
@@ -111,7 +92,7 @@ export default function TeamsPage() {
 
   // Quitter l'équipe
   const handleLeaveTeam = async () => {
-    if (!userId || !userTeam) return;
+    if (!userTeam) return;
 
     const confirmLeave = window.confirm(
       'Es-tu sûr de vouloir quitter ton équipe ? Cette action est irréversible.'
@@ -122,7 +103,7 @@ export default function TeamsPage() {
     setLeavingTeam(true);
 
     try {
-      const result = await leaveTeam(userId, userTeam.id);
+      const result = await leaveTeam(userTeam.id);
 
       if (result.success) {
         setUserTeam(null);

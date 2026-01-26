@@ -3,13 +3,12 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useTheme } from '@/components/providers/ThemeProvider';
-import { Profile, Session, SessionParticipant } from '@/lib/types';
+import { useAuth } from '@/components/providers/AuthProvider';
+import { Session, SessionParticipant } from '@/lib/types';
 import { calculateLevel } from '@/lib/constants';
 import ProgressBar from '@/components/ui/ProgressBar';
 import SessionCard from '@/components/ui/SessionCard';
-import { supabase } from '@/lib/supabase';
 import {
-  getUserProfile,
   getUserUpcomingSessions,
   getUserSessionHistory,
 } from '@/lib/actions';
@@ -19,9 +18,9 @@ export const dynamic = 'force-dynamic';
 
 export default function ProfilePage() {
   const { theme } = useTheme();
+  const { profile, loading: authLoading } = useAuth();
 
   // State
-  const [profile, setProfile] = useState<Profile | null>(null);
   const [upcomingSessions, setUpcomingSessions] = useState<Session[]>([]);
   const [sessionHistory, setSessionHistory] = useState<SessionParticipant[]>([]);
   const [loading, setLoading] = useState(true);
@@ -30,33 +29,24 @@ export default function ProfilePage() {
   // Récupérer les données
   useEffect(() => {
     async function fetchData() {
+      if (authLoading) return;
+
+      if (!profile) {
+        setError('Profil non trouvé');
+        setLoading(false);
+        return;
+      }
+
       try {
         setLoading(true);
         setError(null);
 
-        // Récupérer le premier profil comme userId
-        const { data: profiles, error: profileError } = await supabase
-          .from('profiles')
-          .select('id')
-          .limit(1)
-          .single();
-
-        if (profileError || !profiles) {
-          throw new Error('Impossible de récupérer le profil utilisateur');
-        }
-
-        const userId = profiles.id;
-
-        // Récupérer le profil complet
-        const profileData = await getUserProfile(userId);
-        setProfile(profileData);
-
         // Récupérer les sessions à venir
-        const upcoming = await getUserUpcomingSessions(userId);
+        const upcoming = await getUserUpcomingSessions();
         setUpcomingSessions(upcoming);
 
         // Récupérer l'historique
-        const history = await getUserSessionHistory(userId);
+        const history = await getUserSessionHistory();
         setSessionHistory(history);
       } catch (err) {
         console.error('Error fetching profile data:', err);
@@ -67,7 +57,7 @@ export default function ProfilePage() {
     }
 
     fetchData();
-  }, []);
+  }, [profile, authLoading]);
 
   // Calculer le niveau
   const levelInfo = profile ? calculateLevel(profile.xp_points || 0) : null;
@@ -117,7 +107,7 @@ export default function ProfilePage() {
         </div>
 
         {/* Loading */}
-        {loading && (
+        {(loading || authLoading) && (
           <div className="text-center py-12">
             <div
               className="inline-block animate-spin rounded-full h-12 w-12 border-b-2"
@@ -136,7 +126,7 @@ export default function ProfilePage() {
         )}
 
         {/* Contenu principal */}
-        {!loading && !error && profile && (
+        {!loading && !authLoading && !error && profile && (
           <div className="space-y-8">
             {/* Section Header avec avatar et niveau */}
             <div className="card">

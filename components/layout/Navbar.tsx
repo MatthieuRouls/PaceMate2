@@ -1,26 +1,17 @@
 'use client';
 
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { usePathname, useRouter } from 'next/navigation';
+import { useState } from 'react';
 import { useTheme } from '../providers/ThemeProvider';
-import { supabase } from '@/lib/supabase';
+import { useAuth } from '../providers/AuthProvider';
 
 export default function Navbar() {
   const pathname = usePathname();
+  const router = useRouter();
   const { theme, toggleTheme } = useTheme();
-  const [username, setUsername] = useState('');
-
-  // Récupérer le username de l'utilisateur
-  useEffect(() => {
-    async function fetchUser() {
-      const { data } = await supabase.from('profiles').select('username').limit(1).single();
-      if (data) {
-        setUsername(data.username);
-      }
-    }
-    fetchUser();
-  }, []);
+  const { profile, signOut, loading } = useAuth();
+  const [dropdownOpen, setDropdownOpen] = useState(false);
 
   // Générer les initiales pour l'avatar
   const getInitials = (name: string) => {
@@ -32,6 +23,11 @@ export default function Navbar() {
     return name.substring(0, 2).toUpperCase();
   };
 
+  const handleSignOut = async () => {
+    await signOut();
+    router.push('/auth/login');
+  };
+
   const navLinks = [
     { href: '/sessions', label: 'Sessions', icon: '🏃' },
     { href: '/teams', label: 'Équipes', icon: '🏆' },
@@ -39,6 +35,13 @@ export default function Navbar() {
   ];
 
   const isActive = (href: string) => pathname === href || pathname?.startsWith(href + '/');
+
+  // Si on est sur une page d'auth, ne pas afficher la navbar complète
+  const isAuthPage = pathname?.startsWith('/auth');
+
+  if (isAuthPage) {
+    return null;
+  }
 
   return (
     <nav
@@ -125,21 +128,105 @@ export default function Navbar() {
               <span className="text-xl">{theme === 'discovery' ? '☀️' : '🌙'}</span>
             </button>
 
-            {/* Avatar utilisateur */}
-            <Link href="/profile">
-              <div
-                className="w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold cursor-pointer hover:scale-105 transition-transform"
-                style={{
-                  backgroundColor: theme === 'elite'
-                    ? 'rgba(167, 139, 250, 0.2)'
-                    : 'rgba(34, 197, 94, 0.2)',
-                  color: 'var(--color-primary)',
-                }}
-                title="Mon profil"
-              >
-                {getInitials(username)}
+            {/* Avatar utilisateur avec dropdown */}
+            {!loading && profile ? (
+              <div className="relative">
+                <button
+                  onClick={() => setDropdownOpen(!dropdownOpen)}
+                  className="w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold hover:scale-105 transition-transform"
+                  style={{
+                    backgroundColor: theme === 'elite'
+                      ? 'rgba(167, 139, 250, 0.2)'
+                      : 'rgba(34, 197, 94, 0.2)',
+                    color: 'var(--color-primary)',
+                  }}
+                  title={profile.username}
+                >
+                  {getInitials(profile.username)}
+                </button>
+
+                {/* Dropdown menu */}
+                {dropdownOpen && (
+                  <>
+                    {/* Overlay pour fermer le dropdown */}
+                    <div
+                      className="fixed inset-0 z-40"
+                      onClick={() => setDropdownOpen(false)}
+                    />
+
+                    {/* Menu */}
+                    <div
+                      className="absolute right-0 mt-2 w-48 py-2 shadow-lg z-50"
+                      style={{
+                        backgroundColor: theme === 'elite' ? '#1a1a2e' : '#ffffff',
+                        borderRadius: 'var(--radius)',
+                        border: `1px solid ${theme === 'elite' ? 'rgba(167, 139, 250, 0.2)' : 'rgba(0, 0, 0, 0.1)'}`,
+                      }}
+                    >
+                      {/* Username */}
+                      <div className="px-4 py-2 border-b" style={{ borderColor: 'var(--color-border)' }}>
+                        <p className="font-semibold" style={{ color: 'var(--color-text)' }}>
+                          {profile.username}
+                        </p>
+                        <p className="text-xs" style={{ color: 'var(--color-secondary)' }}>
+                          {profile.xp_points || 0} XP
+                        </p>
+                      </div>
+
+                      {/* Mon profil */}
+                      <Link
+                        href="/profile"
+                        className="block px-4 py-2 hover:bg-opacity-80 transition-colors"
+                        style={{
+                          color: 'var(--color-text)',
+                        }}
+                        onClick={() => setDropdownOpen(false)}
+                      >
+                        👤 Mon profil
+                      </Link>
+
+                      {/* Déconnexion */}
+                      <button
+                        onClick={handleSignOut}
+                        className="w-full text-left px-4 py-2 hover:bg-opacity-80 transition-colors"
+                        style={{
+                          color: '#ef4444',
+                        }}
+                      >
+                        🚪 Déconnexion
+                      </button>
+                    </div>
+                  </>
+                )}
               </div>
-            </Link>
+            ) : (
+              // Boutons de connexion/inscription si pas connecté
+              !loading && (
+                <div className="flex items-center gap-2">
+                  <Link
+                    href="/auth/login"
+                    className="px-4 py-2 rounded-lg font-medium hover:opacity-80 transition-opacity"
+                    style={{
+                      borderRadius: 'var(--radius)',
+                      color: 'var(--color-primary)',
+                    }}
+                  >
+                    Connexion
+                  </Link>
+                  <Link
+                    href="/auth/signup"
+                    className="px-4 py-2 rounded-lg font-medium hover:opacity-90 transition-opacity"
+                    style={{
+                      borderRadius: 'var(--radius)',
+                      backgroundColor: 'var(--color-primary)',
+                      color: 'white',
+                    }}
+                  >
+                    Inscription
+                  </Link>
+                </div>
+              )
+            )}
           </div>
         </div>
       </div>

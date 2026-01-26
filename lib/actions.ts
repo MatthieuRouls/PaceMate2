@@ -1,6 +1,7 @@
 'use server';
 
 import { supabase } from './supabase';
+import { getCurrentUser } from './supabase-auth';
 
 export interface CreateSessionData {
   title: string;
@@ -42,22 +43,14 @@ function convertPaceToInterval(pace: string): string | null {
  */
 export async function createSession(data: CreateSessionData): Promise<CreateSessionResult> {
   try {
-    // 1. Récupérer le premier profil pour creator_id (en dur pour l'instant)
-    const { data: profiles, error: profileError } = await supabase
-      .from('profiles')
-      .select('id')
-      .limit(1)
-      .single();
-
-    if (profileError || !profiles) {
-      console.error('Error fetching profile:', profileError);
+    // 1. Récupérer l'utilisateur connecté
+    const user = await getCurrentUser();
+    if (!user) {
       return {
         success: false,
-        error: 'Impossible de récupérer le profil utilisateur. Veuillez créer un profil d\'abord.',
+        error: 'Non authentifié',
       };
     }
-
-    const creator_id = profiles.id;
 
     // 2. Convertir l'allure si renseignée
     const target_pace = data.target_pace ? convertPaceToInterval(data.target_pace) : null;
@@ -69,7 +62,7 @@ export async function createSession(data: CreateSessionData): Promise<CreateSess
     const sessionData = {
       title: data.title,
       description: data.description || null,
-      creator_id,
+      creator_id: user.id,
       start_time,
       location_name: data.location_name,
       distance_km: data.distance_km,
@@ -128,10 +121,18 @@ export interface ActionResult {
  */
 export async function createTeam(
   name: string,
-  description: string,
-  userId: string
+  description: string
 ): Promise<CreateTeamResult> {
   try {
+    // Récupérer l'utilisateur connecté
+    const user = await getCurrentUser();
+    if (!user) {
+      return {
+        success: false,
+        error: 'Non authentifié',
+      };
+    }
+
     // Validation
     if (!name || name.trim().length === 0) {
       return {
@@ -180,7 +181,7 @@ export async function createTeam(
       .from('team_memberships')
       .insert({
         team_id: team.id,
-        user_id: userId,
+        user_id: user.id,
         role: 'captain',
       });
 
@@ -200,7 +201,7 @@ export async function createTeam(
     const { error: profileError } = await supabase
       .from('profiles')
       .update({ team_id: team.id })
-      .eq('id', userId);
+      .eq('id', user.id);
 
     if (profileError) {
       console.error('Error updating profile:', profileError);
@@ -231,13 +232,22 @@ export async function createTeam(
 /**
  * Quitter une équipe
  */
-export async function leaveTeam(userId: string, teamId: string): Promise<ActionResult> {
+export async function leaveTeam(teamId: string): Promise<ActionResult> {
   try {
+    // Récupérer l'utilisateur connecté
+    const user = await getCurrentUser();
+    if (!user) {
+      return {
+        success: false,
+        error: 'Non authentifié',
+      };
+    }
+
     // 1. Supprimer l'entrée dans team_memberships
     const { error: membershipError } = await supabase
       .from('team_memberships')
       .delete()
-      .eq('user_id', userId)
+      .eq('user_id', user.id)
       .eq('team_id', teamId);
 
     if (membershipError) {
@@ -252,7 +262,7 @@ export async function leaveTeam(userId: string, teamId: string): Promise<ActionR
     const { error: profileError } = await supabase
       .from('profiles')
       .update({ team_id: null })
-      .eq('id', userId);
+      .eq('id', user.id);
 
     if (profileError) {
       console.error('Error updating profile:', profileError);
@@ -329,13 +339,19 @@ export async function getTeamsLeaderboard() {
 /**
  * Récupérer l'équipe de l'utilisateur
  */
-export async function getUserTeam(userId: string) {
+export async function getUserTeam() {
   try {
+    // Récupérer l'utilisateur connecté
+    const user = await getCurrentUser();
+    if (!user) {
+      return null;
+    }
+
     // 1. Récupérer le profil avec team_id
     const { data: profile, error: profileError } = await supabase
       .from('profiles')
       .select('team_id')
-      .eq('id', userId)
+      .eq('id', user.id)
       .single();
 
     if (profileError || !profile || !profile.team_id) {
@@ -376,13 +392,19 @@ export async function getUserTeam(userId: string) {
 /**
  * Récupérer le profil complet de l'utilisateur avec ses statistiques
  */
-export async function getUserProfile(userId: string) {
+export async function getUserProfile() {
   try {
+    // Récupérer l'utilisateur connecté
+    const user = await getCurrentUser();
+    if (!user) {
+      return null;
+    }
+
     // 1. Récupérer le profil avec tous les champs
     const { data: profile, error: profileError } = await supabase
       .from('profiles')
       .select('*')
-      .eq('id', userId)
+      .eq('id', user.id)
       .single();
 
     if (profileError || !profile) {
@@ -408,7 +430,7 @@ export async function getUserProfile(userId: string) {
     const { count } = await supabase
       .from('session_participants')
       .select('*', { count: 'exact', head: true })
-      .eq('user_id', userId)
+      .eq('user_id', user.id)
       .eq('status', 'completed');
 
     // 4. Retourner le profil avec l'équipe et le compteur de sessions
@@ -426,13 +448,19 @@ export async function getUserProfile(userId: string) {
 /**
  * Récupérer les prochaines sessions de l'utilisateur
  */
-export async function getUserUpcomingSessions(userId: string) {
+export async function getUserUpcomingSessions() {
   try {
+    // Récupérer l'utilisateur connecté
+    const user = await getCurrentUser();
+    if (!user) {
+      return [];
+    }
+
     // 1. Récupérer les IDs des sessions confirmées de l'utilisateur
     const { data: participations, error: participationsError } = await supabase
       .from('session_participants')
       .select('session_id')
-      .eq('user_id', userId)
+      .eq('user_id', user.id)
       .eq('status', 'confirmed');
 
     if (participationsError) {
@@ -469,13 +497,19 @@ export async function getUserUpcomingSessions(userId: string) {
 /**
  * Récupérer l'historique des sessions complétées de l'utilisateur
  */
-export async function getUserSessionHistory(userId: string) {
+export async function getUserSessionHistory() {
   try {
+    // Récupérer l'utilisateur connecté
+    const user = await getCurrentUser();
+    if (!user) {
+      return [];
+    }
+
     // 1. Récupérer les participations complétées avec les session_ids
     const { data: participations, error: participationsError } = await supabase
       .from('session_participants')
       .select('*')
-      .eq('user_id', userId)
+      .eq('user_id', user.id)
       .eq('status', 'completed')
       .order('created_at', { ascending: false })
       .limit(5);
@@ -584,13 +618,19 @@ export async function getSessionDetails(sessionId: string) {
 /**
  * Vérifier le statut de participation de l'utilisateur à une session
  */
-export async function getUserSessionStatus(sessionId: string, userId: string) {
+export async function getUserSessionStatus(sessionId: string) {
   try {
+    // Récupérer l'utilisateur connecté
+    const user = await getCurrentUser();
+    if (!user) {
+      return null;
+    }
+
     const { data, error } = await supabase
       .from('session_participants')
       .select('status, rating')
       .eq('session_id', sessionId)
-      .eq('user_id', userId)
+      .eq('user_id', user.id)
       .maybeSingle();
 
     if (error) {
@@ -608,8 +648,17 @@ export async function getUserSessionStatus(sessionId: string, userId: string) {
 /**
  * Rejoindre une session
  */
-export async function joinSession(sessionId: string, userId: string): Promise<ActionResult> {
+export async function joinSession(sessionId: string): Promise<ActionResult> {
   try {
+    // Récupérer l'utilisateur connecté
+    const user = await getCurrentUser();
+    if (!user) {
+      return {
+        success: false,
+        error: 'Non authentifié',
+      };
+    }
+
     // 1. Vérifier que la session existe et n'est pas passée
     const { data: session, error: sessionError } = await supabase
       .from('sessions')
@@ -637,7 +686,7 @@ export async function joinSession(sessionId: string, userId: string): Promise<Ac
       .from('session_participants')
       .select('id, status')
       .eq('session_id', sessionId)
-      .eq('user_id', userId)
+      .eq('user_id', user.id)
       .maybeSingle();
 
     if (existing && existing.status === 'confirmed') {
@@ -682,7 +731,7 @@ export async function joinSession(sessionId: string, userId: string): Promise<Ac
         .from('session_participants')
         .insert({
           session_id: sessionId,
-          user_id: userId,
+          user_id: user.id,
           status: 'confirmed',
         });
 
@@ -710,14 +759,23 @@ export async function joinSession(sessionId: string, userId: string): Promise<Ac
 /**
  * Quitter une session
  */
-export async function leaveSession(sessionId: string, userId: string): Promise<ActionResult> {
+export async function leaveSession(sessionId: string): Promise<ActionResult> {
   try {
+    // Récupérer l'utilisateur connecté
+    const user = await getCurrentUser();
+    if (!user) {
+      return {
+        success: false,
+        error: 'Non authentifié',
+      };
+    }
+
     // Mettre le statut à 'cancelled' au lieu de supprimer
     const { error } = await supabase
       .from('session_participants')
       .update({ status: 'cancelled' })
       .eq('session_id', sessionId)
-      .eq('user_id', userId);
+      .eq('user_id', user.id);
 
     if (error) {
       console.error('Error leaving session:', error);
@@ -744,11 +802,19 @@ export async function leaveSession(sessionId: string, userId: string): Promise<A
  */
 export async function rateSession(
   sessionId: string,
-  userId: string,
   rating: number,
   comment?: string
 ): Promise<ActionResult> {
   try {
+    // Récupérer l'utilisateur connecté
+    const user = await getCurrentUser();
+    if (!user) {
+      return {
+        success: false,
+        error: 'Non authentifié',
+      };
+    }
+
     // 1. Mettre à jour la participation avec la note
     const { error: updateError } = await supabase
       .from('session_participants')
@@ -758,7 +824,7 @@ export async function rateSession(
         // Note: si vous voulez stocker le commentaire, ajoutez ce champ à la table
       })
       .eq('session_id', sessionId)
-      .eq('user_id', userId);
+      .eq('user_id', user.id);
 
     if (updateError) {
       console.error('Error rating session:', updateError);
@@ -778,7 +844,7 @@ export async function rateSession(
     const { data: profile, error: profileError } = await supabase
       .from('profiles')
       .select('xp_points')
-      .eq('id', userId)
+      .eq('id', user.id)
       .single();
 
     if (profileError || !profile) {
@@ -794,7 +860,7 @@ export async function rateSession(
     const { error: xpError } = await supabase
       .from('profiles')
       .update({ xp_points: newXp })
-      .eq('id', userId);
+      .eq('id', user.id);
 
     if (xpError) {
       console.error('Error updating XP:', xpError);
