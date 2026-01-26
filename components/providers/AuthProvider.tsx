@@ -91,7 +91,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     if (result.success && result.user) {
       setUser(result.user);
-      const userProfile = await fetchProfile(result.user.id);
+
+      // Attendre que le profil soit disponible (au cas où il vient d'être créé)
+      let userProfile = null;
+      let attempts = 0;
+      const maxAttempts = 3;
+
+      while (!userProfile && attempts < maxAttempts) {
+        userProfile = await fetchProfile(result.user.id);
+        if (!userProfile && attempts < maxAttempts - 1) {
+          await new Promise(resolve => setTimeout(resolve, 300));
+        }
+        attempts++;
+      }
+
       setProfile(userProfile);
     }
 
@@ -103,7 +116,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     if (result.success && result.user) {
       setUser(result.user);
-      const userProfile = await fetchProfile(result.user.id);
+
+      // Attendre que le trigger PostgreSQL crée le profil
+      // Retry avec backoff si le profil n'existe pas encore
+      let userProfile = null;
+      let attempts = 0;
+      const maxAttempts = 5;
+
+      while (!userProfile && attempts < maxAttempts) {
+        await new Promise(resolve => setTimeout(resolve, 500 * (attempts + 1)));
+        userProfile = await fetchProfile(result.user.id);
+        attempts++;
+      }
+
       setProfile(userProfile);
     }
 
