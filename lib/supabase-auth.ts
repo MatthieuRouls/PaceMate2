@@ -1,7 +1,39 @@
 'use server';
 
-import { supabase } from './supabase';
+import { createServerClient, type CookieOptions } from '@supabase/ssr';
+import { cookies } from 'next/headers';
 import type { User, Session } from '@supabase/supabase-js';
+
+// Créer un client Supabase pour les server actions avec gestion des cookies
+async function createServerSupabaseClient() {
+  const cookieStore = await cookies();
+
+  return createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      cookies: {
+        get(name: string) {
+          return cookieStore.get(name)?.value;
+        },
+        set(name: string, value: string, options: CookieOptions) {
+          try {
+            cookieStore.set({ name, value, ...options });
+          } catch (error) {
+            // Ignore errors during set (can happen in middleware)
+          }
+        },
+        remove(name: string, options: CookieOptions) {
+          try {
+            cookieStore.set({ name, value: '', ...options });
+          } catch (error) {
+            // Ignore errors during remove
+          }
+        },
+      },
+    }
+  );
+}
 
 export interface AuthResult {
   success: boolean;
@@ -18,6 +50,8 @@ export async function signUp(
   username: string
 ): Promise<AuthResult> {
   try {
+    const supabase = await createServerSupabaseClient();
+
     // 1. Créer l'utilisateur dans auth.users avec metadata
     // Le trigger PostgreSQL créera automatiquement le profil
     const { data: authData, error: authError } = await supabase.auth.signUp({
@@ -66,6 +100,8 @@ export async function signIn(
   password: string
 ): Promise<AuthResult> {
   try {
+    const supabase = await createServerSupabaseClient();
+
     const { data, error } = await supabase.auth.signInWithPassword({
       email,
       password,
@@ -96,6 +132,8 @@ export async function signIn(
  */
 export async function signOut(): Promise<AuthResult> {
   try {
+    const supabase = await createServerSupabaseClient();
+
     const { error } = await supabase.auth.signOut();
 
     if (error) {
@@ -122,6 +160,8 @@ export async function signOut(): Promise<AuthResult> {
  */
 export async function resendConfirmationEmail(email: string): Promise<AuthResult> {
   try {
+    const supabase = await createServerSupabaseClient();
+
     const { error } = await supabase.auth.resend({
       type: 'signup',
       email: email,
@@ -151,6 +191,8 @@ export async function resendConfirmationEmail(email: string): Promise<AuthResult
  */
 export async function getCurrentUser(): Promise<User | null> {
   try {
+    const supabase = await createServerSupabaseClient();
+
     const { data: { user } } = await supabase.auth.getUser();
     return user;
   } catch (error) {
@@ -164,6 +206,8 @@ export async function getCurrentUser(): Promise<User | null> {
  */
 export async function getSession(): Promise<Session | null> {
   try {
+    const supabase = await createServerSupabaseClient();
+
     const { data: { session } } = await supabase.auth.getSession();
     return session;
   } catch (error) {
