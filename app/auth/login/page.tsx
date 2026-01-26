@@ -40,7 +40,7 @@ export default function LoginPage() {
 
       if (result.success) {
         console.log('✅ Connexion réussie, redirection vers /sessions');
-        router.push('/sessions');
+        window.location.href = '/sessions';
       } else {
         console.error('❌ Échec de la connexion:', result.error);
         setError(result.error || 'Erreur lors de la connexion');

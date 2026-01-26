@@ -49,7 +49,7 @@ export default function SignupPage() {
       const result = await signUp(email, password, username);
 
       if (result.success) {
-        router.push('/sessions');
+        window.location.href = '/sessions';
       } else {
         setError(result.error || 'Erreur lors de l\'inscription');
       }
