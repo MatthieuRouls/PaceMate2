@@ -18,10 +18,16 @@ export async function signUp(
   username: string
 ): Promise<AuthResult> {
   try {
-    // 1. Créer l'utilisateur dans auth.users
+    // 1. Créer l'utilisateur dans auth.users avec metadata
+    // Le trigger PostgreSQL créera automatiquement le profil
     const { data: authData, error: authError } = await supabase.auth.signUp({
       email,
       password,
+      options: {
+        data: {
+          username: username,
+        },
+      },
     });
 
     if (authError) {
@@ -38,24 +44,7 @@ export async function signUp(
       };
     }
 
-    // 2. Créer le profil dans la table profiles
-    const { error: profileError } = await supabase.from('profiles').insert({
-      id: authData.user.id,
-      email: authData.user.email,
-      username,
-      running_level: 1,
-      xp_points: 0,
-      total_distance_km: 0,
-    });
-
-    if (profileError) {
-      console.error('Error creating profile:', profileError);
-      return {
-        success: false,
-        error: 'Erreur lors de la création du profil',
-      };
-    }
-
+    // Le profil est créé automatiquement par le trigger PostgreSQL
     return {
       success: true,
       user: authData.user,
