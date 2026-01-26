@@ -118,6 +118,35 @@ export async function signOut(): Promise<AuthResult> {
 }
 
 /**
+ * Renvoyer l'email de confirmation
+ */
+export async function resendConfirmationEmail(email: string): Promise<AuthResult> {
+  try {
+    const { error } = await supabase.auth.resend({
+      type: 'signup',
+      email: email,
+    });
+
+    if (error) {
+      return {
+        success: false,
+        error: translateAuthError(error.message),
+      };
+    }
+
+    return {
+      success: true,
+    };
+  } catch (error) {
+    console.error('ResendConfirmation error:', error);
+    return {
+      success: false,
+      error: 'Une erreur est survenue lors de l\'envoi de l\'email',
+    };
+  }
+}
+
+/**
  * Récupérer l'utilisateur actuellement connecté
  */
 export async function getCurrentUser(): Promise<User | null> {

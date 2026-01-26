@@ -16,11 +16,13 @@ export default function SignupPage() {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+    setSuccess('');
 
     // Validation
     if (!username || !email || !password || !confirmPassword) {
@@ -49,7 +51,13 @@ export default function SignupPage() {
       const result = await signUp(email, password, username);
 
       if (result.success) {
-        window.location.href = '/sessions';
+        // Afficher un message de succès demandant de vérifier l'email
+        setSuccess('Compte créé ! Vérifiez votre email pour confirmer votre inscription, puis connectez-vous.');
+        // Réinitialiser le formulaire
+        setEmail('');
+        setPassword('');
+        setConfirmPassword('');
+        setUsername('');
       } else {
         setError(result.error || 'Erreur lors de l\'inscription');
       }
@@ -203,6 +211,21 @@ export default function SignupPage() {
                 disabled={loading}
               />
             </div>
+
+            {/* Success */}
+            {success && (
+              <div
+                className="p-3 text-sm"
+                style={{
+                  backgroundColor: 'rgba(34, 197, 94, 0.1)',
+                  color: '#22c55e',
+                  borderRadius: 'var(--radius)',
+                  border: '1px solid rgba(34, 197, 94, 0.3)',
+                }}
+              >
+                {success}
+              </div>
+            )}
 
             {/* Erreur */}
             {error && (
