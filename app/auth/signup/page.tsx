@@ -20,7 +20,6 @@ export default function SignupPage() {
     setError('');
     setSuccess('');
 
-    // Validation
     if (!username || !email || !password || !confirmPassword) {
       setError('Veuillez remplir tous les champs');
       return;
@@ -48,7 +47,6 @@ export default function SignupPage() {
 
       if (result.success) {
         setSuccess('Compte créé ! Vérifiez votre email pour confirmer votre inscription, puis connectez-vous.');
-        // Réinitialiser le formulaire
         setEmail('');
         setPassword('');
         setConfirmPassword('');
@@ -65,170 +63,120 @@ export default function SignupPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4">
-      <div className="w-full max-w-md animate-fadeIn">
-        <div className="card-modern p-8">
-          {/* Logo / Titre */}
+    <div style={{
+      minHeight: '100vh',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      padding: '24px',
+      backgroundColor: 'var(--bg-secondary)'
+    }}>
+      <div style={{ width: '100%', maxWidth: '400px' }}>
+        <div className="card p-8">
+          {/* Header */}
           <div className="text-center mb-8">
-            <div className="w-16 h-16 mx-auto mb-4 rounded-xl flex items-center justify-center" style={{
-              background: 'var(--gradient-primary)',
-              boxShadow: 'var(--shadow-colored)'
-            }}>
-              <span className="text-white text-3xl font-bold">M</span>
-            </div>
-            <h1 className="text-3xl font-bold mb-2 gradient-text">
+            <h1 className="mb-2" style={{ fontSize: '28px', color: 'var(--primary)' }}>
               PaceMate
             </h1>
-            <p style={{ color: 'var(--text-light)' }}>
+            <p className="text-secondary">
               Créez votre compte
             </p>
           </div>
 
           {/* Formulaire */}
-          <form onSubmit={handleSubmit} className="space-y-5">
-            {/* Username */}
+          <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label
-                htmlFor="username"
-                className="block text-sm font-semibold mb-2"
-                style={{ color: 'var(--text-dark)' }}
-              >
-                Nom d'utilisateur
-              </label>
+              <label className="label">Nom d'utilisateur</label>
               <input
-                id="username"
                 type="text"
                 required
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
-                className="input-modern"
+                className="input"
                 placeholder="votre_pseudo"
                 minLength={3}
                 maxLength={20}
                 disabled={loading}
               />
-              <p className="text-xs mt-1" style={{ color: 'var(--text-light)' }}>
-                Entre 3 et 20 caractères
-              </p>
+              <p className="text-xs text-light mt-1">Entre 3 et 20 caractères</p>
             </div>
 
-            {/* Email */}
             <div>
-              <label
-                htmlFor="email"
-                className="block text-sm font-semibold mb-2"
-                style={{ color: 'var(--text-dark)' }}
-              >
-                Email
-              </label>
+              <label className="label">Email</label>
               <input
-                id="email"
                 type="email"
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="input-modern"
+                className="input"
                 placeholder="votre@email.com"
                 disabled={loading}
               />
             </div>
 
-            {/* Mot de passe */}
             <div>
-              <label
-                htmlFor="password"
-                className="block text-sm font-semibold mb-2"
-                style={{ color: 'var(--text-dark)' }}
-              >
-                Mot de passe
-              </label>
+              <label className="label">Mot de passe</label>
               <input
-                id="password"
                 type="password"
                 required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="input-modern"
+                className="input"
                 placeholder="••••••••"
                 minLength={6}
                 disabled={loading}
               />
-              <p className="text-xs mt-1" style={{ color: 'var(--text-light)' }}>
-                Minimum 6 caractères
-              </p>
+              <p className="text-xs text-light mt-1">Minimum 6 caractères</p>
             </div>
 
-            {/* Confirmation mot de passe */}
             <div>
-              <label
-                htmlFor="confirmPassword"
-                className="block text-sm font-semibold mb-2"
-                style={{ color: 'var(--text-dark)' }}
-              >
-                Confirmer le mot de passe
-              </label>
+              <label className="label">Confirmer le mot de passe</label>
               <input
-                id="confirmPassword"
                 type="password"
                 required
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
-                className="input-modern"
+                className="input"
                 placeholder="••••••••"
                 minLength={6}
                 disabled={loading}
               />
             </div>
 
-            {/* Success */}
             {success && (
-              <div className="p-4 text-sm font-medium animate-fadeIn" style={{
-                backgroundColor: 'rgba(34, 197, 94, 0.1)',
-                color: '#22c55e',
-                borderRadius: 'var(--radius-md)',
-                border: '1px solid rgba(34, 197, 94, 0.3)',
-              }}>
-                ✅ {success}
+              <div className="alert alert-success">
+                ✓ {success}
               </div>
             )}
 
-            {/* Erreur */}
             {error && (
-              <div className="p-4 text-sm font-medium animate-fadeIn" style={{
-                backgroundColor: 'rgba(239, 68, 68, 0.1)',
-                color: '#ef4444',
-                borderRadius: 'var(--radius-md)',
-                border: '1px solid rgba(239, 68, 68, 0.3)',
-              }}>
-                ❌ {error}
+              <div className="alert alert-error">
+                ✗ {error}
               </div>
             )}
 
-            {/* Bouton d'inscription */}
             <button
               type="submit"
               disabled={loading}
-              className="btn-gradient w-full text-lg"
+              className="btn-primary"
+              style={{ width: '100%', fontSize: '16px' }}
             >
               {loading ? (
-                <span className="flex items-center justify-center gap-2">
-                  <div className="spinner-gradient w-5 h-5"></div>
-                  Création du compte...
-                </span>
+                <div className="flex items-center gap-2">
+                  <div className="spinner"></div>
+                  Création...
+                </div>
               ) : (
                 'Créer mon compte'
               )}
             </button>
           </form>
 
-          {/* Lien connexion */}
+          {/* Link */}
           <div className="mt-6 text-center">
-            <p style={{ color: 'var(--text-light)' }}>
+            <p className="text-secondary">
               Déjà un compte ?{' '}
-              <Link
-                href="/auth/login"
-                className="font-bold link-gradient"
-              >
+              <Link href="/auth/login" style={{ fontWeight: '600' }}>
                 Se connecter
               </Link>
             </p>

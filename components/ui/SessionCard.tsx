@@ -8,7 +8,7 @@ interface SessionCardProps {
 }
 
 export default function SessionCard({ session }: SessionCardProps) {
-  // Format date et heure en français
+  // Format date et heure
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
     const days = ['Dim', 'Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam'];
@@ -23,135 +23,81 @@ export default function SessionCard({ session }: SessionCardProps) {
     return `${dayName} ${day} ${month} à ${hours}h${minutes}`;
   };
 
-  // Formater l'allure
-  const getPaceDisplay = () => {
-    if (session.walk_breaks_ok) {
-      return 'Tranquille avec pauses';
-    }
-    if (session.target_pace) {
-      return `${session.target_pace} min/km`;
-    }
-    return 'Allure libre';
-  };
-
-  // Afficher les étoiles selon le niveau
-  const renderLevel = () => {
-    return session.level_required;
-  };
-
   // Calculer les places restantes
   const spotsLeft = session.max_participants - (session.participants_count || 0);
-  const spotsText = `${session.participants_count || 0}/${session.max_participants}`;
-
-  // Emoji pour le type de session
-  const getSessionTypeEmoji = () => {
-    switch (session.session_type) {
-      case 'casual':
-        return '🚶';
-      case 'recovery':
-        return '💆';
-      case 'tempo':
-        return '⚡';
-      case 'long_run':
-        return '🏃‍♂️';
-      case 'intervals':
-        return '⏱️';
-      default:
-        return '🏃';
-    }
-  };
+  const isFull = spotsLeft === 0;
 
   return (
-    <Link href={`/sessions/${session.id}`} className="block">
-      <div className="card-modern cursor-pointer group">
-        {/* Header avec badge type */}
-        <div className="flex items-start justify-between mb-4">
-          <div className="flex-1">
-            <h3 className="text-xl font-bold mb-1 group-hover:gradient-text transition-all" style={{
-              color: 'var(--text-dark)'
+    <Link href={`/sessions/${session.id}`}>
+      <div className="card card-clickable">
+        {/* Header */}
+        <div className="mb-4">
+          <h3 className="mb-2">{session.title}</h3>
+          {session.description && (
+            <p className="text-sm text-secondary" style={{
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              display: '-webkit-box',
+              WebkitLineClamp: 2,
+              WebkitBoxOrient: 'vertical'
             }}>
-              {session.title}
-            </h3>
-            {session.description && (
-              <p className="text-sm line-clamp-2" style={{ color: 'var(--text-light)' }}>
-                {session.description}
-              </p>
-            )}
-          </div>
-          {session.session_type && (
-            <div className="ml-2">
-              <span className="text-2xl">{getSessionTypeEmoji()}</span>
-            </div>
+              {session.description}
+            </p>
           )}
         </div>
 
-        {/* Informations principales */}
+        {/* Infos */}
         <div className="space-y-3 mb-4">
-          {/* Date et heure */}
-          <div className="flex items-center gap-3">
-            <span className="text-lg">📅</span>
-            <span className="font-medium" style={{ color: 'var(--text-dark)' }}>
-              {formatDate(session.start_time)}
-            </span>
+          {/* Date */}
+          <div className="flex items-center gap-3 text-sm">
+            <span>📅</span>
+            <span className="font-semibold">{formatDate(session.start_time)}</span>
           </div>
 
           {/* Lieu */}
-          <div className="flex items-center gap-3">
-            <span className="text-lg">📍</span>
-            <span style={{ color: 'var(--text-dark)' }}>{session.location_name}</span>
+          <div className="flex items-center gap-3 text-sm">
+            <span>📍</span>
+            <span>{session.location_name}</span>
           </div>
 
-          {/* Allure et Distance */}
-          <div className="flex items-center gap-4">
+          {/* Distance et allure */}
+          <div className="flex items-center gap-4 text-sm">
             <div className="flex items-center gap-2">
-              <span className="text-lg">⚡</span>
-              <span className="font-semibold gradient-text">
-                {getPaceDisplay()}
-              </span>
+              <span>🏃</span>
+              <span className="font-semibold">{session.distance_km} km</span>
             </div>
-            <div className="flex items-center gap-2">
-              <span className="text-lg">🏃</span>
-              <span className="font-semibold" style={{ color: 'var(--text-dark)' }}>
-                {session.distance_km} km
-              </span>
-            </div>
-          </div>
-        </div>
-
-        {/* Divider */}
-        <div className="divider-gradient"></div>
-
-        {/* Footer avec niveau et places */}
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <span className="badge-gradient">
-              Niveau {renderLevel()}
-            </span>
-          </div>
-          <div className={`text-sm font-bold flex items-center gap-2 ${spotsLeft === 0 ? '' : ''}`} style={{
-            color: spotsLeft === 0 ? '#ef4444' : 'var(--primary-blue)'
-          }}>
-            {spotsLeft === 0 ? (
-              <>
-                <span>❌</span>
-                <span>Complet</span>
-              </>
-            ) : (
-              <>
-                <span>👥</span>
-                <span>{spotsText}</span>
-              </>
+            {session.target_pace && (
+              <div className="flex items-center gap-2">
+                <span>⚡</span>
+                <span>{session.target_pace} min/km</span>
+              </div>
             )}
           </div>
         </div>
 
-        {/* Indicator pour marquer qu'il reste peu de places */}
-        {spotsLeft > 0 && spotsLeft <= 2 && (
-          <div className="mt-3 text-xs font-semibold text-center px-3 py-1.5 rounded-full" style={{
-            background: 'rgba(255, 107, 157, 0.1)',
-            color: 'var(--primary-pink)'
-          }}>
-            ⚠️ Plus que {spotsLeft} place{spotsLeft > 1 ? 's' : ''} !
+        <div className="divider"></div>
+
+        {/* Footer */}
+        <div className="flex items-center justify-between">
+          <span className="badge badge-primary">
+            Niveau {session.level_required}
+          </span>
+
+          <div className="text-sm font-semibold">
+            {isFull ? (
+              <span style={{ color: '#DC2626' }}>Complet</span>
+            ) : (
+              <span style={{ color: 'var(--text-secondary)' }}>
+                {session.participants_count || 0}/{session.max_participants} places
+              </span>
+            )}
+          </div>
+        </div>
+
+        {/* Warning si peu de places */}
+        {!isFull && spotsLeft <= 2 && (
+          <div className="mt-3 badge badge-warning" style={{ width: '100%', justifyContent: 'center' }}>
+            Plus que {spotsLeft} place{spotsLeft > 1 ? 's' : ''} !
           </div>
         )}
       </div>

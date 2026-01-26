@@ -22,14 +22,8 @@ export default function LoginPage() {
     setSuccess('');
     setNeedsEmailConfirmation(false);
 
-    // Validation
     if (!email || !password) {
       setError('Veuillez remplir tous les champs');
-      return;
-    }
-
-    if (password.length < 6) {
-      setError('Le mot de passe doit contenir au moins 6 caractères');
       return;
     }
 
@@ -39,14 +33,12 @@ export default function LoginPage() {
       const result = await signIn(email, password);
 
       if (result.success) {
-        // Attendre un peu pour que la session soit bien établie
         await new Promise(resolve => setTimeout(resolve, 500));
         window.location.href = '/sessions';
       } else {
         const errorMsg = result.error || 'Erreur lors de la connexion';
         setError(errorMsg);
 
-        // Détecter si c'est une erreur de confirmation d'email
         if (errorMsg.includes('confirmer votre email') || errorMsg.includes('Email not confirmed')) {
           setNeedsEmailConfirmation(true);
         }
@@ -87,132 +79,109 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4">
-      <div className="w-full max-w-md animate-fadeIn">
-        <div className="card-modern p-8">
-          {/* Logo / Titre */}
+    <div style={{
+      minHeight: '100vh',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      padding: '24px',
+      backgroundColor: 'var(--bg-secondary)'
+    }}>
+      <div style={{ width: '100%', maxWidth: '400px' }}>
+        <div className="card p-8">
+          {/* Header */}
           <div className="text-center mb-8">
-            <div className="w-16 h-16 mx-auto mb-4 rounded-xl flex items-center justify-center" style={{
-              background: 'var(--gradient-primary)',
-              boxShadow: 'var(--shadow-colored)'
-            }}>
-              <span className="text-white text-3xl font-bold">M</span>
-            </div>
-            <h1 className="text-3xl font-bold mb-2 gradient-text">
+            <h1 className="mb-2" style={{ fontSize: '28px', color: 'var(--primary)' }}>
               PaceMate
             </h1>
-            <p style={{ color: 'var(--text-light)' }}>
+            <p className="text-secondary">
               Connectez-vous à votre compte
             </p>
           </div>
 
           {/* Formulaire */}
-          <form onSubmit={handleSubmit} className="space-y-5">
-            {/* Email */}
+          <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label
-                htmlFor="email"
-                className="block text-sm font-semibold mb-2"
-                style={{ color: 'var(--text-dark)' }}
-              >
-                Email
-              </label>
+              <label className="label">Email</label>
               <input
-                id="email"
                 type="email"
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="input-modern"
+                className="input"
                 placeholder="votre@email.com"
                 disabled={loading}
               />
             </div>
 
-            {/* Mot de passe */}
             <div>
-              <label
-                htmlFor="password"
-                className="block text-sm font-semibold mb-2"
-                style={{ color: 'var(--text-dark)' }}
-              >
-                Mot de passe
-              </label>
+              <label className="label">Mot de passe</label>
               <input
-                id="password"
                 type="password"
                 required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="input-modern"
+                className="input"
                 placeholder="••••••••"
                 minLength={6}
                 disabled={loading}
               />
             </div>
 
-            {/* Success */}
             {success && (
-              <div className="p-4 text-sm font-medium animate-fadeIn" style={{
-                backgroundColor: 'rgba(34, 197, 94, 0.1)',
-                color: '#22c55e',
-                borderRadius: 'var(--radius-md)',
-                border: '1px solid rgba(34, 197, 94, 0.3)',
-              }}>
-                ✅ {success}
+              <div className="alert alert-success">
+                ✓ {success}
               </div>
             )}
 
-            {/* Erreur */}
             {error && (
-              <div className="p-4 text-sm font-medium animate-fadeIn" style={{
-                backgroundColor: 'rgba(239, 68, 68, 0.1)',
-                color: '#ef4444',
-                borderRadius: 'var(--radius-md)',
-                border: '1px solid rgba(239, 68, 68, 0.3)',
-              }}>
-                ❌ {error}
+              <div className="alert alert-error">
+                ✗ {error}
                 {needsEmailConfirmation && (
                   <div className="mt-3">
                     <button
                       type="button"
                       onClick={handleResendEmail}
                       disabled={resending}
-                      className="text-sm underline hover:no-underline font-semibold"
-                      style={{ color: '#ef4444' }}
+                      style={{
+                        textDecoration: 'underline',
+                        color: '#DC2626',
+                        background: 'none',
+                        border: 'none',
+                        cursor: 'pointer',
+                        padding: 0,
+                        fontWeight: '600'
+                      }}
                     >
-                      {resending ? 'Envoi...' : '📧 Renvoyer l\'email de confirmation'}
+                      {resending ? 'Envoi...' : 'Renvoyer l\'email de confirmation'}
                     </button>
                   </div>
                 )}
               </div>
             )}
 
-            {/* Bouton de connexion */}
             <button
               type="submit"
               disabled={loading}
-              className="btn-gradient w-full text-lg"
+              className="btn-primary"
+              style={{ width: '100%', fontSize: '16px' }}
             >
               {loading ? (
-                <span className="flex items-center justify-center gap-2">
-                  <div className="spinner-gradient w-5 h-5"></div>
+                <div className="flex items-center gap-2">
+                  <div className="spinner"></div>
                   Connexion...
-                </span>
+                </div>
               ) : (
                 'Se connecter'
               )}
             </button>
           </form>
 
-          {/* Lien inscription */}
+          {/* Link */}
           <div className="mt-6 text-center">
-            <p style={{ color: 'var(--text-light)' }}>
+            <p className="text-secondary">
               Pas encore de compte ?{' '}
-              <Link
-                href="/auth/signup"
-                className="font-bold link-gradient"
-              >
+              <Link href="/auth/signup" style={{ fontWeight: '600' }}>
                 S'inscrire
               </Link>
             </p>
