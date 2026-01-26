@@ -1,16 +1,12 @@
 'use client';
 
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useAuth } from '@/components/providers/AuthProvider';
-import { useTheme } from '@/components/providers/ThemeProvider';
 import { resendConfirmationEmail } from '@/lib/supabase-auth';
 
 export default function LoginPage() {
-  const router = useRouter();
   const { signIn } = useAuth();
-  const { theme } = useTheme();
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -40,17 +36,13 @@ export default function LoginPage() {
     setLoading(true);
 
     try {
-      console.log('🔐 Tentative de connexion avec:', email);
       const result = await signIn(email, password);
-      console.log('📊 Résultat de la connexion:', result);
 
       if (result.success) {
-        console.log('✅ Connexion réussie, attente puis redirection vers /sessions');
         // Attendre un peu pour que la session soit bien établie
         await new Promise(resolve => setTimeout(resolve, 500));
         window.location.href = '/sessions';
       } else {
-        console.error('❌ Échec de la connexion:', result.error);
         const errorMsg = result.error || 'Erreur lors de la connexion';
         setError(errorMsg);
 
@@ -60,8 +52,8 @@ export default function LoginPage() {
         }
       }
     } catch (err) {
-      console.error('💥 Erreur inattendue:', err);
       setError('Une erreur est survenue');
+      console.error(err);
     } finally {
       setLoading(false);
     }
@@ -96,29 +88,32 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4">
-      <div className="w-full max-w-md">
-        <div className="card p-8">
+      <div className="w-full max-w-md animate-fadeIn">
+        <div className="card-modern p-8">
           {/* Logo / Titre */}
           <div className="text-center mb-8">
-            <h1
-              className="text-3xl font-bold mb-2"
-              style={{ color: 'var(--color-primary)' }}
-            >
+            <div className="w-16 h-16 mx-auto mb-4 rounded-xl flex items-center justify-center" style={{
+              background: 'var(--gradient-primary)',
+              boxShadow: 'var(--shadow-colored)'
+            }}>
+              <span className="text-white text-3xl font-bold">M</span>
+            </div>
+            <h1 className="text-3xl font-bold mb-2 gradient-text">
               PaceMate
             </h1>
-            <p style={{ color: 'var(--color-secondary)' }}>
+            <p style={{ color: 'var(--text-light)' }}>
               Connectez-vous à votre compte
             </p>
           </div>
 
           {/* Formulaire */}
-          <form onSubmit={handleSubmit} className="space-y-6">
+          <form onSubmit={handleSubmit} className="space-y-5">
             {/* Email */}
             <div>
               <label
                 htmlFor="email"
-                className="block text-sm font-medium mb-2"
-                style={{ color: 'var(--color-text)' }}
+                className="block text-sm font-semibold mb-2"
+                style={{ color: 'var(--text-dark)' }}
               >
                 Email
               </label>
@@ -128,13 +123,7 @@ export default function LoginPage() {
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full px-4 py-2 border"
-                style={{
-                  borderRadius: 'var(--radius)',
-                  borderColor: 'var(--color-border)',
-                  backgroundColor: 'var(--color-background)',
-                  color: 'var(--color-text)',
-                }}
+                className="input-modern"
                 placeholder="votre@email.com"
                 disabled={loading}
               />
@@ -144,8 +133,8 @@ export default function LoginPage() {
             <div>
               <label
                 htmlFor="password"
-                className="block text-sm font-medium mb-2"
-                style={{ color: 'var(--color-text)' }}
+                className="block text-sm font-semibold mb-2"
+                style={{ color: 'var(--text-dark)' }}
               >
                 Mot de passe
               </label>
@@ -155,13 +144,7 @@ export default function LoginPage() {
                 required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full px-4 py-2 border"
-                style={{
-                  borderRadius: 'var(--radius)',
-                  borderColor: 'var(--color-border)',
-                  backgroundColor: 'var(--color-background)',
-                  color: 'var(--color-text)',
-                }}
+                className="input-modern"
                 placeholder="••••••••"
                 minLength={6}
                 disabled={loading}
@@ -170,41 +153,35 @@ export default function LoginPage() {
 
             {/* Success */}
             {success && (
-              <div
-                className="p-3 text-sm"
-                style={{
-                  backgroundColor: 'rgba(34, 197, 94, 0.1)',
-                  color: '#22c55e',
-                  borderRadius: 'var(--radius)',
-                  border: '1px solid rgba(34, 197, 94, 0.3)',
-                }}
-              >
-                {success}
+              <div className="p-4 text-sm font-medium animate-fadeIn" style={{
+                backgroundColor: 'rgba(34, 197, 94, 0.1)',
+                color: '#22c55e',
+                borderRadius: 'var(--radius-md)',
+                border: '1px solid rgba(34, 197, 94, 0.3)',
+              }}>
+                ✅ {success}
               </div>
             )}
 
             {/* Erreur */}
             {error && (
-              <div
-                className="p-3 text-sm"
-                style={{
-                  backgroundColor: 'rgba(239, 68, 68, 0.1)',
-                  color: '#ef4444',
-                  borderRadius: 'var(--radius)',
-                  border: '1px solid rgba(239, 68, 68, 0.3)',
-                }}
-              >
-                {error}
+              <div className="p-4 text-sm font-medium animate-fadeIn" style={{
+                backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                color: '#ef4444',
+                borderRadius: 'var(--radius-md)',
+                border: '1px solid rgba(239, 68, 68, 0.3)',
+              }}>
+                ❌ {error}
                 {needsEmailConfirmation && (
-                  <div className="mt-2">
+                  <div className="mt-3">
                     <button
                       type="button"
                       onClick={handleResendEmail}
                       disabled={resending}
-                      className="text-xs underline hover:no-underline"
+                      className="text-sm underline hover:no-underline font-semibold"
                       style={{ color: '#ef4444' }}
                     >
-                      {resending ? 'Envoi...' : 'Renvoyer l\'email de confirmation'}
+                      {resending ? 'Envoi...' : '📧 Renvoyer l\'email de confirmation'}
                     </button>
                   </div>
                 )}
@@ -215,28 +192,26 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-3 font-semibold transition-all"
-              style={{
-                backgroundColor: loading
-                  ? 'var(--color-border)'
-                  : 'var(--color-primary)',
-                color: 'white',
-                borderRadius: 'var(--radius)',
-                cursor: loading ? 'not-allowed' : 'pointer',
-              }}
+              className="btn-gradient w-full text-lg"
             >
-              {loading ? 'Connexion...' : 'Se connecter'}
+              {loading ? (
+                <span className="flex items-center justify-center gap-2">
+                  <div className="spinner-gradient w-5 h-5"></div>
+                  Connexion...
+                </span>
+              ) : (
+                'Se connecter'
+              )}
             </button>
           </form>
 
           {/* Lien inscription */}
           <div className="mt-6 text-center">
-            <p style={{ color: 'var(--color-secondary)' }}>
+            <p style={{ color: 'var(--text-light)' }}>
               Pas encore de compte ?{' '}
               <Link
                 href="/auth/signup"
-                className="font-semibold hover:underline"
-                style={{ color: 'var(--color-primary)' }}
+                className="font-bold link-gradient"
               >
                 S'inscrire
               </Link>

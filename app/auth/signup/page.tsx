@@ -1,15 +1,11 @@
 'use client';
 
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useAuth } from '@/components/providers/AuthProvider';
-import { useTheme } from '@/components/providers/ThemeProvider';
 
 export default function SignupPage() {
-  const router = useRouter();
   const { signUp } = useAuth();
-  const { theme } = useTheme();
 
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
@@ -51,7 +47,6 @@ export default function SignupPage() {
       const result = await signUp(email, password, username);
 
       if (result.success) {
-        // Afficher un message de succès demandant de vérifier l'email
         setSuccess('Compte créé ! Vérifiez votre email pour confirmer votre inscription, puis connectez-vous.');
         // Réinitialiser le formulaire
         setEmail('');
@@ -71,17 +66,20 @@ export default function SignupPage() {
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4">
-      <div className="w-full max-w-md">
-        <div className="card p-8">
+      <div className="w-full max-w-md animate-fadeIn">
+        <div className="card-modern p-8">
           {/* Logo / Titre */}
           <div className="text-center mb-8">
-            <h1
-              className="text-3xl font-bold mb-2"
-              style={{ color: 'var(--color-primary)' }}
-            >
+            <div className="w-16 h-16 mx-auto mb-4 rounded-xl flex items-center justify-center" style={{
+              background: 'var(--gradient-primary)',
+              boxShadow: 'var(--shadow-colored)'
+            }}>
+              <span className="text-white text-3xl font-bold">M</span>
+            </div>
+            <h1 className="text-3xl font-bold mb-2 gradient-text">
               PaceMate
             </h1>
-            <p style={{ color: 'var(--color-secondary)' }}>
+            <p style={{ color: 'var(--text-light)' }}>
               Créez votre compte
             </p>
           </div>
@@ -92,8 +90,8 @@ export default function SignupPage() {
             <div>
               <label
                 htmlFor="username"
-                className="block text-sm font-medium mb-2"
-                style={{ color: 'var(--color-text)' }}
+                className="block text-sm font-semibold mb-2"
+                style={{ color: 'var(--text-dark)' }}
               >
                 Nom d'utilisateur
               </label>
@@ -103,22 +101,13 @@ export default function SignupPage() {
                 required
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
-                className="w-full px-4 py-2 border"
-                style={{
-                  borderRadius: 'var(--radius)',
-                  borderColor: 'var(--color-border)',
-                  backgroundColor: 'var(--color-background)',
-                  color: 'var(--color-text)',
-                }}
+                className="input-modern"
                 placeholder="votre_pseudo"
                 minLength={3}
                 maxLength={20}
                 disabled={loading}
               />
-              <p
-                className="text-xs mt-1"
-                style={{ color: 'var(--color-secondary)' }}
-              >
+              <p className="text-xs mt-1" style={{ color: 'var(--text-light)' }}>
                 Entre 3 et 20 caractères
               </p>
             </div>
@@ -127,8 +116,8 @@ export default function SignupPage() {
             <div>
               <label
                 htmlFor="email"
-                className="block text-sm font-medium mb-2"
-                style={{ color: 'var(--color-text)' }}
+                className="block text-sm font-semibold mb-2"
+                style={{ color: 'var(--text-dark)' }}
               >
                 Email
               </label>
@@ -138,13 +127,7 @@ export default function SignupPage() {
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full px-4 py-2 border"
-                style={{
-                  borderRadius: 'var(--radius)',
-                  borderColor: 'var(--color-border)',
-                  backgroundColor: 'var(--color-background)',
-                  color: 'var(--color-text)',
-                }}
+                className="input-modern"
                 placeholder="votre@email.com"
                 disabled={loading}
               />
@@ -154,8 +137,8 @@ export default function SignupPage() {
             <div>
               <label
                 htmlFor="password"
-                className="block text-sm font-medium mb-2"
-                style={{ color: 'var(--color-text)' }}
+                className="block text-sm font-semibold mb-2"
+                style={{ color: 'var(--text-dark)' }}
               >
                 Mot de passe
               </label>
@@ -165,21 +148,12 @@ export default function SignupPage() {
                 required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full px-4 py-2 border"
-                style={{
-                  borderRadius: 'var(--radius)',
-                  borderColor: 'var(--color-border)',
-                  backgroundColor: 'var(--color-background)',
-                  color: 'var(--color-text)',
-                }}
+                className="input-modern"
                 placeholder="••••••••"
                 minLength={6}
                 disabled={loading}
               />
-              <p
-                className="text-xs mt-1"
-                style={{ color: 'var(--color-secondary)' }}
-              >
+              <p className="text-xs mt-1" style={{ color: 'var(--text-light)' }}>
                 Minimum 6 caractères
               </p>
             </div>
@@ -188,8 +162,8 @@ export default function SignupPage() {
             <div>
               <label
                 htmlFor="confirmPassword"
-                className="block text-sm font-medium mb-2"
-                style={{ color: 'var(--color-text)' }}
+                className="block text-sm font-semibold mb-2"
+                style={{ color: 'var(--text-dark)' }}
               >
                 Confirmer le mot de passe
               </label>
@@ -199,13 +173,7 @@ export default function SignupPage() {
                 required
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
-                className="w-full px-4 py-2 border"
-                style={{
-                  borderRadius: 'var(--radius)',
-                  borderColor: 'var(--color-border)',
-                  backgroundColor: 'var(--color-background)',
-                  color: 'var(--color-text)',
-                }}
+                className="input-modern"
                 placeholder="••••••••"
                 minLength={6}
                 disabled={loading}
@@ -214,31 +182,25 @@ export default function SignupPage() {
 
             {/* Success */}
             {success && (
-              <div
-                className="p-3 text-sm"
-                style={{
-                  backgroundColor: 'rgba(34, 197, 94, 0.1)',
-                  color: '#22c55e',
-                  borderRadius: 'var(--radius)',
-                  border: '1px solid rgba(34, 197, 94, 0.3)',
-                }}
-              >
-                {success}
+              <div className="p-4 text-sm font-medium animate-fadeIn" style={{
+                backgroundColor: 'rgba(34, 197, 94, 0.1)',
+                color: '#22c55e',
+                borderRadius: 'var(--radius-md)',
+                border: '1px solid rgba(34, 197, 94, 0.3)',
+              }}>
+                ✅ {success}
               </div>
             )}
 
             {/* Erreur */}
             {error && (
-              <div
-                className="p-3 text-sm"
-                style={{
-                  backgroundColor: 'rgba(239, 68, 68, 0.1)',
-                  color: '#ef4444',
-                  borderRadius: 'var(--radius)',
-                  border: '1px solid rgba(239, 68, 68, 0.3)',
-                }}
-              >
-                {error}
+              <div className="p-4 text-sm font-medium animate-fadeIn" style={{
+                backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                color: '#ef4444',
+                borderRadius: 'var(--radius-md)',
+                border: '1px solid rgba(239, 68, 68, 0.3)',
+              }}>
+                ❌ {error}
               </div>
             )}
 
@@ -246,28 +208,26 @@ export default function SignupPage() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-3 font-semibold transition-all"
-              style={{
-                backgroundColor: loading
-                  ? 'var(--color-border)'
-                  : 'var(--color-primary)',
-                color: 'white',
-                borderRadius: 'var(--radius)',
-                cursor: loading ? 'not-allowed' : 'pointer',
-              }}
+              className="btn-gradient w-full text-lg"
             >
-              {loading ? 'Création du compte...' : 'Créer mon compte'}
+              {loading ? (
+                <span className="flex items-center justify-center gap-2">
+                  <div className="spinner-gradient w-5 h-5"></div>
+                  Création du compte...
+                </span>
+              ) : (
+                'Créer mon compte'
+              )}
             </button>
           </form>
 
           {/* Lien connexion */}
           <div className="mt-6 text-center">
-            <p style={{ color: 'var(--color-secondary)' }}>
+            <p style={{ color: 'var(--text-light)' }}>
               Déjà un compte ?{' '}
               <Link
                 href="/auth/login"
-                className="font-semibold hover:underline"
-                style={{ color: 'var(--color-primary)' }}
+                className="font-bold link-gradient"
               >
                 Se connecter
               </Link>
