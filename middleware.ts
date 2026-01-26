@@ -3,7 +3,7 @@ import type { NextRequest } from 'next/server';
 import { createServerClient, type CookieOptions } from '@supabase/ssr';
 
 // Routes publiques (pas d'authentification requise)
-const publicRoutes = ['/', '/auth/login', '/auth/signup'];
+const publicRoutes = ['/', '/auth/login', '/auth/signup', '/auth/callback'];
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
