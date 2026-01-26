@@ -3,12 +3,10 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useState } from 'react';
-import { useTheme } from '../providers/ThemeProvider';
 import { useAuth } from '../providers/AuthProvider';
 
 export default function Navbar() {
   const pathname = usePathname();
-  const { theme, toggleTheme } = useTheme();
   const { profile, signOut, loading } = useAuth();
   const [dropdownOpen, setDropdownOpen] = useState(false);
 
@@ -43,101 +41,82 @@ export default function Navbar() {
   }
 
   return (
-    <nav
-      className="fixed top-0 left-0 right-0 z-50 shadow-md"
-      style={{
-        backgroundColor: theme === 'elite' ? '#1a1a2e' : '#ffffff',
-        borderBottom: `1px solid ${theme === 'elite' ? 'rgba(167, 139, 250, 0.2)' : 'rgba(0, 0, 0, 0.1)'}`,
-      }}
-    >
+    <nav className="navbar-glass fixed top-0 left-0 right-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16">
+        <div className="flex items-center justify-between h-18">
           {/* Logo */}
-          <Link href="/" className="flex items-center gap-2 font-bold text-xl hover:opacity-80 transition-opacity">
-            <span style={{ color: 'var(--color-primary)' }}>⚡</span>
-            <span>PaceMate</span>
+          <Link
+            href="/"
+            className="flex items-center gap-3 font-bold text-xl hover:opacity-80 transition-opacity"
+          >
+            <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{
+              background: 'var(--gradient-primary)',
+              boxShadow: 'var(--shadow-colored)'
+            }}>
+              <span className="text-white text-2xl font-bold">M</span>
+            </div>
+            <span className="gradient-text hidden sm:inline">PaceMate</span>
           </Link>
 
           {/* Navigation centrale - Desktop */}
-          <div className="hidden md:flex items-center gap-8">
+          <div className="hidden md:flex items-center gap-2">
             {navLinks.map((link) => (
               <Link
                 key={link.href}
                 href={link.href}
-                className={`flex items-center gap-2 px-3 py-2 rounded-lg font-medium transition-all ${
+                className={`flex items-center gap-2 px-4 py-2 font-medium transition-all ${
                   isActive(link.href)
-                    ? 'font-bold'
+                    ? 'font-semibold'
                     : 'opacity-75 hover:opacity-100'
                 }`}
                 style={{
-                  borderRadius: 'var(--radius)',
-                  color: isActive(link.href) ? 'var(--color-primary)' : 'inherit',
+                  borderRadius: 'var(--radius-md)',
+                  color: isActive(link.href) ? 'var(--primary-pink)' : 'var(--text-dark)',
                   backgroundColor: isActive(link.href)
-                    ? theme === 'elite'
-                      ? 'rgba(167, 139, 250, 0.1)'
-                      : 'rgba(34, 197, 94, 0.1)'
+                    ? 'rgba(255, 107, 157, 0.1)'
                     : 'transparent',
                 }}
               >
-                <span>{link.icon}</span>
+                <span className="text-lg">{link.icon}</span>
                 <span>{link.label}</span>
               </Link>
             ))}
           </div>
 
           {/* Navigation mobile */}
-          <div className="flex md:hidden items-center gap-2">
+          <div className="flex md:hidden items-center gap-1">
             {navLinks.map((link) => (
               <Link
                 key={link.href}
                 href={link.href}
-                className={`px-3 py-2 rounded-lg transition-all ${
+                className={`px-3 py-2 transition-all ${
                   isActive(link.href) ? '' : 'opacity-60'
                 }`}
                 style={{
-                  borderRadius: 'var(--radius)',
-                  color: isActive(link.href) ? 'var(--color-primary)' : 'inherit',
+                  borderRadius: 'var(--radius-md)',
+                  color: isActive(link.href) ? 'var(--primary-pink)' : 'var(--text-dark)',
                   backgroundColor: isActive(link.href)
-                    ? theme === 'elite'
-                      ? 'rgba(167, 139, 250, 0.1)'
-                      : 'rgba(34, 197, 94, 0.1)'
+                    ? 'rgba(255, 107, 157, 0.1)'
                     : 'transparent',
                 }}
                 title={link.label}
               >
-                {link.icon}
+                <span className="text-xl">{link.icon}</span>
               </Link>
             ))}
           </div>
 
           {/* Actions à droite */}
-          <div className="flex items-center gap-4">
-            {/* Toggle thème */}
-            <button
-              onClick={toggleTheme}
-              className="p-2 rounded-lg hover:bg-opacity-80 transition-all"
-              style={{
-                borderRadius: 'var(--radius)',
-                backgroundColor: theme === 'elite'
-                  ? 'rgba(167, 139, 250, 0.1)'
-                  : 'rgba(34, 197, 94, 0.1)',
-              }}
-              title={`Passer en mode ${theme === 'discovery' ? 'Elite' : 'Discovery'}`}
-            >
-              <span className="text-xl">{theme === 'discovery' ? '☀️' : '🌙'}</span>
-            </button>
-
+          <div className="flex items-center gap-3">
             {/* Avatar utilisateur avec dropdown */}
             {!loading && profile ? (
               <div className="relative">
                 <button
                   onClick={() => setDropdownOpen(!dropdownOpen)}
-                  className="w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold hover:scale-105 transition-transform"
+                  className="avatar-gradient w-11 h-11 flex items-center justify-center text-sm font-bold hover:scale-105 transition-transform"
                   style={{
-                    backgroundColor: theme === 'elite'
-                      ? 'rgba(167, 139, 250, 0.2)'
-                      : 'rgba(34, 197, 94, 0.2)',
-                    color: 'var(--color-primary)',
+                    background: 'var(--gradient-primary)',
+                    color: 'var(--text-white)',
                   }}
                   title={profile.username}
                 >
@@ -155,19 +134,17 @@ export default function Navbar() {
 
                     {/* Menu */}
                     <div
-                      className="absolute right-0 mt-2 w-48 py-2 shadow-lg z-50"
+                      className="absolute right-0 mt-2 w-56 py-2 z-50 glass animate-fadeIn"
                       style={{
-                        backgroundColor: theme === 'elite' ? '#1a1a2e' : '#ffffff',
-                        borderRadius: 'var(--radius)',
-                        border: `1px solid ${theme === 'elite' ? 'rgba(167, 139, 250, 0.2)' : 'rgba(0, 0, 0, 0.1)'}`,
+                        borderRadius: 'var(--radius-lg)',
                       }}
                     >
                       {/* Username */}
-                      <div className="px-4 py-2 border-b" style={{ borderColor: 'var(--color-border)' }}>
-                        <p className="font-semibold" style={{ color: 'var(--color-text)' }}>
+                      <div className="px-4 py-3 border-b" style={{ borderColor: 'rgba(255,255,255,0.3)' }}>
+                        <p className="font-semibold" style={{ color: 'var(--text-dark)' }}>
                           {profile.username}
                         </p>
-                        <p className="text-xs" style={{ color: 'var(--color-secondary)' }}>
+                        <p className="text-sm" style={{ color: 'var(--text-light)' }}>
                           {profile.xp_points || 0} XP
                         </p>
                       </div>
@@ -175,24 +152,26 @@ export default function Navbar() {
                       {/* Mon profil */}
                       <Link
                         href="/profile"
-                        className="block px-4 py-2 hover:bg-opacity-80 transition-colors"
+                        className="flex items-center gap-2 px-4 py-3 hover:bg-opacity-50 transition-colors"
                         style={{
-                          color: 'var(--color-text)',
+                          color: 'var(--text-dark)',
                         }}
                         onClick={() => setDropdownOpen(false)}
                       >
-                        👤 Mon profil
+                        <span>👤</span>
+                        <span>Mon profil</span>
                       </Link>
 
                       {/* Déconnexion */}
                       <button
                         onClick={handleSignOut}
-                        className="w-full text-left px-4 py-2 hover:bg-opacity-80 transition-colors"
+                        className="w-full flex items-center gap-2 text-left px-4 py-3 hover:bg-opacity-50 transition-colors"
                         style={{
                           color: '#ef4444',
                         }}
                       >
-                        🚪 Déconnexion
+                        <span>🚪</span>
+                        <span>Déconnexion</span>
                       </button>
                     </div>
                   </>
@@ -204,22 +183,17 @@ export default function Navbar() {
                 <div className="flex items-center gap-2">
                   <Link
                     href="/auth/login"
-                    className="px-4 py-2 rounded-lg font-medium hover:opacity-80 transition-opacity"
+                    className="px-4 py-2 font-medium hover:opacity-80 transition-opacity"
                     style={{
-                      borderRadius: 'var(--radius)',
-                      color: 'var(--color-primary)',
+                      borderRadius: 'var(--radius-md)',
+                      color: 'var(--primary-pink)',
                     }}
                   >
                     Connexion
                   </Link>
                   <Link
                     href="/auth/signup"
-                    className="px-4 py-2 rounded-lg font-medium hover:opacity-90 transition-opacity"
-                    style={{
-                      borderRadius: 'var(--radius)',
-                      backgroundColor: 'var(--color-primary)',
-                      color: 'white',
-                    }}
+                    className="btn-gradient"
                   >
                     Inscription
                   </Link>
