@@ -31,55 +31,100 @@ export default function Navbar() {
   return (
     <nav className="navbar fixed top-0 left-0 right-0 z-50">
       <div className="container">
-        <div className="flex items-center justify-between" style={{ height: '64px' }}>
+        <div style={{
+          height: '72px',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          gap: '48px'
+        }}>
           {/* Logo */}
-          <Link href="/" className="flex items-center">
+          <Link href="/" style={{
+            display: 'flex',
+            alignItems: 'center',
+            flexShrink: 0
+          }}>
             <span style={{
-              fontSize: '24px',
+              fontSize: '26px',
               fontWeight: '700',
-              color: 'var(--primary)'
+              color: 'var(--primary)',
+              letterSpacing: '-0.5px'
             }}>
               PaceMate
             </span>
           </Link>
 
           {/* Navigation - Desktop */}
-          <div className="hidden md:flex items-center gap-6">
+          <div style={{
+            display: 'none',
+            alignItems: 'center',
+            gap: '32px',
+            flex: 1,
+            justifyContent: 'center'
+          }} className="md:flex">
             {navLinks.map((link) => (
               <Link
                 key={link.href}
                 href={link.href}
                 style={{
+                  fontSize: '16px',
                   fontWeight: '500',
-                  color: isActive(link.href) ? 'var(--primary)' : 'var(--text-secondary)',
-                  borderBottom: isActive(link.href) ? '2px solid var(--primary)' : 'none',
-                  paddingBottom: '4px'
+                  color: isActive(link.href) ? 'var(--text-primary)' : 'var(--text-secondary)',
+                  padding: '8px 0',
+                  position: 'relative',
+                  transition: 'color 0.2s ease'
                 }}
               >
                 {link.label}
+                {isActive(link.href) && (
+                  <div style={{
+                    position: 'absolute',
+                    bottom: 0,
+                    left: 0,
+                    right: 0,
+                    height: '3px',
+                    backgroundColor: 'var(--primary)',
+                    borderRadius: '3px 3px 0 0'
+                  }} />
+                )}
               </Link>
             ))}
           </div>
 
           {/* Actions */}
-          <div className="flex items-center gap-3">
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '12px',
+            flexShrink: 0
+          }}>
             {!loading && profile ? (
-              <div className="relative">
+              <div style={{ position: 'relative' }}>
                 {/* Avatar */}
                 <button
                   onClick={() => setDropdownOpen(!dropdownOpen)}
                   style={{
-                    width: '40px',
-                    height: '40px',
+                    width: '42px',
+                    height: '42px',
                     borderRadius: '50%',
                     backgroundColor: 'var(--primary)',
                     color: 'white',
+                    fontSize: '15px',
                     fontWeight: '600',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
                     cursor: 'pointer',
-                    border: 'none'
+                    border: '2px solid transparent',
+                    transition: 'all 0.2s ease'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.borderColor = 'var(--primary-dark)';
+                    e.currentTarget.style.transform = 'scale(1.05)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.borderColor = 'transparent';
+                    e.currentTarget.style.transform = 'scale(1)';
                   }}
                 >
                   {profile.username.substring(0, 2).toUpperCase()}
@@ -101,23 +146,28 @@ export default function Navbar() {
                       style={{
                         position: 'absolute',
                         right: 0,
-                        top: '48px',
-                        width: '200px',
+                        top: '52px',
+                        width: '220px',
                         zIndex: 50,
                         padding: '8px'
                       }}
                     >
                       <div style={{
-                        padding: '12px',
+                        padding: '16px',
                         borderBottom: '1px solid var(--border)'
                       }}>
                         <p style={{
                           fontWeight: '600',
-                          color: 'var(--text-primary)'
+                          fontSize: '15px',
+                          color: 'var(--text-primary)',
+                          marginBottom: '4px'
                         }}>
                           {profile.username}
                         </p>
-                        <p className="text-sm text-secondary">
+                        <p style={{
+                          fontSize: '13px',
+                          color: 'var(--text-secondary)'
+                        }}>
                           {profile.xp_points || 0} XP
                         </p>
                       </div>
@@ -127,9 +177,18 @@ export default function Navbar() {
                         onClick={() => setDropdownOpen(false)}
                         style={{
                           display: 'block',
-                          padding: '12px',
+                          padding: '12px 16px',
                           color: 'var(--text-primary)',
-                          fontWeight: '500'
+                          fontSize: '15px',
+                          fontWeight: '500',
+                          borderRadius: 'var(--radius-sm)',
+                          transition: 'background-color 0.2s ease'
+                        }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.backgroundColor = 'var(--bg-hover)';
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.backgroundColor = 'transparent';
                         }}
                       >
                         Mon profil
@@ -140,12 +199,21 @@ export default function Navbar() {
                         style={{
                           width: '100%',
                           textAlign: 'left',
-                          padding: '12px',
+                          padding: '12px 16px',
                           color: '#DC2626',
+                          fontSize: '15px',
                           fontWeight: '500',
                           background: 'none',
                           border: 'none',
-                          cursor: 'pointer'
+                          cursor: 'pointer',
+                          borderRadius: 'var(--radius-sm)',
+                          transition: 'background-color 0.2s ease'
+                        }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.backgroundColor = '#FEE2E2';
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.backgroundColor = 'transparent';
                         }}
                       >
                         Déconnexion
@@ -156,10 +224,45 @@ export default function Navbar() {
               </div>
             ) : !loading ? (
               <>
-                <Link href="/auth/login" className="btn-ghost hidden sm:inline-flex">
+                <Link
+                  href="/auth/login"
+                  style={{
+                    padding: '10px 20px',
+                    fontSize: '15px',
+                    fontWeight: '600',
+                    color: 'var(--text-primary)',
+                    borderRadius: 'var(--radius)',
+                    transition: 'background-color 0.2s ease',
+                    display: 'none'
+                  }}
+                  className="sm:inline-flex"
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = 'var(--bg-hover)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = 'transparent';
+                  }}
+                >
                   Connexion
                 </Link>
-                <Link href="/auth/signup" className="btn-primary">
+                <Link
+                  href="/auth/signup"
+                  style={{
+                    padding: '10px 24px',
+                    fontSize: '15px',
+                    fontWeight: '600',
+                    color: 'white',
+                    backgroundColor: 'var(--primary)',
+                    borderRadius: 'var(--radius)',
+                    transition: 'background-color 0.2s ease'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = 'var(--primary-dark)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = 'var(--primary)';
+                  }}
+                >
                   Inscription
                 </Link>
               </>
@@ -170,22 +273,30 @@ export default function Navbar() {
 
       {/* Navigation mobile */}
       {!isAuthPage && (
-        <div className="md:hidden border-t" style={{
-          borderColor: 'var(--border)',
+        <div style={{
+          display: 'block',
+          borderTop: '1px solid var(--border)',
           backgroundColor: 'white'
-        }}>
-          <div className="container flex gap-4 py-2">
+        }} className="md:hidden">
+          <div className="container" style={{
+            display: 'flex',
+            gap: '8px',
+            padding: '8px 24px'
+          }}>
             {navLinks.map((link) => (
               <Link
                 key={link.href}
                 href={link.href}
-                className="flex-1 text-center py-2"
                 style={{
-                  fontWeight: '500',
+                  flex: 1,
+                  textAlign: 'center',
+                  padding: '10px 16px',
+                  fontWeight: '600',
                   fontSize: '14px',
                   color: isActive(link.href) ? 'var(--primary)' : 'var(--text-secondary)',
                   backgroundColor: isActive(link.href) ? 'var(--primary-light)' : 'transparent',
-                  borderRadius: 'var(--radius-sm)'
+                  borderRadius: 'var(--radius)',
+                  transition: 'all 0.2s ease'
                 }}
               >
                 {link.label}
