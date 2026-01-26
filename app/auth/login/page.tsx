@@ -45,7 +45,9 @@ export default function LoginPage() {
       console.log('📊 Résultat de la connexion:', result);
 
       if (result.success) {
-        console.log('✅ Connexion réussie, redirection vers /sessions');
+        console.log('✅ Connexion réussie, attente puis redirection vers /sessions');
+        // Attendre un peu pour que la session soit bien établie
+        await new Promise(resolve => setTimeout(resolve, 500));
         window.location.href = '/sessions';
       } else {
         console.error('❌ Échec de la connexion:', result.error);
