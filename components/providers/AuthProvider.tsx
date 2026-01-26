@@ -87,9 +87,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const signIn = async (email: string, password: string) => {
+    console.log('🔑 AuthProvider: signIn appelé');
     const result = await signInAction(email, password);
+    console.log('🔑 AuthProvider: Résultat signInAction:', result);
 
     if (result.success && result.user) {
+      console.log('✅ AuthProvider: Utilisateur authentifié:', result.user.email);
       setUser(result.user);
 
       // Attendre que le profil soit disponible (au cas où il vient d'être créé)
@@ -98,14 +101,23 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const maxAttempts = 3;
 
       while (!userProfile && attempts < maxAttempts) {
+        console.log(`🔍 AuthProvider: Tentative ${attempts + 1}/${maxAttempts} de chargement du profil`);
         userProfile = await fetchProfile(result.user.id);
         if (!userProfile && attempts < maxAttempts - 1) {
+          console.log('⏳ AuthProvider: Attente de 300ms avant nouvelle tentative');
           await new Promise(resolve => setTimeout(resolve, 300));
         }
         attempts++;
       }
 
-      setProfile(userProfile);
+      if (userProfile) {
+        console.log('✅ AuthProvider: Profil chargé:', userProfile.username);
+        setProfile(userProfile);
+      } else {
+        console.error('❌ AuthProvider: Impossible de charger le profil après', maxAttempts, 'tentatives');
+      }
+    } else {
+      console.error('❌ AuthProvider: Échec de l\'authentification');
     }
 
     return result;

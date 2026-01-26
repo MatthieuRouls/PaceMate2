@@ -34,16 +34,20 @@ export default function LoginPage() {
     setLoading(true);
 
     try {
+      console.log('🔐 Tentative de connexion avec:', email);
       const result = await signIn(email, password);
+      console.log('📊 Résultat de la connexion:', result);
 
       if (result.success) {
+        console.log('✅ Connexion réussie, redirection vers /sessions');
         router.push('/sessions');
       } else {
+        console.error('❌ Échec de la connexion:', result.error);
         setError(result.error || 'Erreur lors de la connexion');
       }
     } catch (err) {
+      console.error('💥 Erreur inattendue:', err);
       setError('Une erreur est survenue');
-      console.error(err);
     } finally {
       setLoading(false);
     }
