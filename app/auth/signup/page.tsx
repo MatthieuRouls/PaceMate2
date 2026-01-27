@@ -3,6 +3,9 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { useAuth } from '@/components/providers/AuthProvider';
+import Button from '@/components/ui/Button';
+import Input from '@/components/ui/Input';
+import Card from '@/components/ui/Card';
 
 export default function SignupPage() {
   const { signUp } = useAuth();
@@ -63,124 +66,164 @@ export default function SignupPage() {
   };
 
   return (
-    <div style={{
-      minHeight: '100vh',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      padding: '24px',
-      backgroundColor: 'var(--bg-secondary)'
-    }}>
-      <div style={{ width: '100%', maxWidth: '400px' }}>
-        <div className="card p-8">
-          {/* Header */}
-          <div className="text-center mb-8">
-            <h1 className="mb-2" style={{ fontSize: '28px', color: 'var(--primary)' }}>
+    <div className="min-h-screen flex items-center justify-center p-6">
+      {/* Background gradient orbs */}
+      <div className="fixed top-0 left-1/4 w-96 h-96 bg-pink-300/20 rounded-full blur-3xl" />
+      <div className="fixed bottom-0 right-1/4 w-96 h-96 bg-blue-300/20 rounded-full blur-3xl" />
+
+      <div className="w-full max-w-md relative z-10">
+        {/* Logo */}
+        <div className="text-center mb-8">
+          <Link href="/" className="inline-flex items-center gap-2 mb-4">
+            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-pink-500 to-blue-500 flex items-center justify-center shadow-lg">
+              <span className="text-white font-bold text-2xl">P</span>
+            </div>
+            <span className="text-3xl font-bold text-gradient">
               PaceMate
-            </h1>
-            <p className="text-secondary">
-              Créez votre compte
-            </p>
-          </div>
+            </span>
+          </Link>
+          <p className="text-gray-600 mt-2">
+            Créez votre compte
+          </p>
+        </div>
 
-          {/* Formulaire */}
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div>
-              <label className="label">Nom d'utilisateur</label>
-              <input
-                type="text"
-                required
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                className="input"
-                placeholder="votre_pseudo"
-                minLength={3}
-                maxLength={20}
-                disabled={loading}
-              />
-              <p className="text-xs text-light mt-1">Entre 3 et 20 caractères</p>
-            </div>
-
-            <div>
-              <label className="label">Email</label>
-              <input
-                type="email"
-                required
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="input"
-                placeholder="votre@email.com"
-                disabled={loading}
-              />
-            </div>
-
-            <div>
-              <label className="label">Mot de passe</label>
-              <input
-                type="password"
-                required
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="input"
-                placeholder="••••••••"
-                minLength={6}
-                disabled={loading}
-              />
-              <p className="text-xs text-light mt-1">Minimum 6 caractères</p>
-            </div>
-
-            <div>
-              <label className="label">Confirmer le mot de passe</label>
-              <input
-                type="password"
-                required
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                className="input"
-                placeholder="••••••••"
-                minLength={6}
-                disabled={loading}
-              />
-            </div>
-
+        {/* Card */}
+        <Card variant="glass" padding="xl">
+          <form onSubmit={handleSubmit} className="space-y-6">
+            {/* Success Message */}
             {success && (
-              <div className="alert alert-success">
-                ✓ {success}
-              </div>
-            )}
-
-            {error && (
-              <div className="alert alert-error">
-                ✗ {error}
-              </div>
-            )}
-
-            <button
-              type="submit"
-              disabled={loading}
-              className="btn-primary"
-              style={{ width: '100%', fontSize: '16px' }}
-            >
-              {loading ? (
-                <div className="flex items-center gap-2">
-                  <div className="spinner"></div>
-                  Création...
+              <div className="p-4 rounded-xl bg-green-50 border-2 border-green-200">
+                <div className="flex items-center gap-2 mb-2">
+                  <svg className="w-5 h-5 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                  </svg>
+                  <p className="text-sm font-semibold text-green-900">{success}</p>
                 </div>
-              ) : (
-                'Créer mon compte'
-              )}
-            </button>
-          </form>
+                <Link href="/auth/login" className="mt-3 inline-block">
+                  <Button variant="outline" size="sm" fullWidth>
+                    Se connecter →
+                  </Button>
+                </Link>
+              </div>
+            )}
 
-          {/* Link */}
-          <div className="mt-6 text-center">
-            <p className="text-secondary">
-              Déjà un compte ?{' '}
-              <Link href="/auth/login" style={{ fontWeight: '600' }}>
+            {/* Error Message */}
+            {error && (
+              <div className="p-4 rounded-xl bg-red-50 border-2 border-red-200">
+                <div className="flex items-center gap-2">
+                  <svg className="w-5 h-5 text-red-600" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                  </svg>
+                  <p className="text-sm font-semibold text-red-900">{error}</p>
+                </div>
+              </div>
+            )}
+
+            {/* Username */}
+            <Input
+              label="Nom d'utilisateur"
+              type="text"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              placeholder="votre_pseudo"
+              required
+              minLength={3}
+              maxLength={20}
+              fullWidth
+              icon={
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                </svg>
+              }
+            />
+
+            {/* Email */}
+            <Input
+              label="Email"
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="votre@email.com"
+              required
+              fullWidth
+              icon={
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                </svg>
+              }
+            />
+
+            {/* Password */}
+            <Input
+              label="Mot de passe"
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="••••••••"
+              required
+              minLength={6}
+              fullWidth
+              icon={
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                </svg>
+              }
+            />
+
+            {/* Confirm Password */}
+            <Input
+              label="Confirmer le mot de passe"
+              type="password"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              placeholder="••••••••"
+              required
+              minLength={6}
+              fullWidth
+              icon={
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              }
+            />
+
+            {/* Submit Button */}
+            <Button
+              type="submit"
+              variant="gradient"
+              size="lg"
+              fullWidth
+              loading={loading}
+            >
+              {loading ? 'Création en cours...' : 'Créer mon compte'}
+            </Button>
+
+            {/* Divider */}
+            <div className="relative">
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-full border-t border-gray-300"></div>
+              </div>
+              <div className="relative flex justify-center text-sm">
+                <span className="px-4 bg-white/70 text-gray-500">
+                  Déjà un compte ?
+                </span>
+              </div>
+            </div>
+
+            {/* Login Link */}
+            <Link href="/auth/login">
+              <Button type="button" variant="outline" size="lg" fullWidth>
                 Se connecter
-              </Link>
-            </p>
-          </div>
+              </Button>
+            </Link>
+          </form>
+        </Card>
+
+        {/* Back to home */}
+        <div className="text-center mt-6">
+          <Link href="/" className="text-sm text-gray-600 hover:text-gray-900 transition-colors">
+            ← Retour à l'accueil
+          </Link>
         </div>
       </div>
     </div>
