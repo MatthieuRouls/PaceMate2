@@ -18,7 +18,7 @@ export default function RootLayout({
       <body>
         <AuthProvider>
           <Navbar />
-          <main className="pt-16">
+          <main style={{ paddingTop: '60px', minHeight: '100vh' }}>
             {children}
           </main>
         </AuthProvider>

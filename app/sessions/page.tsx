@@ -5,12 +5,10 @@ import Link from 'next/link';
 import { supabase } from '@/lib/supabase';
 import { Session } from '@/lib/types';
 import SessionCard from '@/components/ui/SessionCard';
-import { useTheme } from '@/components/providers/ThemeProvider';
 
 type FilterLevel = 'all' | 'beginner' | 'expert';
 
 export default function SessionsPage() {
-  const { theme } = useTheme();
   const [sessions, setSessions] = useState<Session[]>([]);
   const [filteredSessions, setFilteredSessions] = useState<Session[]>([]);
   const [loading, setLoading] = useState(true);
@@ -77,67 +75,62 @@ export default function SessionsPage() {
     setFilteredSessions(filtered);
   }, [filterLevel, sessions]);
 
-  // Composant bouton de filtre
-  const FilterButton = ({ level, label }: { level: FilterLevel; label: string }) => (
-    <button
-      onClick={() => setFilterLevel(level)}
-      className={`px-4 py-2 rounded-lg font-medium transition-all ${
-        filterLevel === level
-          ? 'btn-primary'
-          : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-      }`}
-      style={
-        filterLevel === level
-          ? {}
-          : theme === 'elite'
-          ? { backgroundColor: 'rgba(167, 139, 250, 0.1)', color: 'var(--color-text)' }
-          : {}
-      }
-    >
-      {label}
-    </button>
-  );
-
   return (
-    <div className="min-h-screen p-4 md:p-8">
-      <div className="max-w-6xl mx-auto">
+    <div className="py-4">
+      <div className="container">
         {/* Header avec titre et bouton créer */}
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
+        <div style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          marginBottom: '2rem',
+          flexWrap: 'wrap',
+          gap: '1rem'
+        }}>
           <div>
-            <h1 className="text-3xl md:text-4xl font-bold mb-2">
-              Sessions de running
-            </h1>
-            <p className="text-sm md:text-base opacity-75">
+            <h1 style={{ marginBottom: '0.5rem' }}>Sessions de running</h1>
+            <p style={{ fontSize: '0.875rem', color: '#6c757d' }}>
               Trouve ta prochaine sortie et rejoins la communauté
             </p>
           </div>
-          <Link href="/sessions/create" className="btn-primary whitespace-nowrap">
+          <Link href="/sessions/create" className="btn-primary">
             ➕ Créer une sortie
           </Link>
         </div>
 
         {/* Filtres */}
-        <div className="mb-6">
-          <div className="flex flex-wrap gap-3">
-            <FilterButton level="all" label="Tous les niveaux" />
-            <FilterButton level="beginner" label="Débutant (1-2 ⭐)" />
-            <FilterButton level="expert" label="Expert (4-5 ⭐)" />
-          </div>
+        <div style={{ display: 'flex', gap: '0.75rem', marginBottom: '2rem', flexWrap: 'wrap' }}>
+          <button
+            onClick={() => setFilterLevel('all')}
+            className={filterLevel === 'all' ? 'btn-primary' : 'btn-secondary'}
+          >
+            Tous les niveaux
+          </button>
+          <button
+            onClick={() => setFilterLevel('beginner')}
+            className={filterLevel === 'beginner' ? 'btn-primary' : 'btn-secondary'}
+          >
+            Débutant (1-2 ⭐)
+          </button>
+          <button
+            onClick={() => setFilterLevel('expert')}
+            className={filterLevel === 'expert' ? 'btn-primary' : 'btn-secondary'}
+          >
+            Expert (4-5 ⭐)
+          </button>
         </div>
 
         {/* États de chargement et erreur */}
         {loading && (
-          <div className="text-center py-12">
-            <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2"
-                 style={{ borderColor: 'var(--color-primary)' }}></div>
-            <p className="mt-4 opacity-75">Chargement des sessions...</p>
+          <div style={{ textAlign: 'center', padding: '3rem' }}>
+            <p>Chargement des sessions...</p>
           </div>
         )}
 
         {error && (
-          <div className="card border-2 border-red-500 text-center py-8">
-            <p className="text-red-500 font-semibold mb-2">❌ Erreur</p>
-            <p className="opacity-75">{error}</p>
+          <div className="card" style={{ textAlign: 'center', padding: '2rem', border: '2px solid #dc3545' }}>
+            <p style={{ color: '#dc3545', fontWeight: 600, marginBottom: '0.5rem' }}>❌ Erreur</p>
+            <p style={{ color: '#6c757d' }}>{error}</p>
           </div>
         )}
 
@@ -145,14 +138,14 @@ export default function SessionsPage() {
         {!loading && !error && (
           <>
             {filteredSessions.length === 0 ? (
-              <div className="card text-center py-12">
-                <p className="text-2xl mb-4">🏃‍♂️</p>
-                <h3 className="text-xl font-semibold mb-2">
+              <div className="card" style={{ textAlign: 'center', padding: '3rem' }}>
+                <p style={{ fontSize: '2rem', marginBottom: '1rem' }}>🏃‍♂️</p>
+                <h3 style={{ marginBottom: '0.5rem' }}>
                   {filterLevel === 'all'
                     ? 'Aucune session disponible'
                     : 'Aucune session pour ce niveau'}
                 </h3>
-                <p className="opacity-75 mb-6">
+                <p style={{ color: '#6c757d', marginBottom: '1.5rem' }}>
                   {filterLevel === 'all'
                     ? 'Sois le premier à créer une sortie !'
                     : 'Essaie de changer les filtres ou crée ta propre session'}
@@ -167,7 +160,7 @@ export default function SessionsPage() {
                 )}
               </div>
             ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className="grid grid-3">
                 {filteredSessions.map((session) => (
                   <SessionCard key={session.id} session={session} />
                 ))}

@@ -4,9 +4,6 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { useAuth } from '@/components/providers/AuthProvider';
 import { resendConfirmationEmail } from '@/lib/supabase-auth';
-import Button from '@/components/ui/Button';
-import Input from '@/components/ui/Input';
-import Card from '@/components/ui/Card';
 
 export default function LoginPage() {
   const { signIn } = useAuth();
@@ -82,135 +79,147 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-6">
-      {/* Background gradient orbs */}
-      <div className="fixed top-0 left-1/4 w-96 h-96 bg-pink-300/20 rounded-full blur-3xl" />
-      <div className="fixed bottom-0 right-1/4 w-96 h-96 bg-blue-300/20 rounded-full blur-3xl" />
-
-      <div className="w-full max-w-md relative z-10">
+    <div style={{
+      minHeight: '100vh',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      padding: '2rem'
+    }}>
+      <div style={{ width: '100%', maxWidth: '400px' }}>
         {/* Logo */}
-        <div className="text-center mb-6">
-          <Link href="/" className="inline-flex items-center gap-2 mb-3">
-            <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-pink-500 to-blue-500 flex items-center justify-center shadow-lg">
-              <span className="text-white font-bold text-lg">P</span>
-            </div>
-            <span className="text-2xl font-bold text-gradient">
-              PaceMate
-            </span>
+        <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
+          <Link href="/" style={{
+            fontSize: '1.5rem',
+            fontWeight: 700,
+            color: '#0066cc'
+          }}>
+            PaceMate
           </Link>
-          <p className="text-sm text-gray-600">
+          <p style={{ fontSize: '0.875rem', color: '#6c757d', marginTop: '0.5rem' }}>
             Connectez-vous à votre compte
           </p>
         </div>
 
         {/* Card */}
-        <Card variant="glass" padding="lg">
-          <form onSubmit={handleSubmit} className="space-y-4">
+        <div className="card">
+          <form onSubmit={handleSubmit}>
             {/* Success Message */}
             {success && (
-              <div className="p-4 rounded-xl bg-green-50 border-2 border-green-200">
-                <div className="flex items-center gap-2">
-                  <svg className="w-5 h-5 text-green-600" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                  </svg>
-                  <p className="text-sm font-semibold text-green-900">{success}</p>
-                </div>
+              <div style={{
+                padding: '1rem',
+                borderRadius: '0.5rem',
+                backgroundColor: '#d1e7dd',
+                border: '1px solid #badbcc',
+                marginBottom: '1rem'
+              }}>
+                <p style={{ fontSize: '0.875rem', fontWeight: 600, color: '#0f5132' }}>{success}</p>
               </div>
             )}
 
             {/* Error Message */}
             {error && (
-              <div className="p-4 rounded-xl bg-red-50 border-2 border-red-200">
-                <div className="flex items-center gap-2 mb-2">
-                  <svg className="w-5 h-5 text-red-600" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
-                  </svg>
-                  <p className="text-sm font-semibold text-red-900">{error}</p>
-                </div>
+              <div style={{
+                padding: '1rem',
+                borderRadius: '0.5rem',
+                backgroundColor: '#f8d7da',
+                border: '1px solid #f5c2c7',
+                marginBottom: '1rem'
+              }}>
+                <p style={{ fontSize: '0.875rem', fontWeight: 600, color: '#842029', marginBottom: needsEmailConfirmation ? '0.5rem' : 0 }}>
+                  {error}
+                </p>
                 {needsEmailConfirmation && (
-                  <Button
+                  <button
                     type="button"
                     onClick={handleResendEmail}
-                    variant="outline"
-                    size="sm"
-                    loading={resending}
-                    fullWidth
-                    className="mt-2"
+                    disabled={resending}
+                    className="btn-secondary"
+                    style={{ marginTop: '0.5rem', fontSize: '0.875rem' }}
                   >
                     {resending ? 'Envoi en cours...' : 'Renvoyer l\'email de confirmation'}
-                  </Button>
+                  </button>
                 )}
               </div>
             )}
 
             {/* Email */}
-            <Input
-              label="Email"
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="votre@email.com"
-              required
-              fullWidth
-              icon={
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                </svg>
-              }
-            />
+            <div style={{ marginBottom: '1rem' }}>
+              <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.875rem', fontWeight: 500 }}>
+                Email
+              </label>
+              <input
+                type="email"
+                className="input"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="votre@email.com"
+                required
+              />
+            </div>
 
             {/* Password */}
-            <Input
-              label="Mot de passe"
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="••••••••"
-              required
-              minLength={6}
-              fullWidth
-              icon={
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                </svg>
-              }
-            />
+            <div style={{ marginBottom: '1.5rem' }}>
+              <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.875rem', fontWeight: 500 }}>
+                Mot de passe
+              </label>
+              <input
+                type="password"
+                className="input"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="••••••••"
+                required
+                minLength={6}
+              />
+            </div>
 
             {/* Submit Button */}
-            <Button
+            <button
               type="submit"
-              variant="gradient"
-              size="md"
-              fullWidth
-              loading={loading}
+              className="btn-primary"
+              disabled={loading}
+              style={{ width: '100%', marginBottom: '1rem' }}
             >
               {loading ? 'Connexion...' : 'Se connecter'}
-            </Button>
+            </button>
 
             {/* Divider */}
-            <div className="relative">
-              <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-gray-300"></div>
-              </div>
-              <div className="relative flex justify-center text-sm">
-                <span className="px-4 bg-white/70 text-gray-500">
-                  Pas encore de compte ?
-                </span>
-              </div>
+            <div style={{
+              position: 'relative',
+              margin: '1.5rem 0',
+              textAlign: 'center'
+            }}>
+              <div style={{
+                position: 'absolute',
+                top: '50%',
+                left: 0,
+                right: 0,
+                borderTop: '1px solid #dee2e6'
+              }} />
+              <span style={{
+                position: 'relative',
+                padding: '0 1rem',
+                backgroundColor: 'white',
+                fontSize: '0.875rem',
+                color: '#6c757d'
+              }}>
+                Pas encore de compte ?
+              </span>
             </div>
 
             {/* Sign Up Link */}
             <Link href="/auth/signup">
-              <Button type="button" variant="outline" size="md" fullWidth>
+              <button type="button" className="btn-secondary" style={{ width: '100%' }}>
                 Créer un compte
-              </Button>
+              </button>
             </Link>
           </form>
-        </Card>
+        </div>
 
         {/* Back to home */}
-        <div className="text-center mt-6">
-          <Link href="/" className="text-sm text-gray-600 hover:text-gray-900 transition-colors">
+        <div style={{ textAlign: 'center', marginTop: '1.5rem' }}>
+          <Link href="/" style={{ fontSize: '0.875rem', color: '#6c757d' }}>
             ← Retour à l'accueil
           </Link>
         </div>
