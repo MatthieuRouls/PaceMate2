@@ -2,13 +2,23 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useAuth } from '../providers/AuthProvider';
+import Container from '../ui/Container';
 
 export default function Navbar() {
   const pathname = usePathname();
   const { profile, signOut, loading } = useAuth();
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 20);
+    };
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   const handleSignOut = async () => {
     await signOut();
@@ -18,6 +28,7 @@ export default function Navbar() {
   const navLinks = [
     { href: '/sessions', label: 'Sessions' },
     { href: '/teams', label: 'Équipes' },
+    { href: '/profile', label: 'Profil' },
   ];
 
   const isActive = (href: string) => pathname === href || pathname?.startsWith(href + '/');
@@ -29,280 +40,165 @@ export default function Navbar() {
   }
 
   return (
-    <nav className="navbar fixed top-0 left-0 right-0 z-50">
-      <div className="container">
-        <div style={{
-          height: '72px',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          gap: '48px'
-        }}>
+    <nav
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+        scrolled ? 'navbar-scrolled' : 'bg-white/60 backdrop-blur-lg border-b border-white/20'
+      }`}
+    >
+      <Container>
+        <div className="flex items-center justify-between h-20">
           {/* Logo */}
-          <Link href="/" style={{
-            display: 'flex',
-            alignItems: 'center',
-            flexShrink: 0
-          }}>
-            <span style={{
-              fontSize: '26px',
-              fontWeight: '700',
-              color: 'var(--primary)',
-              letterSpacing: '-0.5px'
-            }}>
+          <Link href="/" className="flex items-center gap-2 group">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-pink-500 to-blue-500 flex items-center justify-center shadow-lg group-hover:shadow-xl transition-all duration-300">
+              <span className="text-white font-bold text-xl">P</span>
+            </div>
+            <span className="text-2xl font-bold text-gradient hidden sm:inline-block">
               PaceMate
             </span>
           </Link>
 
           {/* Navigation - Desktop */}
-          <div style={{
-            display: 'none',
-            alignItems: 'center',
-            gap: '32px',
-            flex: 1,
-            justifyContent: 'center'
-          }} className="md:flex">
+          <div className="hidden md:flex items-center gap-8">
             {navLinks.map((link) => (
               <Link
                 key={link.href}
                 href={link.href}
-                style={{
-                  fontSize: '16px',
-                  fontWeight: '500',
-                  color: isActive(link.href) ? 'var(--text-primary)' : 'var(--text-secondary)',
-                  padding: '8px 0',
-                  position: 'relative',
-                  transition: 'color 0.2s ease'
-                }}
+                className="relative group"
               >
-                {link.label}
+                <span className={`text-base font-semibold transition-colors duration-200 ${
+                  isActive(link.href)
+                    ? 'text-gray-900'
+                    : 'text-gray-600 group-hover:text-gray-900'
+                }`}>
+                  {link.label}
+                </span>
                 {isActive(link.href) && (
-                  <div style={{
-                    position: 'absolute',
-                    bottom: 0,
-                    left: 0,
-                    right: 0,
-                    height: '3px',
-                    backgroundColor: 'var(--primary)',
-                    borderRadius: '3px 3px 0 0'
-                  }} />
+                  <span className="absolute -bottom-[2px] left-0 right-0 h-0.5 bg-gradient-to-r from-pink-500 to-blue-500 rounded-full" />
+                )}
+                {!isActive(link.href) && (
+                  <span className="absolute -bottom-[2px] left-0 right-0 h-0.5 bg-gradient-to-r from-pink-500 to-blue-500 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-200" />
                 )}
               </Link>
             ))}
           </div>
 
           {/* Actions */}
-          <div style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: '12px',
-            flexShrink: 0
-          }}>
+          <div className="flex items-center gap-3">
             {!loading && profile ? (
-              <div style={{ position: 'relative' }}>
+              <div className="relative">
                 {/* Avatar */}
                 <button
                   onClick={() => setDropdownOpen(!dropdownOpen)}
-                  style={{
-                    width: '42px',
-                    height: '42px',
-                    borderRadius: '50%',
-                    backgroundColor: 'var(--primary)',
-                    color: 'white',
-                    fontSize: '15px',
-                    fontWeight: '600',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    cursor: 'pointer',
-                    border: '2px solid transparent',
-                    transition: 'all 0.2s ease'
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.borderColor = 'var(--primary-dark)';
-                    e.currentTarget.style.transform = 'scale(1.05)';
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.borderColor = 'transparent';
-                    e.currentTarget.style.transform = 'scale(1)';
-                  }}
+                  className="flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-gray-100/80 transition-colors duration-200"
                 >
-                  {profile.username.substring(0, 2).toUpperCase()}
+                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-pink-500 to-blue-500 flex items-center justify-center text-white font-semibold shadow-md">
+                    {profile.username.substring(0, 2).toUpperCase()}
+                  </div>
+                  <span className="hidden sm:block font-semibold text-gray-900">
+                    {profile.username}
+                  </span>
+                  <svg
+                    className={`w-4 h-4 text-gray-600 transition-transform duration-200 ${
+                      dropdownOpen ? 'rotate-180' : ''
+                    }`}
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
                 </button>
 
                 {/* Dropdown */}
                 {dropdownOpen && (
                   <>
                     <div
-                      style={{
-                        position: 'fixed',
-                        inset: 0,
-                        zIndex: 40
-                      }}
+                      className="fixed inset-0 z-40"
                       onClick={() => setDropdownOpen(false)}
                     />
-                    <div
-                      className="card"
-                      style={{
-                        position: 'absolute',
-                        right: 0,
-                        top: '52px',
-                        width: '220px',
-                        zIndex: 50,
-                        padding: '8px'
-                      }}
-                    >
-                      <div style={{
-                        padding: '16px',
-                        borderBottom: '1px solid var(--border)'
-                      }}>
-                        <p style={{
-                          fontWeight: '600',
-                          fontSize: '15px',
-                          color: 'var(--text-primary)',
-                          marginBottom: '4px'
-                        }}>
-                          {profile.username}
-                        </p>
-                        <p style={{
-                          fontSize: '13px',
-                          color: 'var(--text-secondary)'
-                        }}>
-                          {profile.xp_points || 0} XP
+                    <div className="absolute right-0 top-14 w-64 glass-card p-2 z-50 animate-fade-in">
+                      <div className="px-4 py-3 border-b border-gray-200/50">
+                        <p className="font-semibold text-gray-900">{profile.username}</p>
+                        <p className="text-sm text-gray-600 mt-1">
+                          {profile.xp_points || 0} XP • Niveau {Math.floor((profile.xp_points || 0) / 100) + 1}
                         </p>
                       </div>
 
                       <Link
                         href="/profile"
                         onClick={() => setDropdownOpen(false)}
-                        style={{
-                          display: 'block',
-                          padding: '12px 16px',
-                          color: 'var(--text-primary)',
-                          fontSize: '15px',
-                          fontWeight: '500',
-                          borderRadius: 'var(--radius-sm)',
-                          transition: 'background-color 0.2s ease'
-                        }}
-                        onMouseEnter={(e) => {
-                          e.currentTarget.style.backgroundColor = 'var(--bg-hover)';
-                        }}
-                        onMouseLeave={(e) => {
-                          e.currentTarget.style.backgroundColor = 'transparent';
-                        }}
+                        className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-gray-100/80 transition-colors duration-200 mt-1"
                       >
-                        Mon profil
+                        <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                        </svg>
+                        <span className="text-gray-900 font-medium">Mon profil</span>
+                      </Link>
+
+                      <Link
+                        href="/sessions/create"
+                        onClick={() => setDropdownOpen(false)}
+                        className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-gray-100/80 transition-colors duration-200"
+                      >
+                        <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                        </svg>
+                        <span className="text-gray-900 font-medium">Créer une sortie</span>
                       </Link>
 
                       <button
                         onClick={handleSignOut}
-                        style={{
-                          width: '100%',
-                          textAlign: 'left',
-                          padding: '12px 16px',
-                          color: '#DC2626',
-                          fontSize: '15px',
-                          fontWeight: '500',
-                          background: 'none',
-                          border: 'none',
-                          cursor: 'pointer',
-                          borderRadius: 'var(--radius-sm)',
-                          transition: 'background-color 0.2s ease'
-                        }}
-                        onMouseEnter={(e) => {
-                          e.currentTarget.style.backgroundColor = '#FEE2E2';
-                        }}
-                        onMouseLeave={(e) => {
-                          e.currentTarget.style.backgroundColor = 'transparent';
-                        }}
+                        className="w-full flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-red-50 transition-colors duration-200 mt-1"
                       >
-                        Déconnexion
+                        <svg className="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                        </svg>
+                        <span className="text-red-600 font-medium">Déconnexion</span>
                       </button>
                     </div>
                   </>
                 )}
               </div>
             ) : !loading ? (
-              <>
+              <div className="flex items-center gap-3">
                 <Link
                   href="/auth/login"
-                  style={{
-                    padding: '10px 20px',
-                    fontSize: '15px',
-                    fontWeight: '600',
-                    color: 'var(--text-primary)',
-                    borderRadius: 'var(--radius)',
-                    transition: 'background-color 0.2s ease',
-                    display: 'none'
-                  }}
-                  className="sm:inline-flex"
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.backgroundColor = 'var(--bg-hover)';
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.backgroundColor = 'transparent';
-                  }}
+                  className="hidden sm:inline-flex px-5 py-2.5 text-gray-700 font-semibold rounded-xl hover:bg-gray-100/80 transition-colors duration-200"
                 >
                   Connexion
                 </Link>
                 <Link
                   href="/auth/signup"
-                  style={{
-                    padding: '10px 24px',
-                    fontSize: '15px',
-                    fontWeight: '600',
-                    color: 'white',
-                    backgroundColor: 'var(--primary)',
-                    borderRadius: 'var(--radius)',
-                    transition: 'background-color 0.2s ease'
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.backgroundColor = 'var(--primary-dark)';
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.backgroundColor = 'var(--primary)';
-                  }}
+                  className="px-6 py-2.5 bg-gradient-to-r from-pink-500 to-blue-500 text-white font-semibold rounded-xl hover:shadow-lg hover:shadow-pink-500/30 transition-all duration-200 hover:-translate-y-0.5"
                 >
                   Inscription
                 </Link>
-              </>
+              </div>
             ) : null}
           </div>
         </div>
-      </div>
+      </Container>
 
       {/* Navigation mobile */}
       {!isAuthPage && (
-        <div style={{
-          display: 'block',
-          borderTop: '1px solid var(--border)',
-          backgroundColor: 'white'
-        }} className="md:hidden">
-          <div className="container" style={{
-            display: 'flex',
-            gap: '8px',
-            padding: '8px 24px'
-          }}>
-            {navLinks.map((link) => (
-              <Link
-                key={link.href}
-                href={link.href}
-                style={{
-                  flex: 1,
-                  textAlign: 'center',
-                  padding: '10px 16px',
-                  fontWeight: '600',
-                  fontSize: '14px',
-                  color: isActive(link.href) ? 'var(--primary)' : 'var(--text-secondary)',
-                  backgroundColor: isActive(link.href) ? 'var(--primary-light)' : 'transparent',
-                  borderRadius: 'var(--radius)',
-                  transition: 'all 0.2s ease'
-                }}
-              >
-                {link.label}
-              </Link>
-            ))}
-          </div>
+        <div className="md:hidden border-t border-gray-200/50 bg-white/80 backdrop-blur-lg">
+          <Container>
+            <div className="flex gap-1 py-2">
+              {navLinks.map((link) => (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  className={`flex-1 text-center py-2.5 px-3 rounded-lg font-semibold text-sm transition-all duration-200 ${
+                    isActive(link.href)
+                      ? 'bg-gradient-to-r from-pink-500 to-blue-500 text-white shadow-md'
+                      : 'text-gray-600 hover:bg-gray-100/80'
+                  }`}
+                >
+                  {link.label}
+                </Link>
+              ))}
+            </div>
+          </Container>
         </div>
       )}
     </nav>
