@@ -3,7 +3,10 @@
 import { useState, FormEvent } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { useTheme } from '@/components/providers/ThemeProvider';
+import Container from '@/components/ui/Container';
+import Button from '@/components/ui/Button';
+import Input, { Textarea } from '@/components/ui/Input';
+import Card from '@/components/ui/Card';
 import { createSession, CreateSessionData } from '@/lib/actions';
 
 // Désactiver la pré-génération statique
@@ -11,7 +14,6 @@ export const dynamic = 'force-dynamic';
 
 export default function CreateSessionPage() {
   const router = useRouter();
-  const { theme } = useTheme();
 
   // State du formulaire
   const [formData, setFormData] = useState<CreateSessionData>({
@@ -77,307 +79,330 @@ export default function CreateSessionPage() {
   // Styles pour les labels d'étoiles
   const getLevelLabel = (level: number): string => {
     const labels = [
-      '⭐ Débutant',
-      '⭐⭐ Débutant confirmé',
-      '⭐⭐⭐ Intermédiaire',
-      '⭐⭐⭐⭐ Confirmé',
-      '⭐⭐⭐⭐⭐ Expert',
+      'Débutant',
+      'Débutant confirmé',
+      'Intermédiaire',
+      'Confirmé',
+      'Expert',
     ];
     return labels[level - 1] || '';
   };
 
-  // Libellés des types de session
-  const sessionTypeLabels: Record<string, string> = {
-    casual: 'Sortie détente',
-    recovery: 'Récupération',
-    tempo: 'Allure soutenue',
-    long_run: 'Sortie longue',
-    intervals: 'Fractionné',
+  const getLevelStars = (level: number): string => {
+    return '⭐'.repeat(level);
   };
 
+  const getLevelDescription = (level: number): string => {
+    const descriptions = [
+      'Première expérience en course à pied',
+      'Pratique régulière depuis quelques mois',
+      'Course régulière, bon niveau général',
+      'Pratique intensive, objectifs compétitifs',
+      'Niveau très avancé, performances élevées',
+    ];
+    return descriptions[level - 1] || '';
+  };
+
+  // Types de session
+  const sessionTypes = [
+    {
+      value: 'casual',
+      label: 'Sortie détente',
+      icon: '🚶',
+      description: 'Rythme tranquille et convivial',
+    },
+    {
+      value: 'recovery',
+      label: 'Récupération',
+      icon: '🧘',
+      description: 'Allure très modérée',
+    },
+    {
+      value: 'tempo',
+      label: 'Allure soutenue',
+      icon: '🏃',
+      description: 'Rythme challengeant',
+    },
+    {
+      value: 'long_run',
+      label: 'Sortie longue',
+      icon: '🗓️',
+      description: 'Endurance fondamentale',
+    },
+    {
+      value: 'intervals',
+      label: 'Fractionné',
+      icon: '⚡',
+      description: 'Séance intensive',
+    },
+  ];
+
   return (
-    <div className="min-h-screen p-4 md:p-8">
-      <div className="max-w-2xl mx-auto">
+    <div className="min-h-screen pt-32 pb-20">
+      <Container maxW="2xl">
         {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl md:text-4xl font-bold mb-2">Créer une sortie</h1>
-          <p className="opacity-75">Propose une nouvelle session de running à la communauté</p>
+        <div className="mb-12 text-center lg:text-left">
+          <h1 className="mb-4">Créer une sortie</h1>
+          <p className="text-xl text-gray-600">
+            Propose une session et trouve des partenaires de course
+          </p>
         </div>
 
         {/* Formulaire */}
-        <form onSubmit={handleSubmit} className="card space-y-6">
-          {/* Message d'erreur */}
-          {error && (
-            <div
-              className="p-4 rounded-lg border-2 border-red-500 bg-red-50 text-red-700"
-              style={
-                theme === 'elite'
-                  ? { backgroundColor: 'rgba(239, 68, 68, 0.1)', borderColor: 'rgb(239, 68, 68)' }
-                  : {}
-              }
-            >
-              <p className="font-semibold">❌ Erreur</p>
-              <p className="text-sm mt-1">{error}</p>
-            </div>
-          )}
+        <Card variant="glass" padding="xl">
+          <form onSubmit={handleSubmit} className="space-y-8">
+            {/* Message d'erreur */}
+            {error && (
+              <div className="p-4 rounded-xl bg-red-50 border-2 border-red-200">
+                <div className="flex items-center gap-2 mb-1">
+                  <span className="text-lg">❌</span>
+                  <p className="font-semibold text-red-900">Erreur</p>
+                </div>
+                <p className="text-sm text-red-700">{error}</p>
+              </div>
+            )}
 
-          {/* Titre */}
-          <div>
-            <label htmlFor="title" className="block font-semibold mb-2">
-              Titre <span className="text-red-500">*</span>
-            </label>
-            <input
-              type="text"
-              id="title"
-              name="title"
-              value={formData.title}
-              onChange={handleChange}
-              required
-              maxLength={100}
-              placeholder="Ex: Sortie matinale au parc"
-              className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-opacity-50"
-              style={{
-                borderRadius: 'var(--radius)',
-                borderColor: theme === 'elite' ? 'rgba(167, 139, 250, 0.3)' : undefined,
-              }}
-            />
-          </div>
-
-          {/* Description */}
-          <div>
-            <label htmlFor="description" className="block font-semibold mb-2">
-              Description <span className="text-red-500">*</span>
-            </label>
-            <textarea
-              id="description"
-              name="description"
-              value={formData.description}
-              onChange={handleChange}
-              required
-              maxLength={500}
-              rows={4}
-              placeholder="Décris l'ambiance et le parcours de la sortie..."
-              className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-opacity-50 resize-none"
-              style={{
-                borderRadius: 'var(--radius)',
-                borderColor: theme === 'elite' ? 'rgba(167, 139, 250, 0.3)' : undefined,
-              }}
-            />
-            <p className="text-sm opacity-75 mt-1">
-              {formData.description?.length || 0}/500 caractères
-            </p>
-          </div>
-
-          {/* Date et heure */}
-          <div>
-            <label htmlFor="start_time" className="block font-semibold mb-2">
-              Date et heure <span className="text-red-500">*</span>
-            </label>
-            <input
-              type="datetime-local"
-              id="start_time"
-              name="start_time"
-              value={formData.start_time}
-              onChange={handleChange}
-              required
-              className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-opacity-50"
-              style={{
-                borderRadius: 'var(--radius)',
-                borderColor: theme === 'elite' ? 'rgba(167, 139, 250, 0.3)' : undefined,
-              }}
-            />
-          </div>
-
-          {/* Lieu */}
-          <div>
-            <label htmlFor="location_name" className="block font-semibold mb-2">
-              Lieu <span className="text-red-500">*</span>
-            </label>
-            <input
-              type="text"
-              id="location_name"
-              name="location_name"
-              value={formData.location_name}
-              onChange={handleChange}
-              required
-              placeholder="Ex: Parc de la Tête d'Or, Lyon"
-              className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-opacity-50"
-              style={{
-                borderRadius: 'var(--radius)',
-                borderColor: theme === 'elite' ? 'rgba(167, 139, 250, 0.3)' : undefined,
-              }}
-            />
-          </div>
-
-          {/* Distance */}
-          <div>
-            <label htmlFor="distance_km" className="block font-semibold mb-2">
-              Distance (km) <span className="text-red-500">*</span>
-            </label>
-            <input
-              type="number"
-              id="distance_km"
-              name="distance_km"
-              value={formData.distance_km}
-              onChange={handleChange}
-              required
-              min={1}
-              max={100}
-              step={0.5}
-              className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-opacity-50"
-              style={{
-                borderRadius: 'var(--radius)',
-                borderColor: theme === 'elite' ? 'rgba(167, 139, 250, 0.3)' : undefined,
-              }}
-            />
-          </div>
-
-          {/* Type de session */}
-          <div>
-            <label htmlFor="session_type" className="block font-semibold mb-2">
-              Type de session
-            </label>
-            <select
-              id="session_type"
-              name="session_type"
-              value={formData.session_type}
-              onChange={handleChange}
-              className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-opacity-50"
-              style={{
-                borderRadius: 'var(--radius)',
-                borderColor: theme === 'elite' ? 'rgba(167, 139, 250, 0.3)' : undefined,
-              }}
-            >
-              {Object.entries(sessionTypeLabels).map(([value, label]) => (
-                <option key={value} value={value}>
-                  {label}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          {/* Niveau requis */}
-          <div>
-            <label className="block font-semibold mb-3">
-              Niveau requis <span className="text-red-500">*</span>
-            </label>
-            <div className="space-y-2">
-              {[1, 2, 3, 4, 5].map((level) => (
-                <label
-                  key={level}
-                  className="flex items-center gap-3 cursor-pointer p-3 rounded-lg border transition-all hover:bg-gray-50"
-                  style={{
-                    borderRadius: 'var(--radius)',
-                    borderColor:
-                      formData.level_required === level
-                        ? 'var(--color-primary)'
-                        : theme === 'elite'
-                        ? 'rgba(167, 139, 250, 0.2)'
-                        : '#e5e7eb',
-                    borderWidth: formData.level_required === level ? '2px' : '1px',
-                    backgroundColor:
-                      formData.level_required === level
-                        ? theme === 'elite'
-                          ? 'rgba(167, 139, 250, 0.1)'
-                          : 'rgba(34, 197, 94, 0.05)'
-                        : 'transparent',
-                  }}
-                >
-                  <input
-                    type="radio"
-                    name="level_required"
-                    value={level}
-                    checked={formData.level_required === level}
-                    onChange={() => handleLevelChange(level)}
-                    className="w-4 h-4"
-                    style={{ accentColor: 'var(--color-primary)' }}
-                  />
-                  <span className="flex-1">{getLevelLabel(level)}</span>
-                </label>
-              ))}
-            </div>
-          </div>
-
-          {/* Allure cible */}
-          <div>
-            <label htmlFor="target_pace" className="block font-semibold mb-2">
-              Allure cible (optionnel)
-            </label>
-            <input
-              type="text"
-              id="target_pace"
-              name="target_pace"
-              value={formData.target_pace}
-              onChange={handleChange}
-              placeholder="Ex: 5:30 (5min30/km)"
-              pattern="[0-9]{1,2}:[0-9]{2}"
-              className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-opacity-50"
-              style={{
-                borderRadius: 'var(--radius)',
-                borderColor: theme === 'elite' ? 'rgba(167, 139, 250, 0.3)' : undefined,
-              }}
-            />
-            <p className="text-sm opacity-75 mt-1">Format: min:sec (ex: 5:30 pour 5min30/km)</p>
-          </div>
-
-          {/* Pauses marche autorisées */}
-          <div>
-            <label className="flex items-center gap-3 cursor-pointer">
-              <input
-                type="checkbox"
-                name="walk_breaks_ok"
-                checked={formData.walk_breaks_ok}
+            {/* Titre */}
+            <div className="form-section">
+              <Input
+                label="Titre de la sortie"
+                type="text"
+                name="title"
+                value={formData.title}
                 onChange={handleChange}
-                className="w-5 h-5 rounded"
-                style={{ accentColor: 'var(--color-primary)' }}
+                required
+                maxLength={100}
+                placeholder="Ex: Sortie matinale au parc"
               />
-              <span className="font-semibold">Pauses marche autorisées</span>
-            </label>
-          </div>
+            </div>
 
-          {/* Nombre max de participants */}
-          <div>
-            <label htmlFor="max_participants" className="block font-semibold mb-2">
-              Nombre maximum de participants
-            </label>
-            <input
-              type="number"
-              id="max_participants"
-              name="max_participants"
-              value={formData.max_participants}
-              onChange={handleChange}
-              min={2}
-              max={20}
-              className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-opacity-50"
-              style={{
-                borderRadius: 'var(--radius)',
-                borderColor: theme === 'elite' ? 'rgba(167, 139, 250, 0.3)' : undefined,
-              }}
-            />
-          </div>
+            {/* Description */}
+            <div className="form-section">
+              <Textarea
+                label="Description"
+                name="description"
+                value={formData.description}
+                onChange={handleChange}
+                required
+                maxLength={500}
+                rows={4}
+                placeholder="Décris l'ambiance et le parcours de la sortie..."
+              />
+              <p className="text-sm text-gray-500 mt-2">
+                {formData.description?.length || 0}/500 caractères
+              </p>
+            </div>
 
-          {/* Boutons */}
-          <div className="flex flex-col sm:flex-row gap-4 pt-4">
-            <button
-              type="submit"
-              disabled={loading}
-              className="btn-primary flex-1 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {loading ? '⏳ Création en cours...' : '✨ Créer la sortie'}
-            </button>
-            <Link
-              href="/sessions"
-              className="flex-1 px-6 py-3 text-center rounded-lg font-medium border-2 transition-all hover:bg-gray-50"
-              style={{
-                borderRadius: 'var(--radius)',
-                borderColor: theme === 'elite' ? 'rgba(167, 139, 250, 0.3)' : '#d1d5db',
-              }}
-            >
-              Annuler
-            </Link>
-          </div>
-        </form>
-      </div>
+            {/* Date/heure et Distance */}
+            <div className="form-section">
+              <div className="grid md:grid-cols-2 gap-6">
+                <Input
+                  label="Date et heure"
+                  type="datetime-local"
+                  name="start_time"
+                  value={formData.start_time}
+                  onChange={handleChange}
+                  required
+                />
+                <Input
+                  label="Distance (km)"
+                  type="number"
+                  name="distance_km"
+                  value={formData.distance_km.toString()}
+                  onChange={handleChange}
+                  required
+                  min={1}
+                  max={100}
+                  step={0.5}
+                />
+              </div>
+            </div>
+
+            {/* Lieu */}
+            <div className="form-section">
+              <Input
+                label="Lieu de rendez-vous"
+                type="text"
+                name="location_name"
+                value={formData.location_name}
+                onChange={handleChange}
+                required
+                placeholder="Ex: Parc de la Tête d'Or, Lyon"
+                icon={
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                  </svg>
+                }
+              />
+            </div>
+
+            {/* Type de session */}
+            <div className="form-section">
+              <label className="block text-sm font-semibold text-gray-700 mb-4">
+                Type de sortie
+              </label>
+              <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-3">
+                {sessionTypes.map((type) => (
+                  <label
+                    key={type.value}
+                    className={`
+                      relative cursor-pointer rounded-xl p-4 border-2 transition-all duration-200
+                      ${
+                        formData.session_type === type.value
+                          ? 'border-blue-500 bg-blue-50/50'
+                          : 'border-gray-200 bg-white/40 hover:border-gray-300'
+                      }
+                    `}
+                  >
+                    <input
+                      type="radio"
+                      name="session_type"
+                      value={type.value}
+                      checked={formData.session_type === type.value}
+                      onChange={handleChange}
+                      className="sr-only"
+                    />
+                    <div className="text-2xl mb-2">{type.icon}</div>
+                    <div className="font-semibold text-gray-900 text-sm mb-1">
+                      {type.label}
+                    </div>
+                    <div className="text-xs text-gray-600">{type.description}</div>
+                    {formData.session_type === type.value && (
+                      <div className="absolute top-2 right-2 w-5 h-5 rounded-full bg-blue-500 flex items-center justify-center">
+                        <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
+                          <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                        </svg>
+                      </div>
+                    )}
+                  </label>
+                ))}
+              </div>
+            </div>
+
+            {/* Niveau requis */}
+            <div className="form-section">
+              <label className="block text-sm font-semibold text-gray-700 mb-4">
+                Niveau requis
+              </label>
+              <div className="space-y-3">
+                {[1, 2, 3, 4, 5].map((level) => (
+                  <label
+                    key={level}
+                    className={`
+                      flex items-center gap-4 p-4 rounded-xl border-2 cursor-pointer transition-all duration-200
+                      ${
+                        formData.level_required === level
+                          ? 'border-blue-500 bg-blue-50/50'
+                          : 'border-gray-200 bg-white/40 hover:border-gray-300'
+                      }
+                    `}
+                  >
+                    <input
+                      type="radio"
+                      name="level_required"
+                      value={level}
+                      checked={formData.level_required === level}
+                      onChange={() => handleLevelChange(level)}
+                      className="w-5 h-5 text-blue-600"
+                    />
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2 mb-1">
+                        <span className="text-lg">{getLevelStars(level)}</span>
+                        <span className="font-semibold text-gray-900">
+                          {getLevelLabel(level)}
+                        </span>
+                      </div>
+                      <p className="text-sm text-gray-600">{getLevelDescription(level)}</p>
+                    </div>
+                  </label>
+                ))}
+              </div>
+            </div>
+
+            {/* Allure et Participants */}
+            <div className="form-section">
+              <div className="grid md:grid-cols-2 gap-6">
+                <Input
+                  label="Allure cible (optionnel)"
+                  type="text"
+                  name="target_pace"
+                  value={formData.target_pace}
+                  onChange={handleChange}
+                  placeholder="Ex: 5:30"
+                  pattern="[0-9]{1,2}:[0-9]{2}"
+                  icon={
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                    </svg>
+                  }
+                />
+                <Input
+                  label="Participants max"
+                  type="number"
+                  name="max_participants"
+                  value={formData.max_participants.toString()}
+                  onChange={handleChange}
+                  min={2}
+                  max={20}
+                  icon={
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                    </svg>
+                  }
+                />
+              </div>
+              <p className="text-sm text-gray-500 mt-2">
+                Format allure: min:sec (ex: 5:30 pour 5min30/km)
+              </p>
+            </div>
+
+            {/* Pauses marche */}
+            <div className="form-section">
+              <label className="flex items-center gap-3 cursor-pointer p-4 rounded-xl bg-white/40 hover:bg-white/60 transition-colors">
+                <input
+                  type="checkbox"
+                  name="walk_breaks_ok"
+                  checked={formData.walk_breaks_ok}
+                  onChange={handleChange}
+                  className="w-5 h-5 text-blue-600 rounded"
+                />
+                <div>
+                  <span className="font-semibold text-gray-900 block">
+                    Pauses marche autorisées
+                  </span>
+                  <span className="text-sm text-gray-600">
+                    Idéal pour les débutants ou sorties longues
+                  </span>
+                </div>
+              </label>
+            </div>
+
+            {/* Actions */}
+            <div className="flex flex-col sm:flex-row gap-4 pt-6">
+              <Button
+                type="submit"
+                variant="gradient"
+                size="lg"
+                fullWidth
+                loading={loading}
+                icon={
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                  </svg>
+                }
+              >
+                {loading ? 'Création en cours...' : 'Créer la sortie'}
+              </Button>
+              <Link href="/sessions" className="sm:w-auto">
+                <Button type="button" variant="outline" size="lg" fullWidth>
+                  Annuler
+                </Button>
+              </Link>
+            </div>
+          </form>
+        </Card>
+      </Container>
     </div>
   );
 }
