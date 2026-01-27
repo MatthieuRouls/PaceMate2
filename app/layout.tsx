@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import { ThemeProvider } from "../components/providers/ThemeProvider";
 import { AuthProvider } from "../components/providers/AuthProvider";
 import Navbar from "../components/layout/Navbar";
 
@@ -17,14 +16,12 @@ export default function RootLayout({
   return (
     <html lang="fr">
       <body>
-        <ThemeProvider>
-          <AuthProvider>
-            <Navbar />
-            <main className="pt-16">
-              {children}
-            </main>
-          </AuthProvider>
-        </ThemeProvider>
+        <AuthProvider>
+          <Navbar />
+          <main className="pt-20">
+            {children}
+          </main>
+        </AuthProvider>
       </body>
     </html>
   );
