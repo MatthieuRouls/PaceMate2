@@ -138,19 +138,19 @@ export default function CreateSessionPage() {
   ];
 
   return (
-    <div className="min-h-screen pt-32 pb-20">
+    <div className="min-h-screen py-8">
       <Container maxW="2xl">
         {/* Header */}
-        <div className="mb-12 text-center lg:text-left">
-          <h1 className="mb-4">Créer une sortie</h1>
-          <p className="text-xl text-gray-600">
+        <div className="mb-6">
+          <h1 className="mb-2">Créer une sortie</h1>
+          <p className="text-gray-600">
             Propose une session et trouve des partenaires de course
           </p>
         </div>
 
         {/* Formulaire */}
-        <Card variant="glass" padding="xl">
-          <form onSubmit={handleSubmit} className="space-y-8">
+        <Card variant="glass" padding="lg">
+          <form onSubmit={handleSubmit} className="space-y-6">
             {/* Message d'erreur */}
             {error && (
               <div className="p-4 rounded-xl bg-red-50 border-2 border-red-200">
@@ -379,23 +379,18 @@ export default function CreateSessionPage() {
             </div>
 
             {/* Actions */}
-            <div className="flex flex-col sm:flex-row gap-4 pt-6">
+            <div className="flex flex-col sm:flex-row gap-3 pt-4">
               <Button
                 type="submit"
                 variant="gradient"
-                size="lg"
+                size="md"
                 fullWidth
                 loading={loading}
-                icon={
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                  </svg>
-                }
               >
                 {loading ? 'Création en cours...' : 'Créer la sortie'}
               </Button>
               <Link href="/sessions" className="sm:w-auto">
-                <Button type="button" variant="outline" size="lg" fullWidth>
+                <Button type="button" variant="outline" size="md" fullWidth>
                   Annuler
                 </Button>
               </Link>

@@ -73,23 +73,23 @@ export default function SignupPage() {
 
       <div className="w-full max-w-md relative z-10">
         {/* Logo */}
-        <div className="text-center mb-8">
-          <Link href="/" className="inline-flex items-center gap-2 mb-4">
-            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-pink-500 to-blue-500 flex items-center justify-center shadow-lg">
-              <span className="text-white font-bold text-2xl">P</span>
+        <div className="text-center mb-6">
+          <Link href="/" className="inline-flex items-center gap-2 mb-3">
+            <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-pink-500 to-blue-500 flex items-center justify-center shadow-lg">
+              <span className="text-white font-bold text-lg">P</span>
             </div>
-            <span className="text-3xl font-bold text-gradient">
+            <span className="text-2xl font-bold text-gradient">
               PaceMate
             </span>
           </Link>
-          <p className="text-gray-600 mt-2">
+          <p className="text-sm text-gray-600">
             Créez votre compte
           </p>
         </div>
 
         {/* Card */}
-        <Card variant="glass" padding="xl">
-          <form onSubmit={handleSubmit} className="space-y-6">
+        <Card variant="glass" padding="lg">
+          <form onSubmit={handleSubmit} className="space-y-4">
             {/* Success Message */}
             {success && (
               <div className="p-4 rounded-xl bg-green-50 border-2 border-green-200">
@@ -191,7 +191,7 @@ export default function SignupPage() {
             <Button
               type="submit"
               variant="gradient"
-              size="lg"
+              size="md"
               fullWidth
               loading={loading}
             >
@@ -212,7 +212,7 @@ export default function SignupPage() {
 
             {/* Login Link */}
             <Link href="/auth/login">
-              <Button type="button" variant="outline" size="lg" fullWidth>
+              <Button type="button" variant="outline" size="md" fullWidth>
                 Se connecter
               </Button>
             </Link>
