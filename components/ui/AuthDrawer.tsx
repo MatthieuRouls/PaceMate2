@@ -38,8 +38,10 @@ export default function AuthDrawer({ isOpen, onClose, mode, onSwitchMode }: Auth
       if (mode === 'login') {
         const result = await signIn(email, password);
         if (result.success) {
+          onClose();
+          // Give time for AuthProvider to update
           await new Promise(resolve => setTimeout(resolve, 500));
-          window.location.href = '/sessions';
+          window.location.href = '/dashboard';
         } else {
           setError(result.error || 'Erreur lors de la connexion');
         }
