@@ -33,35 +33,31 @@ export default function Home() {
     <div className="min-h-screen bg-white">
       {/* Hero Section */}
       <section className="bg-gradient-to-b from-slate-50 to-white py-20 px-4 sm:px-6 lg:px-8">
-        <div>
-            <h1 className="text-5xl font-bold text-slate-900 mb-6">
-              Trouve ton binôme de course
-            </h1>
-            <p className="text-xl text-slate-600 mb-8">
-              Rejoins une communauté de runners, partage tes sorties et progresse ensemble
-            </p>
-            <div className="flex gap-4">
-              <Link
-                href="/sessions"
-                className="px-6 py-3 font-semibold text-white bg-brand-500 hover:bg-brand-600 rounded-lg shadow-sm"
-              >
-                Voir les sessions
-              </Link>
-              <Link
-                href="/sessions/create"
-                className="px-6 py-3 font-semibold text-brand-600 bg-white border-2 border-brand-200 hover:bg-brand-50 rounded-lg"
-              >
-                Créer une sortie
-              </Link>
-            </div>
-          </div>
+        <h1 className="text-5xl font-bold text-slate-900 mb-6">
+          Trouve ton binôme de course
+        </h1>
+        <p className="text-xl text-slate-600 mb-8">
+          Rejoins une communauté de runners, partage tes sorties et progresse ensemble
+        </p>
+        <div className="flex gap-4">
+          <Link
+            href="/sessions"
+            className="px-6 py-3 font-semibold text-white bg-brand-500 hover:bg-brand-600 rounded-lg shadow-sm"
+          >
+            Voir les sessions
+          </Link>
+          <Link
+            href="/sessions/create"
+            className="px-6 py-3 font-semibold text-brand-600 bg-white border-2 border-brand-200 hover:bg-brand-50 rounded-lg"
+          >
+            Créer une sortie
+          </Link>
         </div>
       </section>
 
       {/* Upcoming Sessions */}
       <section className="py-16 px-4 sm:px-6 lg:px-8">
-        <div>
-          <div className="flex items-center justify-between mb-8">
+        <div className="flex items-center justify-between mb-8">
             <h2 className="text-3xl font-bold text-slate-900">
               Prochaines sorties
             </h2>
@@ -94,13 +90,11 @@ export default function Home() {
               </Link>
             </div>
           )}
-        </div>
       </section>
 
       {/* Top Teams */}
       <section className="py-16 px-4 sm:px-6 lg:px-8 bg-slate-50">
-        <div>
-          <h2 className="text-3xl font-bold text-slate-900 mb-8">
+        <h2 className="text-3xl font-bold text-slate-900 mb-8">
             Top Équipes
           </h2>
 
@@ -156,7 +150,6 @@ export default function Home() {
               <p className="text-slate-600">Aucune équipe pour le moment</p>
             </div>
           )}
-        </div>
       </section>
     </div>
   );
