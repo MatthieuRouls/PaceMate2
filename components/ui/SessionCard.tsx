@@ -33,141 +33,88 @@ export default function SessionCard({ session }: SessionCardProps) {
   const isFull = spotsLeft === 0;
   const almostFull = !isFull && spotsLeft <= 2;
 
-  // Level badge colors
-  const levelColors = [
-    'bg-green-100 text-green-700',
-    'bg-green-100 text-green-700',
-    'bg-blue-100 text-blue-700',
-    'bg-orange-100 text-orange-700',
-    'bg-red-100 text-red-700',
-  ];
-
   return (
-    <Link href={`/sessions/${session.id}`} className="group block">
-      <div className="card-interactive h-full relative overflow-hidden">
-        {/* Gradient accent bar */}
-        <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-primary-500 to-accent-500" />
-
+    <Link href={`/sessions/${session.id}`} className="block group">
+      <div className="bg-white border border-gray-200 rounded-lg p-4 hover:border-gray-300 hover:shadow-sm transition-all">
         {/* Header */}
-        <div className="flex items-start justify-between mb-4">
-          <span className={`badge ${levelColors[session.level_required - 1]} text-xs font-bold`}>
+        <div className="flex items-start justify-between mb-3">
+          <span className="inline-flex items-center px-2 py-1 rounded text-xs font-medium bg-blue-50 text-blue-700">
             {'⭐'.repeat(session.level_required)}
           </span>
-          <div className="text-right">
-            <div className="text-sm font-semibold text-gray-900">
-              {formatDate(session.start_time)}
-            </div>
-            <div className="text-xs text-gray-500">
-              {formatTime(session.start_time)}
-            </div>
+          <div className="text-right text-sm">
+            <div className="font-medium text-gray-900">{formatDate(session.start_time)}</div>
+            <div className="text-gray-500 text-xs">{formatTime(session.start_time)}</div>
           </div>
         </div>
 
         {/* Title */}
-        <h3 className="text-lg font-bold text-gray-900 mb-2 line-clamp-1 group-hover:text-primary-600 transition-colors">
+        <h3 className="font-bold text-gray-900 mb-2 group-hover:text-blue-600 transition-colors">
           {session.title}
         </h3>
 
         {/* Description */}
         {session.description && (
-          <p className="text-sm text-gray-600 mb-4 line-clamp-2">
+          <p className="text-sm text-gray-600 mb-3 line-clamp-2">
             {session.description}
           </p>
         )}
 
-        {/* Stats Grid */}
-        <div className="grid grid-cols-2 gap-3 mb-4">
-          {/* Location */}
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-primary-50 flex items-center justify-center flex-shrink-0">
-              <svg className="w-4 h-4 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-              </svg>
-            </div>
-            <span className="text-sm text-gray-700 truncate font-medium">{session.location_name}</span>
+        {/* Stats */}
+        <div className="space-y-2 mb-3">
+          <div className="flex items-center justify-between text-sm">
+            <span className="text-gray-600">📍 {session.location_name}</span>
+            <span className="font-medium text-gray-900">{session.distance_km} km</span>
           </div>
-
-          {/* Distance */}
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-accent-50 flex items-center justify-center flex-shrink-0">
-              <svg className="w-4 h-4 text-accent-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
-              </svg>
-            </div>
-            <span className="text-sm font-bold text-gray-900">{session.distance_km} km</span>
-          </div>
-
-          {/* Pace */}
           {session.target_pace && (
-            <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-lg bg-success-50 flex items-center justify-center flex-shrink-0">
-                <svg className="w-4 h-4 text-success-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                </svg>
-              </div>
-              <span className="text-sm text-gray-700 font-medium">{session.target_pace} min/km</span>
+            <div className="flex items-center justify-between text-sm">
+              <span className="text-gray-600">⚡ Allure</span>
+              <span className="font-medium text-gray-900">{session.target_pace} min/km</span>
             </div>
           )}
-
-          {/* Participants */}
-          <div className="flex items-center gap-2">
-            <div className={`w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 ${
-              isFull ? 'bg-red-50' : almostFull ? 'bg-yellow-50' : 'bg-gray-50'
-            }`}>
-              <svg className={`w-4 h-4 ${
-                isFull ? 'text-red-600' : almostFull ? 'text-yellow-600' : 'text-gray-600'
-              }`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-              </svg>
-            </div>
-            <span className={`text-sm font-bold ${
-              isFull ? 'text-red-600' : almostFull ? 'text-yellow-600' : 'text-gray-900'
+          <div className="flex items-center justify-between text-sm">
+            <span className="text-gray-600">👥 Places</span>
+            <span className={`font-medium ${
+              isFull ? 'text-red-600' : almostFull ? 'text-orange-600' : 'text-gray-900'
             }`}>
               {session.participants_count || 0}/{session.max_participants}
             </span>
           </div>
         </div>
 
-        {/* Status badges */}
+        {/* Status */}
         {(almostFull || isFull) && (
-          <div className="mb-4">
+          <div className="mb-3">
             {almostFull && (
-              <span className="badge-warning">
-                ⚡ Plus que {spotsLeft} place{spotsLeft > 1 ? 's' : ''} !
+              <span className="inline-block px-2 py-1 rounded text-xs font-medium bg-orange-50 text-orange-700">
+                Plus que {spotsLeft} place{spotsLeft > 1 ? 's' : ''} !
               </span>
             )}
             {isFull && (
-              <span className="badge-danger">
-                ❌ Complet
+              <span className="inline-block px-2 py-1 rounded text-xs font-medium bg-red-50 text-red-700">
+                Complet
               </span>
             )}
           </div>
         )}
 
-        {/* Divider */}
-        <div className="border-t border-gray-100 pt-4 mt-4">
-          {/* Creator + Action */}
-          <div className="flex items-center justify-between">
-            {session.creator && (
-              <div className="flex items-center gap-2">
-                <div className="w-7 h-7 rounded-full bg-gradient-to-br from-primary-500 to-accent-500 flex items-center justify-center">
-                  <span className="text-white text-xs font-bold">
-                    {session.creator.username.substring(0, 2).toUpperCase()}
-                  </span>
-                </div>
-                <span className="text-xs text-gray-600">
-                  @{session.creator.username}
+        {/* Footer */}
+        <div className="flex items-center justify-between pt-3 border-t border-gray-100">
+          {session.creator && (
+            <div className="flex items-center gap-2">
+              <div className="w-6 h-6 rounded-full bg-blue-600 flex items-center justify-center">
+                <span className="text-white text-xs font-bold">
+                  {session.creator.username.substring(0, 2).toUpperCase()}
                 </span>
               </div>
-            )}
-
-            <div className="flex items-center gap-1 text-primary-600 font-semibold text-sm group-hover:gap-2 transition-all">
-              <span>{isFull ? 'Voir' : 'Rejoindre'}</span>
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-              </svg>
+              <span className="text-xs text-gray-600">
+                @{session.creator.username}
+              </span>
             </div>
-          </div>
+          )}
+
+          <span className="text-xs text-blue-600 font-medium">
+            {isFull ? 'Voir →' : 'Rejoindre →'}
+          </span>
         </div>
       </div>
     </Link>
