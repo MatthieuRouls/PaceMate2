@@ -33,8 +33,7 @@ export default function Home() {
     <div className="min-h-screen bg-white">
       {/* Hero Section */}
       <section className="bg-gradient-to-b from-slate-50 to-white py-20 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-7xl mx-auto">
-          <div className="max-w-3xl">
+        <div>
             <h1 className="text-5xl font-bold text-slate-900 mb-6">
               Trouve ton binôme de course
             </h1>
@@ -61,7 +60,7 @@ export default function Home() {
 
       {/* Upcoming Sessions */}
       <section className="py-16 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-7xl mx-auto">
+        <div>
           <div className="flex items-center justify-between mb-8">
             <h2 className="text-3xl font-bold text-slate-900">
               Prochaines sorties
@@ -100,7 +99,7 @@ export default function Home() {
 
       {/* Top Teams */}
       <section className="py-16 px-4 sm:px-6 lg:px-8 bg-slate-50">
-        <div className="max-w-7xl mx-auto">
+        <div>
           <h2 className="text-3xl font-bold text-slate-900 mb-8">
             Top Équipes
           </h2>
