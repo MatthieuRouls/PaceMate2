@@ -15,8 +15,14 @@ export default function DashboardPage() {
   const [sessionsLoading, setSessionsLoading] = useState(true);
 
   useEffect(() => {
+    // Only redirect if we're sure user is not authenticated
+    // Wait for loading to complete before checking
     if (!loading && !profile) {
-      router.push('/');
+      // Add a small delay to ensure auth state is fully settled
+      const timeoutId = setTimeout(() => {
+        router.push('/');
+      }, 300);
+      return () => clearTimeout(timeoutId);
     }
   }, [loading, profile, router]);
 

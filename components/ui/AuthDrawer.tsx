@@ -38,9 +38,11 @@ export default function AuthDrawer({ isOpen, onClose, mode, onSwitchMode }: Auth
       if (mode === 'login') {
         const result = await signIn(email, password);
         if (result.success) {
+          // Close drawer and wait a bit for state to update
           onClose();
-          // Give time for AuthProvider to update
-          await new Promise(resolve => setTimeout(resolve, 500));
+          // Wait for AuthProvider to fully update profile state
+          await new Promise(resolve => setTimeout(resolve, 1000));
+          // Force reload to ensure all auth state is fresh
           window.location.href = '/dashboard';
         } else {
           setError(result.error || 'Erreur lors de la connexion');
