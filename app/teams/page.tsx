@@ -1,7 +1,6 @@
 'use client';
 
 import { useEffect, useState, FormEvent } from 'react';
-import { useTheme } from '@/components/providers/ThemeProvider';
 import { Team } from '@/lib/types';
 import TeamCard from '@/components/ui/TeamCard';
 import {
@@ -15,7 +14,6 @@ import {
 export const dynamic = 'force-dynamic';
 
 export default function TeamsPage() {
-  const { theme } = useTheme();
 
   // State
   const [userTeam, setUserTeam] = useState<Team | null>(null);
@@ -225,17 +223,7 @@ export default function TeamsPage() {
                 <form onSubmit={handleCreateTeam} className="space-y-4">
                   {/* Erreur de création */}
                   {createError && (
-                    <div
-                      className="p-4 rounded-lg border-2 border-red-500 bg-red-50 text-red-700"
-                      style={
-                        theme === 'elite'
-                          ? {
-                              backgroundColor: 'rgba(239, 68, 68, 0.1)',
-                              borderColor: 'rgb(239, 68, 68)',
-                            }
-                          : {}
-                      }
-                    >
+                    <div className="p-4 rounded-lg border-2 border-red-500 bg-red-50 text-red-700">
                       <p className="font-semibold">❌ Erreur</p>
                       <p className="text-sm mt-1">{createError}</p>
                     </div>
@@ -254,11 +242,7 @@ export default function TeamsPage() {
                       required
                       maxLength={50}
                       placeholder="Ex: Les Runners du dimanche"
-                      className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-opacity-50"
-                      style={{
-                        borderRadius: 'var(--radius)',
-                        borderColor: theme === 'elite' ? 'rgba(167, 139, 250, 0.3)' : undefined,
-                      }}
+                      className="input"
                     />
                     <p className="text-sm opacity-75 mt-1">{teamName.length}/50 caractères</p>
                   </div>
@@ -275,11 +259,7 @@ export default function TeamsPage() {
                       maxLength={200}
                       rows={3}
                       placeholder="Décris ton équipe et son ambiance..."
-                      className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-opacity-50 resize-none"
-                      style={{
-                        borderRadius: 'var(--radius)',
-                        borderColor: theme === 'elite' ? 'rgba(167, 139, 250, 0.3)' : undefined,
-                      }}
+                      className="input resize-none"
                     />
                     <p className="text-sm opacity-75 mt-1">
                       {teamDescription.length}/200 caractères

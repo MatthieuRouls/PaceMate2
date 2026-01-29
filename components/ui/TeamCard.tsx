@@ -1,7 +1,6 @@
 'use client';
 
 import { Team } from '@/lib/types';
-import { useTheme } from '../providers/ThemeProvider';
 
 interface TeamCardProps {
   team: Team;
@@ -9,8 +8,6 @@ interface TeamCardProps {
 }
 
 export default function TeamCard({ team, position }: TeamCardProps) {
-  const { theme } = useTheme();
-
   // Badges pour le top 3
   const getPositionBadge = (pos: number) => {
     if (pos === 1) return '🥇';
@@ -23,16 +20,12 @@ export default function TeamCard({ team, position }: TeamCardProps) {
 
   return (
     <div
-      className={`card transition-all ${
-        isTopThree ? 'border-2' : ''
-      }`}
+      className={`card transition-all ${isTopThree ? 'border-2' : ''}`}
       style={
         isTopThree
           ? {
-              borderColor: 'var(--color-primary)',
-              backgroundColor: theme === 'elite'
-                ? 'rgba(167, 139, 250, 0.05)'
-                : 'rgba(34, 197, 94, 0.05)',
+              borderColor: '#0066cc',
+              backgroundColor: '#f0f7ff',
             }
           : {}
       }
@@ -42,12 +35,8 @@ export default function TeamCard({ team, position }: TeamCardProps) {
         <div
           className="flex-shrink-0 w-12 h-12 rounded-full flex items-center justify-center font-bold text-lg"
           style={{
-            backgroundColor: isTopThree
-              ? theme === 'elite'
-                ? 'rgba(167, 139, 250, 0.2)'
-                : 'rgba(34, 197, 94, 0.2)'
-              : 'rgba(0, 0, 0, 0.05)',
-            color: isTopThree ? 'var(--color-primary)' : 'var(--color-text)',
+            backgroundColor: isTopThree ? '#cfe2ff' : '#e9ecef',
+            color: isTopThree ? '#0066cc' : '#212529',
           }}
         >
           {getPositionBadge(position)}
@@ -75,7 +64,7 @@ export default function TeamCard({ team, position }: TeamCardProps) {
               <span>🏃</span>
               <span
                 className="font-semibold"
-                style={{ color: isTopThree ? 'var(--color-primary)' : 'inherit' }}
+                style={{ color: isTopThree ? '#0066cc' : 'inherit' }}
               >
                 {(team.total_distance || 0).toFixed(1)} km
               </span>

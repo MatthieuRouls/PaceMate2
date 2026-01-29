@@ -3,7 +3,6 @@
 import { useEffect, useState } from 'react';
 import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
-import { useTheme } from '@/components/providers/ThemeProvider';
 import { Session, Profile } from '@/lib/types';
 import {
   getSessionDetails,
@@ -26,7 +25,6 @@ export default function SessionDetailsPage() {
   const params = useParams();
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { theme } = useTheme();
   const sessionId = params.id as string;
 
   // Mode debug pour tester la notation (ajoutez ?testRating=true à l'URL)
@@ -100,20 +98,7 @@ export default function SessionDetailsPage() {
   // Formater l'allure
   const getPaceDisplay = () => {
     if (!session) return '';
-
-    if (theme === 'discovery') {
-      if (session.walk_breaks_ok) return 'Tranquille avec pauses';
-      if (session.target_pace) {
-        const [min, sec] = session.target_pace.split(':').map(Number);
-        const totalMinutes = min + sec / 60;
-        if (totalMinutes <= 5) return 'Rapide';
-        if (totalMinutes <= 6) return 'Allure modérée';
-        return 'Tranquille';
-      }
-      return 'Allure modérée';
-    } else {
-      return session.target_pace ? `${session.target_pace} min/km` : 'Allure libre';
-    }
+    return session.target_pace ? `${session.target_pace} min/km` : 'Allure libre';
   };
 
   // Labels des types de session
@@ -218,7 +203,6 @@ export default function SessionDetailsPage() {
             <span
               className="px-3 py-1 rounded-full text-sm font-medium border-2"
               style={{
-                borderRadius: 'var(--radius)',
                 borderColor: 'orange',
                 backgroundColor: 'rgba(255, 165, 0, 0.1)',
                 color: 'orange',
@@ -234,7 +218,7 @@ export default function SessionDetailsPage() {
           <div className="text-center py-12">
             <div
               className="inline-block animate-spin rounded-full h-12 w-12 border-b-2"
-              style={{ borderColor: 'var(--color-primary)' }}
+              style={{ borderColor: '#0066cc' }}
             ></div>
             <p className="mt-4 opacity-75">Chargement...</p>
           </div>
@@ -259,14 +243,12 @@ export default function SessionDetailsPage() {
               {/* Créateur */}
               {session.creator && (
                 <div className="flex items-center gap-3 mb-6 pb-6 border-b"
-                     style={{ borderColor: theme === 'elite' ? 'rgba(167, 139, 250, 0.2)' : 'rgba(0, 0, 0, 0.1)' }}>
+                     style={{ borderColor: '#dee2e6' }}>
                   <div
                     className="w-12 h-12 rounded-full flex items-center justify-center font-bold"
                     style={{
-                      backgroundColor: theme === 'elite'
-                        ? 'rgba(167, 139, 250, 0.2)'
-                        : 'rgba(34, 197, 94, 0.2)',
-                      color: 'var(--color-primary)',
+                      backgroundColor: '#0066cc',
+                      color: 'white',
                     }}
                   >
                     {getInitials(session.creator.username)}
@@ -308,7 +290,7 @@ export default function SessionDetailsPage() {
                   <span className="text-2xl">⚡</span>
                   <div>
                     <p className="text-sm opacity-75">Allure</p>
-                    <p className="font-semibold" style={{ color: 'var(--color-primary)' }}>
+                    <p className="font-semibold" style={{ color: '#0066cc' }}>
                       {getPaceDisplay()}
                     </p>
                   </div>
@@ -339,11 +321,8 @@ export default function SessionDetailsPage() {
                   <span
                     className="inline-block px-3 py-1 rounded-full text-sm font-medium"
                     style={{
-                      borderRadius: 'var(--radius)',
-                      backgroundColor: theme === 'elite'
-                        ? 'rgba(167, 139, 250, 0.2)'
-                        : 'rgba(34, 197, 94, 0.2)',
-                      color: 'var(--color-primary)',
+                      backgroundColor: '#cfe2ff',
+                      color: '#0066cc',
                     }}
                   >
                     ✓ Pauses marche autorisées
@@ -369,16 +348,14 @@ export default function SessionDetailsPage() {
                 <div
                   className="w-full h-3 rounded-full overflow-hidden"
                   style={{
-                    backgroundColor: theme === 'elite' ? 'rgba(167, 139, 250, 0.1)' : 'rgba(0, 0, 0, 0.1)',
-                    borderRadius: theme === 'discovery' ? '999px' : '4px',
+                    backgroundColor: '#e9ecef',
                   }}
                 >
                   <div
                     className="h-full transition-all"
                     style={{
                       width: `${((session.participants_count || 0) / session.max_participants) * 100}%`,
-                      backgroundColor: 'var(--color-primary)',
-                      borderRadius: theme === 'discovery' ? '999px' : '4px',
+                      backgroundColor: '#0066cc',
                     }}
                   />
                 </div>
@@ -392,10 +369,8 @@ export default function SessionDetailsPage() {
                       <div
                         className="w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0"
                         style={{
-                          backgroundColor: theme === 'elite'
-                            ? 'rgba(167, 139, 250, 0.2)'
-                            : 'rgba(34, 197, 94, 0.2)',
-                          color: 'var(--color-primary)',
+                          backgroundColor: '#0066cc',
+                          color: 'white',
                         }}
                       >
                         {getInitials(participant.username)}
@@ -430,7 +405,6 @@ export default function SessionDetailsPage() {
                   onClick={handleLeave}
                   disabled={actionLoading}
                   className="w-full px-6 py-3 rounded-lg border-2 border-red-500 text-red-500 font-medium hover:bg-red-50 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-                  style={{ borderRadius: 'var(--radius)' }}
                 >
                   {actionLoading ? '⏳ Chargement...' : '🚪 Se désister'}
                 </button>

@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { useTheme } from '@/components/providers/ThemeProvider';
 import { useAuth } from '@/components/providers/AuthProvider';
 import { Session, SessionParticipant } from '@/lib/types';
 import { calculateLevel } from '@/lib/constants';
@@ -17,7 +16,6 @@ import {
 export const dynamic = 'force-dynamic';
 
 export default function ProfilePage() {
-  const { theme } = useTheme();
   const { profile, loading: authLoading } = useAuth();
 
   // State
@@ -135,10 +133,8 @@ export default function ProfilePage() {
                 <div
                   className="flex-shrink-0 w-24 h-24 rounded-full flex items-center justify-center text-3xl font-bold"
                   style={{
-                    backgroundColor: theme === 'elite'
-                      ? 'rgba(167, 139, 250, 0.2)'
-                      : 'rgba(34, 197, 94, 0.2)',
-                    color: 'var(--color-primary)',
+                    backgroundColor: '#0066cc',
+                    color: 'white',
                   }}
                 >
                   {getInitials(profile.username)}
@@ -177,11 +173,8 @@ export default function ProfilePage() {
                       href="/teams"
                       className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border-2 transition-all hover:scale-105"
                       style={{
-                        borderRadius: 'var(--radius)',
-                        borderColor: 'var(--color-primary)',
-                        backgroundColor: theme === 'elite'
-                          ? 'rgba(167, 139, 250, 0.1)'
-                          : 'rgba(34, 197, 94, 0.1)',
+                        borderColor: '#0066cc',
+                        backgroundColor: '#f0f7ff',
                       }}
                     >
                       <span>🏆</span>
@@ -282,10 +275,7 @@ export default function ProfilePage() {
                         key={participant.id}
                         className="flex items-center justify-between p-3 rounded-lg border transition-all hover:bg-gray-50"
                         style={{
-                          borderRadius: 'var(--radius)',
-                          borderColor: theme === 'elite'
-                            ? 'rgba(167, 139, 250, 0.2)'
-                            : 'rgba(0, 0, 0, 0.1)',
+                          borderColor: '#dee2e6',
                         }}
                       >
                         <div className="flex-1">

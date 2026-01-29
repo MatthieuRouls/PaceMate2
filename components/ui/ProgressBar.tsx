@@ -1,7 +1,5 @@
 'use client';
 
-import { useTheme } from '../providers/ThemeProvider';
-
 interface ProgressBarProps {
   current: number;
   max: number;
@@ -9,8 +7,6 @@ interface ProgressBarProps {
 }
 
 export default function ProgressBar({ current, max, level }: ProgressBarProps) {
-  const { theme } = useTheme();
-
   // Calculer le pourcentage
   const percentage = Math.min(100, Math.max(0, (current / max) * 100));
 
@@ -18,10 +14,9 @@ export default function ProgressBar({ current, max, level }: ProgressBarProps) {
     <div className="w-full">
       {/* Barre de fond */}
       <div
-        className="w-full h-3 overflow-hidden relative"
+        className="w-full h-3 overflow-hidden relative rounded"
         style={{
-          borderRadius: theme === 'discovery' ? '999px' : '4px',
-          backgroundColor: theme === 'elite' ? 'rgba(167, 139, 250, 0.1)' : 'rgba(0, 0, 0, 0.1)',
+          backgroundColor: '#e9ecef',
         }}
       >
         {/* Barre de progression */}
@@ -29,8 +24,7 @@ export default function ProgressBar({ current, max, level }: ProgressBarProps) {
           className="h-full transition-all duration-300"
           style={{
             width: `${percentage}%`,
-            backgroundColor: 'var(--color-primary)',
-            borderRadius: theme === 'discovery' ? '999px' : '4px',
+            backgroundColor: '#0066cc',
           }}
         />
       </div>

@@ -1,7 +1,6 @@
 'use client';
 
 import { useState } from 'react';
-import { useTheme } from '../providers/ThemeProvider';
 
 interface RatingModalProps {
   isOpen: boolean;
@@ -11,7 +10,6 @@ interface RatingModalProps {
 }
 
 export default function RatingModal({ isOpen, onClose, onSubmit, sessionTitle }: RatingModalProps) {
-  const { theme } = useTheme();
   const [rating, setRating] = useState(0);
   const [hoveredRating, setHoveredRating] = useState(0);
   const [comment, setComment] = useState('');
@@ -43,11 +41,6 @@ export default function RatingModal({ isOpen, onClose, onSubmit, sessionTitle }:
     >
       <div
         className="bg-white rounded-lg p-6 max-w-md w-full shadow-xl"
-        style={{
-          borderRadius: 'var(--radius)',
-          backgroundColor: 'var(--color-bg)',
-          color: 'var(--color-text)',
-        }}
         onClick={(e) => e.stopPropagation()}
       >
         <h2 className="text-2xl font-bold mb-4">Comment s'est passée cette sortie ?</h2>
@@ -67,12 +60,7 @@ export default function RatingModal({ isOpen, onClose, onSubmit, sessionTitle }:
                   onMouseLeave={() => setHoveredRating(0)}
                   className="text-5xl transition-all hover:scale-110"
                   style={{
-                    color:
-                      star <= (hoveredRating || rating)
-                        ? 'var(--color-primary)'
-                        : theme === 'elite'
-                        ? 'rgba(167, 139, 250, 0.2)'
-                        : 'rgba(0, 0, 0, 0.2)',
+                    color: star <= (hoveredRating || rating) ? '#0066cc' : '#e9ecef',
                   }}
                 >
                   ⭐
@@ -80,7 +68,7 @@ export default function RatingModal({ isOpen, onClose, onSubmit, sessionTitle }:
               ))}
             </div>
             {rating > 0 && (
-              <p className="text-center mt-2 text-sm font-semibold" style={{ color: 'var(--color-primary)' }}>
+              <p className="text-center mt-2 text-sm font-semibold" style={{ color: '#0066cc' }}>
                 {rating} / 5 étoiles
               </p>
             )}
@@ -100,10 +88,7 @@ export default function RatingModal({ isOpen, onClose, onSubmit, sessionTitle }:
               placeholder="Qu'avez-vous pensé de cette sortie ?"
               className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-opacity-50 resize-none"
               style={{
-                borderRadius: 'var(--radius)',
-                borderColor: theme === 'elite' ? 'rgba(167, 139, 250, 0.3)' : undefined,
-                backgroundColor: 'var(--color-bg)',
-                color: 'var(--color-text)',
+                borderColor: '#dee2e6',
               }}
             />
             <p className="text-sm opacity-75 mt-1">{comment.length}/300 caractères</p>
@@ -121,11 +106,7 @@ export default function RatingModal({ isOpen, onClose, onSubmit, sessionTitle }:
             <button
               type="button"
               onClick={handleClose}
-              className="flex-1 px-4 py-2 rounded-lg border-2 font-medium transition-all hover:bg-gray-50"
-              style={{
-                borderRadius: 'var(--radius)',
-                borderColor: theme === 'elite' ? 'rgba(167, 139, 250, 0.3)' : '#d1d5db',
-              }}
+              className="flex-1 btn-secondary"
             >
               Annuler
             </button>
