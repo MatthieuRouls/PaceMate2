@@ -4,11 +4,14 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useState } from 'react';
 import { useAuth } from '../providers/AuthProvider';
+import AuthDrawer from '../ui/AuthDrawer';
 
 export default function Navbar() {
   const pathname = usePathname();
   const { profile, signOut, loading } = useAuth();
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [authDrawerOpen, setAuthDrawerOpen] = useState(false);
+  const [authMode, setAuthMode] = useState<'login' | 'signup'>('login');
 
   const handleSignOut = async () => {
     await signOut();
@@ -125,22 +128,36 @@ export default function Navbar() {
             </div>
           ) : !loading ? (
             <div className="flex items-center gap-3">
-              <Link
-                href="/auth/login"
+              <button
+                onClick={() => {
+                  setAuthMode('login');
+                  setAuthDrawerOpen(true);
+                }}
                 className="px-5 py-2 font-medium text-secondary-600 hover:text-primary-500 transition-colors"
               >
                 Connexion
-              </Link>
-              <Link
-                href="/auth/signup"
+              </button>
+              <button
+                onClick={() => {
+                  setAuthMode('signup');
+                  setAuthDrawerOpen(true);
+                }}
                 className="px-5 py-2 rounded-lg bg-primary-500 text-white text-sm font-semibold hover:bg-primary-600 transition-all shadow-md hover:scale-105"
               >
                 Inscription
-              </Link>
+              </button>
             </div>
           ) : null}
         </div>
       </div>
+
+      {/* Auth Drawer */}
+      <AuthDrawer
+        isOpen={authDrawerOpen}
+        onClose={() => setAuthDrawerOpen(false)}
+        mode={authMode}
+        onSwitchMode={setAuthMode}
+      />
     </nav>
   );
 }
