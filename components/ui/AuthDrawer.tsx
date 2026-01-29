@@ -71,13 +71,16 @@ export default function AuthDrawer({ isOpen, onClose, mode, onSwitchMode }: Auth
         onClick={onClose}
       />
 
-      {/* Drawer */}
+      {/* Floating Card */}
       <div
-        className={`fixed top-0 right-0 h-full w-full sm:w-[480px] bg-white shadow-2xl z-50 transform transition-transform duration-300 ease-out ${
-          isOpen ? 'translate-x-0' : 'translate-x-full'
+        className={`fixed top-6 right-6 w-[420px] max-h-[calc(100vh-48px)] bg-white rounded-3xl shadow-2xl z-50 transform transition-all duration-300 ease-out ${
+          isOpen ? 'translate-y-0 opacity-100 scale-100' : '-translate-y-4 opacity-0 scale-95'
         }`}
+        style={{
+          boxShadow: '0 20px 60px rgba(0, 0, 0, 0.15), 0 0 0 1px rgba(0, 0, 0, 0.05)'
+        }}
       >
-        <div className="h-full flex flex-col">
+        <div className="flex flex-col max-h-[calc(100vh-48px)]">
           {/* Header */}
           <div className="flex items-center justify-between p-6 border-b border-gray-100">
             <div>
@@ -92,7 +95,7 @@ export default function AuthDrawer({ isOpen, onClose, mode, onSwitchMode }: Auth
             </div>
             <button
               onClick={onClose}
-              className="w-10 h-10 rounded-lg hover:bg-gray-100 flex items-center justify-center transition-colors"
+              className="w-8 h-8 rounded-full hover:bg-gray-100 flex items-center justify-center transition-colors"
             >
               <X className="w-5 h-5 text-secondary-600" />
             </button>
@@ -100,10 +103,10 @@ export default function AuthDrawer({ isOpen, onClose, mode, onSwitchMode }: Auth
 
           {/* Content */}
           <div className="flex-1 overflow-y-auto p-6">
-            <form onSubmit={handleSubmit} className="space-y-6">
+            <form onSubmit={handleSubmit} className="space-y-5">
               {/* Error message */}
               {error && (
-                <div className="p-4 rounded-xl bg-red-50 border border-red-100">
+                <div className="p-3 rounded-2xl bg-red-50 border border-red-100">
                   <p className="text-sm text-red-600">{error}</p>
                 </div>
               )}
@@ -119,7 +122,7 @@ export default function AuthDrawer({ isOpen, onClose, mode, onSwitchMode }: Auth
                     value={username}
                     onChange={(e) => setUsername(e.target.value)}
                     required
-                    className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 outline-none transition-all text-secondary-600"
+                    className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 outline-none transition-all text-secondary-600 bg-white"
                     placeholder="ton_pseudo"
                   />
                 </div>
@@ -135,7 +138,7 @@ export default function AuthDrawer({ isOpen, onClose, mode, onSwitchMode }: Auth
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
-                  className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 outline-none transition-all text-secondary-600"
+                  className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 outline-none transition-all text-secondary-600 bg-white"
                   placeholder="ton@email.com"
                 />
               </div>
@@ -151,7 +154,7 @@ export default function AuthDrawer({ isOpen, onClose, mode, onSwitchMode }: Auth
                   onChange={(e) => setPassword(e.target.value)}
                   required
                   minLength={6}
-                  className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 outline-none transition-all text-secondary-600"
+                  className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 outline-none transition-all text-secondary-600 bg-white"
                   placeholder="••••••••"
                 />
                 {mode === 'signup' && (
@@ -165,7 +168,7 @@ export default function AuthDrawer({ isOpen, onClose, mode, onSwitchMode }: Auth
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full px-6 py-4 rounded-xl bg-primary-500 text-white font-semibold hover:bg-primary-600 transition-all shadow-lg hover:shadow-xl hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full px-6 py-3.5 rounded-xl bg-primary-500 text-white font-semibold hover:bg-primary-600 transition-all shadow-lg hover:shadow-xl hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {loading ? (
                   <span className="flex items-center justify-center gap-2">
@@ -181,7 +184,7 @@ export default function AuthDrawer({ isOpen, onClose, mode, onSwitchMode }: Auth
               </button>
 
               {/* Switch mode */}
-              <div className="text-center pt-4">
+              <div className="text-center pt-2">
                 <p className="text-sm text-secondary-600/60">
                   {mode === 'login' ? (
                     <>
@@ -212,11 +215,11 @@ export default function AuthDrawer({ isOpen, onClose, mode, onSwitchMode }: Auth
 
             {/* Features (signup only) */}
             {mode === 'signup' && (
-              <div className="mt-12 space-y-4">
-                <h3 className="text-sm font-semibold text-secondary-600">
-                  Pourquoi rejoindre PaceMate ?
+              <div className="mt-8 pt-6 border-t border-gray-100 space-y-3">
+                <h3 className="text-xs font-semibold text-secondary-600 uppercase tracking-wide">
+                  Pourquoi PaceMate ?
                 </h3>
-                <div className="space-y-3">
+                <div className="space-y-2.5">
                   {[
                     { icon: '🏃', text: 'Trouve des partenaires de course' },
                     { icon: '📅', text: 'Organise tes sessions facilement' },
@@ -224,7 +227,7 @@ export default function AuthDrawer({ isOpen, onClose, mode, onSwitchMode }: Auth
                     { icon: '📊', text: 'Suis ta progression' },
                   ].map((feature, i) => (
                     <div key={i} className="flex items-center gap-3">
-                      <span className="text-2xl">{feature.icon}</span>
+                      <span className="text-xl">{feature.icon}</span>
                       <span className="text-sm text-secondary-600/70">{feature.text}</span>
                     </div>
                   ))}
