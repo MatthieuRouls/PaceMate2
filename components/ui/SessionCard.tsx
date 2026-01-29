@@ -33,122 +33,142 @@ export default function SessionCard({ session }: SessionCardProps) {
   const isFull = spotsLeft === 0;
   const almostFull = !isFull && spotsLeft <= 2;
 
+  // Level badge colors
+  const levelColors = [
+    'bg-green-100 text-green-700',
+    'bg-green-100 text-green-700',
+    'bg-blue-100 text-blue-700',
+    'bg-orange-100 text-orange-700',
+    'bg-red-100 text-red-700',
+  ];
+
   return (
-    <Link href={`/sessions/${session.id}`} className="card" style={{ display: 'block', height: '100%', transition: 'transform 0.2s, box-shadow 0.2s' }}>
-      {/* Header: Niveau + Date/Heure */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1rem' }}>
-        <span style={{
-          padding: '0.25rem 0.5rem',
-          borderRadius: '0.25rem',
-          backgroundColor: '#0066cc',
-          color: 'white',
-          fontSize: '0.75rem',
-          fontWeight: 600
-        }}>
-          Niveau {session.level_required}
-        </span>
-        <div style={{ textAlign: 'right' }}>
-          <div style={{ fontSize: '0.875rem', fontWeight: 600 }}>
-            {formatDate(session.start_time)}
-          </div>
-          <div style={{ fontSize: '0.75rem', color: '#6c757d' }}>
-            {formatTime(session.start_time)}
-          </div>
-        </div>
-      </div>
+    <Link href={`/sessions/${session.id}`} className="group block">
+      <div className="card-interactive h-full relative overflow-hidden">
+        {/* Gradient accent bar */}
+        <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-primary-500 to-accent-500" />
 
-      {/* Titre et description */}
-      <h3 style={{ marginBottom: '0.5rem' }}>{session.title}</h3>
-      {session.description && (
-        <p style={{
-          fontSize: '0.875rem',
-          color: '#6c757d',
-          marginBottom: '1rem',
-          overflow: 'hidden',
-          textOverflow: 'ellipsis',
-          display: '-webkit-box',
-          WebkitLineClamp: 2,
-          WebkitBoxOrient: 'vertical'
-        }}>
-          {session.description}
-        </p>
-      )}
-
-      {/* Infos */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem', marginBottom: '1rem' }}>
-        <div style={{ fontSize: '0.875rem' }}>
-          📍 {session.location_name}
-        </div>
-        <div style={{ fontSize: '0.875rem', fontWeight: 600 }}>
-          🏃 {session.distance_km} km
-        </div>
-        {session.target_pace && (
-          <div style={{ fontSize: '0.875rem', color: '#6c757d' }}>
-            ⚡ {session.target_pace} min/km
-          </div>
-        )}
-        <div style={{ fontSize: '0.875rem', fontWeight: 600, color: isFull ? '#dc3545' : almostFull ? '#fd7e14' : '#212529' }}>
-          👥 {session.participants_count || 0}/{session.max_participants}
-        </div>
-      </div>
-
-      {/* Warning si presque complet ou complet */}
-      {almostFull && (
-        <div style={{
-          padding: '0.5rem',
-          borderRadius: '0.25rem',
-          backgroundColor: '#fff3cd',
-          fontSize: '0.75rem',
-          fontWeight: 600,
-          color: '#856404',
-          marginBottom: '1rem'
-        }}>
-          ⚠️ Plus que {spotsLeft} place{spotsLeft > 1 ? 's' : ''} !
-        </div>
-      )}
-      {isFull && (
-        <div style={{
-          padding: '0.5rem',
-          borderRadius: '0.25rem',
-          backgroundColor: '#f8d7da',
-          fontSize: '0.75rem',
-          fontWeight: 600,
-          color: '#721c24',
-          marginBottom: '1rem'
-        }}>
-          ❌ Complet
-        </div>
-      )}
-
-      {/* Divider */}
-      <div style={{ borderTop: '1px solid #dee2e6', margin: '1rem 0' }} />
-
-      {/* Footer: Créateur */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        {session.creator && (
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-            <div style={{
-              width: '32px',
-              height: '32px',
-              borderRadius: '50%',
-              backgroundColor: '#0066cc',
-              color: 'white',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              fontSize: '0.75rem',
-              fontWeight: 600
-            }}>
-              {session.creator.username.substring(0, 2).toUpperCase()}
+        {/* Header */}
+        <div className="flex items-start justify-between mb-4">
+          <span className={`badge ${levelColors[session.level_required - 1]} text-xs font-bold`}>
+            {'⭐'.repeat(session.level_required)}
+          </span>
+          <div className="text-right">
+            <div className="text-sm font-semibold text-gray-900">
+              {formatDate(session.start_time)}
             </div>
-            <span style={{ fontSize: '0.875rem', color: '#6c757d' }}>
-              @{session.creator.username}
+            <div className="text-xs text-gray-500">
+              {formatTime(session.start_time)}
+            </div>
+          </div>
+        </div>
+
+        {/* Title */}
+        <h3 className="text-lg font-bold text-gray-900 mb-2 line-clamp-1 group-hover:text-primary-600 transition-colors">
+          {session.title}
+        </h3>
+
+        {/* Description */}
+        {session.description && (
+          <p className="text-sm text-gray-600 mb-4 line-clamp-2">
+            {session.description}
+          </p>
+        )}
+
+        {/* Stats Grid */}
+        <div className="grid grid-cols-2 gap-3 mb-4">
+          {/* Location */}
+          <div className="flex items-center gap-2">
+            <div className="w-8 h-8 rounded-lg bg-primary-50 flex items-center justify-center flex-shrink-0">
+              <svg className="w-4 h-4 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+              </svg>
+            </div>
+            <span className="text-sm text-gray-700 truncate font-medium">{session.location_name}</span>
+          </div>
+
+          {/* Distance */}
+          <div className="flex items-center gap-2">
+            <div className="w-8 h-8 rounded-lg bg-accent-50 flex items-center justify-center flex-shrink-0">
+              <svg className="w-4 h-4 text-accent-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+              </svg>
+            </div>
+            <span className="text-sm font-bold text-gray-900">{session.distance_km} km</span>
+          </div>
+
+          {/* Pace */}
+          {session.target_pace && (
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-8 rounded-lg bg-success-50 flex items-center justify-center flex-shrink-0">
+                <svg className="w-4 h-4 text-success-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                </svg>
+              </div>
+              <span className="text-sm text-gray-700 font-medium">{session.target_pace} min/km</span>
+            </div>
+          )}
+
+          {/* Participants */}
+          <div className="flex items-center gap-2">
+            <div className={`w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 ${
+              isFull ? 'bg-red-50' : almostFull ? 'bg-yellow-50' : 'bg-gray-50'
+            }`}>
+              <svg className={`w-4 h-4 ${
+                isFull ? 'text-red-600' : almostFull ? 'text-yellow-600' : 'text-gray-600'
+              }`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+              </svg>
+            </div>
+            <span className={`text-sm font-bold ${
+              isFull ? 'text-red-600' : almostFull ? 'text-yellow-600' : 'text-gray-900'
+            }`}>
+              {session.participants_count || 0}/{session.max_participants}
             </span>
           </div>
+        </div>
+
+        {/* Status badges */}
+        {(almostFull || isFull) && (
+          <div className="mb-4">
+            {almostFull && (
+              <span className="badge-warning">
+                ⚡ Plus que {spotsLeft} place{spotsLeft > 1 ? 's' : ''} !
+              </span>
+            )}
+            {isFull && (
+              <span className="badge-danger">
+                ❌ Complet
+              </span>
+            )}
+          </div>
         )}
-        <span style={{ fontSize: '0.875rem', color: '#0066cc', fontWeight: 600 }}>
-          {isFull ? 'Voir →' : 'Rejoindre →'}
-        </span>
+
+        {/* Divider */}
+        <div className="border-t border-gray-100 pt-4 mt-4">
+          {/* Creator + Action */}
+          <div className="flex items-center justify-between">
+            {session.creator && (
+              <div className="flex items-center gap-2">
+                <div className="w-7 h-7 rounded-full bg-gradient-to-br from-primary-500 to-accent-500 flex items-center justify-center">
+                  <span className="text-white text-xs font-bold">
+                    {session.creator.username.substring(0, 2).toUpperCase()}
+                  </span>
+                </div>
+                <span className="text-xs text-gray-600">
+                  @{session.creator.username}
+                </span>
+              </div>
+            )}
+
+            <div className="flex items-center gap-1 text-primary-600 font-semibold text-sm group-hover:gap-2 transition-all">
+              <span>{isFull ? 'Voir' : 'Rejoindre'}</span>
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              </svg>
+            </div>
+          </div>
+        </div>
       </div>
     </Link>
   );
