@@ -151,9 +151,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       console.log('🚪 Déconnexion en cours...');
 
-      // 1. Mise à jour immédiate de l'état pour un feedback instantané
-      setUser(null);
-      setProfile(null);
+      // 1. Déconnexion côté client pour déclencher onAuthStateChange
+      // qui mettra automatiquement à jour user et profile à null
+      const { error: clientError } = await supabase.auth.signOut();
+      if (clientError) {
+        console.error('❌ Erreur lors de la déconnexion client:', clientError);
+        // En cas d'erreur côté client, forcer la mise à jour
+        setUser(null);
+        setProfile(null);
+      } else {
+        console.log('✅ Session client supprimée');
+      }
 
       // 2. Déconnexion côté serveur pour supprimer les cookies HTTPOnly
       const serverResult = await signOutAction();
@@ -163,19 +171,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         console.log('✅ Cookies serveur supprimés');
       }
 
-      // 3. Déconnexion côté client pour supprimer localStorage/sessionStorage
-      // et déclencher onAuthStateChange
-      const { error: clientError } = await supabase.auth.signOut();
-      if (clientError) {
-        console.error('❌ Erreur lors de la déconnexion client:', clientError);
-      } else {
-        console.log('✅ Session client supprimée');
-      }
-
       console.log('✅ Déconnexion terminée');
     } catch (error) {
       console.error('❌ Erreur lors de la déconnexion:', error);
-      // En cas d'erreur, on force quand même la déconnexion côté client
+      // En cas d'erreur, on force la déconnexion locale
       setUser(null);
       setProfile(null);
     }

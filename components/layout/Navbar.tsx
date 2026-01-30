@@ -18,9 +18,11 @@ export default function Navbar() {
   const handleSignOut = async () => {
     setDropdownOpen(false);
     await signOut();
-    // Utiliser router.push au lieu de window.location.href
-    // pour que React puisse mettre à jour l'état correctement
-    router.push('/');
+    // Attendre un peu que le listener onAuthStateChange se déclenche
+    await new Promise(resolve => setTimeout(resolve, 200));
+    // Utiliser window.location.href pour forcer un rechargement complet
+    // et s'assurer que toutes les données en cache sont effacées
+    window.location.href = '/';
   };
 
   const isAuthPage = pathname?.startsWith('/auth');
