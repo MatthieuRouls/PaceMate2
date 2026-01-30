@@ -149,23 +149,32 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const signOut = async () => {
     try {
-      // 1. Déconnexion côté client pour déclencher onAuthStateChange
-      const { error: clientError } = await supabase.auth.signOut();
-      if (clientError) {
-        console.error('Erreur lors de la déconnexion client:', clientError);
-      }
+      console.log('🚪 Déconnexion en cours...');
+
+      // 1. Mise à jour immédiate de l'état pour un feedback instantané
+      setUser(null);
+      setProfile(null);
 
       // 2. Déconnexion côté serveur pour supprimer les cookies HTTPOnly
       const serverResult = await signOutAction();
       if (!serverResult.success) {
-        console.error('Erreur lors de la déconnexion serveur:', serverResult.error);
+        console.error('❌ Erreur lors de la déconnexion serveur:', serverResult.error);
+      } else {
+        console.log('✅ Cookies serveur supprimés');
       }
 
-      // 3. Mise à jour immédiate de l'état pour un feedback instantané
-      setUser(null);
-      setProfile(null);
+      // 3. Déconnexion côté client pour supprimer localStorage/sessionStorage
+      // et déclencher onAuthStateChange
+      const { error: clientError } = await supabase.auth.signOut();
+      if (clientError) {
+        console.error('❌ Erreur lors de la déconnexion client:', clientError);
+      } else {
+        console.log('✅ Session client supprimée');
+      }
+
+      console.log('✅ Déconnexion terminée');
     } catch (error) {
-      console.error('Erreur lors de la déconnexion:', error);
+      console.error('❌ Erreur lors de la déconnexion:', error);
       // En cas d'erreur, on force quand même la déconnexion côté client
       setUser(null);
       setProfile(null);

@@ -18,10 +18,9 @@ export default function Navbar() {
   const handleSignOut = async () => {
     setDropdownOpen(false);
     await signOut();
-    // Attendre un peu que les cookies soient supprimés
-    await new Promise(resolve => setTimeout(resolve, 100));
-    // Forcer un rechargement complet pour s'assurer que le serveur rend la page sans session
-    window.location.href = '/';
+    // Utiliser router.push au lieu de window.location.href
+    // pour que React puisse mettre à jour l'état correctement
+    router.push('/');
   };
 
   const isAuthPage = pathname?.startsWith('/auth');
