@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { X } from 'lucide-react';
-import { useAuth } from '../providers/AuthProvider';
+import { supabase } from '@/lib/supabase';
 
 interface AuthDrawerProps {
   isOpen: boolean;
@@ -12,7 +12,6 @@ interface AuthDrawerProps {
 }
 
 export default function AuthDrawer({ isOpen, onClose, mode, onSwitchMode }: AuthDrawerProps) {
-  const { signIn, signUp } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [username, setUsername] = useState('');
@@ -36,26 +35,46 @@ export default function AuthDrawer({ isOpen, onClose, mode, onSwitchMode }: Auth
 
     try {
       if (mode === 'login') {
-        const result = await signIn(email, password);
-        if (result.success) {
-          // Close drawer and wait a bit for state to update
+        // Use client-side Supabase directly
+        const { data, error: signInError } = await supabase.auth.signInWithPassword({
+          email,
+          password,
+        });
+
+        if (signInError) {
+          setError(translateError(signInError.message));
+          setLoading(false);
+          return;
+        }
+
+        if (data.user) {
+          // Success! Close drawer
           onClose();
-          // Wait for AuthProvider to fully update profile state
-          await new Promise(resolve => setTimeout(resolve, 1000));
-          // Force reload to ensure all auth state is fresh
+          // Redirect to dashboard - AuthProvider will pick up the session automatically
           window.location.href = '/dashboard';
-        } else {
-          setError(result.error || 'Erreur lors de la connexion');
         }
       } else {
-        const result = await signUp(email, password, username);
-        if (result.success) {
+        // Use client-side Supabase for signup
+        const { data, error: signUpError } = await supabase.auth.signUp({
+          email,
+          password,
+          options: {
+            data: {
+              username: username,
+            },
+          },
+        });
+
+        if (signUpError) {
+          setError(translateError(signUpError.message));
+          setLoading(false);
+          return;
+        }
+
+        if (data.user) {
           setError('');
-          // Show success message - user needs to confirm email
           alert('Compte créé ! Vérifiez votre email pour confirmer votre inscription.');
           onClose();
-        } else {
-          setError(result.error || 'Erreur lors de l\'inscription');
         }
       }
     } catch (err: any) {
@@ -63,6 +82,21 @@ export default function AuthDrawer({ isOpen, onClose, mode, onSwitchMode }: Auth
     } finally {
       setLoading(false);
     }
+  };
+
+  const translateError = (error: string): string => {
+    const errorMap: Record<string, string> = {
+      'Invalid login credentials': 'Email ou mot de passe incorrect',
+      'Email not confirmed': 'Veuillez confirmer votre email',
+      'User already registered': 'Cet email est déjà utilisé',
+    };
+
+    for (const [key, value] of Object.entries(errorMap)) {
+      if (error.includes(key)) {
+        return value;
+      }
+    }
+    return error;
   };
 
   if (!isOpen) return null;
