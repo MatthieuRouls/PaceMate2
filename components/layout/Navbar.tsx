@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { Bell } from 'lucide-react';
 import { useAuth } from '../providers/AuthProvider';
@@ -9,13 +9,18 @@ import AuthDrawer from '../ui/AuthDrawer';
 
 export default function Navbar() {
   const pathname = usePathname();
+  const router = useRouter();
   const { profile, signOut, loading } = useAuth();
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [authDrawerOpen, setAuthDrawerOpen] = useState(false);
   const [authMode, setAuthMode] = useState<'login' | 'signup'>('login');
 
   const handleSignOut = async () => {
+    setDropdownOpen(false);
     await signOut();
+    // Attendre un peu que les cookies soient supprimés
+    await new Promise(resolve => setTimeout(resolve, 100));
+    // Forcer un rechargement complet pour s'assurer que le serveur rend la page sans session
     window.location.href = '/';
   };
 

@@ -4,7 +4,7 @@ import { createContext, useContext, useEffect, useState } from 'react';
 import { User } from '@supabase/supabase-js';
 import { supabase } from '@/lib/supabase';
 import type { Profile } from '@/lib/types';
-import { signIn as signInAction, signUp as signUpAction } from '@/lib/supabase-auth';
+import { signIn as signInAction, signUp as signUpAction, signOut as signOutAction } from '@/lib/supabase-auth';
 
 interface AuthContextType {
   user: User | null;
@@ -149,16 +149,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const signOut = async () => {
     try {
-      // Utiliser le client Supabase directement au lieu d'une server action
-      // pour que l'état soit immédiatement mis à jour via onAuthStateChange
-      const { error } = await supabase.auth.signOut();
-
-      if (error) {
-        console.error('Erreur lors de la déconnexion:', error);
+      // 1. Déconnexion côté client pour déclencher onAuthStateChange
+      const { error: clientError } = await supabase.auth.signOut();
+      if (clientError) {
+        console.error('Erreur lors de la déconnexion client:', clientError);
       }
 
-      // Le listener onAuthStateChange mettra automatiquement à jour user et profile à null
-      // Mais on les met à jour immédiatement pour un feedback instantané
+      // 2. Déconnexion côté serveur pour supprimer les cookies HTTPOnly
+      const serverResult = await signOutAction();
+      if (!serverResult.success) {
+        console.error('Erreur lors de la déconnexion serveur:', serverResult.error);
+      }
+
+      // 3. Mise à jour immédiate de l'état pour un feedback instantané
       setUser(null);
       setProfile(null);
     } catch (error) {
