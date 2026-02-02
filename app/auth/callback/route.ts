@@ -38,6 +38,6 @@ export async function GET(request: NextRequest) {
     console.error('❌ Erreur lors de la confirmation:', error);
   }
 
-  // Si erreur ou pas de code, rediriger vers la page de login
-  return NextResponse.redirect(`${origin}/auth/login`);
+  // Si erreur ou pas de code, rediriger vers la page d'accueil
+  return NextResponse.redirect(`${origin}/`);
 }
