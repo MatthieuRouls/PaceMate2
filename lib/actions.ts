@@ -1,7 +1,6 @@
 'use server';
 
-import { supabase } from './supabase';
-import { getCurrentUser } from './supabase-auth';
+import { getCurrentUser, getServerSupabaseClient } from './supabase-auth';
 
 export interface CreateSessionData {
   title: string;
@@ -51,6 +50,8 @@ export async function createSession(data: CreateSessionData): Promise<CreateSess
         error: 'Non authentifié',
       };
     }
+
+    const supabase = await getServerSupabaseClient();
 
     // 2. Convertir l'allure si renseignée
     const target_pace = data.target_pace ? convertPaceToInterval(data.target_pace) : null;
@@ -124,7 +125,7 @@ export async function createTeam(
   description: string
 ): Promise<CreateTeamResult> {
   try {
-    // Récupérer l'utilisateur connecté
+    // Récupérer l'utilisateur connecté et le client serveur
     const user = await getCurrentUser();
     if (!user) {
       return {
@@ -132,6 +133,8 @@ export async function createTeam(
         error: 'Non authentifié',
       };
     }
+
+    const supabase = await getServerSupabaseClient();
 
     // Validation
     if (!name || name.trim().length === 0) {
@@ -234,7 +237,7 @@ export async function createTeam(
  */
 export async function leaveTeam(teamId: string): Promise<ActionResult> {
   try {
-    // Récupérer l'utilisateur connecté
+    // Récupérer l'utilisateur connecté et le client serveur
     const user = await getCurrentUser();
     if (!user) {
       return {
@@ -242,6 +245,8 @@ export async function leaveTeam(teamId: string): Promise<ActionResult> {
         error: 'Non authentifié',
       };
     }
+
+    const supabase = await getServerSupabaseClient();
 
     // 1. Supprimer l'entrée dans team_memberships
     const { error: membershipError } = await supabase
@@ -303,6 +308,8 @@ export async function leaveTeam(teamId: string): Promise<ActionResult> {
  */
 export async function getTeamsLeaderboard() {
   try {
+    const supabase = await getServerSupabaseClient();
+
     const { data, error } = await supabase
       .from('teams')
       .select('*')
@@ -346,6 +353,8 @@ export async function getUserTeam() {
     if (!user) {
       return null;
     }
+
+    const supabase = await getServerSupabaseClient();
 
     // 1. Récupérer le profil avec team_id
     const { data: profile, error: profileError } = await supabase
@@ -399,6 +408,8 @@ export async function getUserProfile() {
     if (!user) {
       return null;
     }
+
+    const supabase = await getServerSupabaseClient();
 
     // 1. Récupérer le profil avec tous les champs
     const { data: profile, error: profileError } = await supabase
@@ -456,6 +467,8 @@ export async function getUserUpcomingSessions() {
       return [];
     }
 
+    const supabase = await getServerSupabaseClient();
+
     // 1. Récupérer les IDs des sessions confirmées de l'utilisateur
     const { data: participations, error: participationsError } = await supabase
       .from('session_participants')
@@ -504,6 +517,8 @@ export async function getUserSessionHistory() {
     if (!user) {
       return [];
     }
+
+    const supabase = await getServerSupabaseClient();
 
     // 1. Récupérer les participations complétées avec les session_ids
     const { data: participations, error: participationsError } = await supabase
@@ -565,6 +580,8 @@ export async function getUserSessionHistory() {
  */
 export async function getSessionDetails(sessionId: string) {
   try {
+    const supabase = await getServerSupabaseClient();
+
     // 1. Récupérer la session
     const { data: session, error: sessionError } = await supabase
       .from('sessions')
@@ -626,6 +643,8 @@ export async function getUserSessionStatus(sessionId: string) {
       return null;
     }
 
+    const supabase = await getServerSupabaseClient();
+
     const { data, error } = await supabase
       .from('session_participants')
       .select('status, rating')
@@ -658,6 +677,8 @@ export async function joinSession(sessionId: string): Promise<ActionResult> {
         error: 'Non authentifié',
       };
     }
+
+    const supabase = await getServerSupabaseClient();
 
     // 1. Vérifier que la session existe et n'est pas passée
     const { data: session, error: sessionError } = await supabase
@@ -770,6 +791,8 @@ export async function leaveSession(sessionId: string): Promise<ActionResult> {
       };
     }
 
+    const supabase = await getServerSupabaseClient();
+
     // Mettre le statut à 'cancelled' au lieu de supprimer
     const { error } = await supabase
       .from('session_participants')
@@ -814,6 +837,8 @@ export async function rateSession(
         error: 'Non authentifié',
       };
     }
+
+    const supabase = await getServerSupabaseClient();
 
     // 1. Mettre à jour la participation avec la note
     const { error: updateError } = await supabase
@@ -888,6 +913,8 @@ export async function rateSession(
  */
 export async function getUpcomingSessions(limit: number = 3) {
   try {
+    const supabase = await getServerSupabaseClient();
+
     const { data: sessions, error } = await supabase
       .from('sessions')
       .select('*')
@@ -937,6 +964,8 @@ export async function getUpcomingSessions(limit: number = 3) {
  */
 export async function getTopTeams(limit: number = 3) {
   try {
+    const supabase = await getServerSupabaseClient();
+
     const { data: teams, error } = await supabase
       .from('teams')
       .select('*')

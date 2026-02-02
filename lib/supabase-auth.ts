@@ -202,6 +202,14 @@ export async function getCurrentUser(): Promise<User | null> {
 }
 
 /**
+ * Récupérer le client Supabase serveur pour les Server Actions
+ * Utiliser cette fonction au lieu d'importer le client browser dans les Server Actions
+ */
+export async function getServerSupabaseClient() {
+  return createServerSupabaseClient();
+}
+
+/**
  * Récupérer la session active
  */
 export async function getSession(): Promise<Session | null> {
