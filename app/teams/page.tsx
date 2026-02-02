@@ -128,30 +128,41 @@ export default function TeamsPage() {
   };
 
   return (
-    <div className="min-h-screen p-4 md:p-8">
-      <div className="max-w-6xl mx-auto">
-        {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl md:text-4xl font-bold mb-2">Équipes</h1>
-          <p className="opacity-75">Rejoins une équipe et grimpe dans le classement</p>
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-orange-50/30">
+      {/* Header */}
+      <div className="bg-white/80 backdrop-blur-xl border-b border-gray-200">
+        <div className="max-w-6xl mx-auto px-6 py-8">
+          <h1 className="text-4xl font-bold text-secondary-600 mb-2">Équipes</h1>
+          <p className="text-gray-600">Rejoins une équipe et grimpe dans le classement</p>
         </div>
+      </div>
 
+      <div className="max-w-6xl mx-auto px-6 py-8">
         {/* Loading */}
         {loading && (
-          <div className="text-center py-12">
-            <div
-              className="inline-block animate-spin rounded-full h-12 w-12 border-b-2"
-              style={{ borderColor: 'var(--color-primary)' }}
-            ></div>
-            <p className="mt-4 opacity-75">Chargement...</p>
+          <div className="text-center py-16">
+            <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-br from-primary-500 to-primary-600 mb-4">
+              <svg className="animate-spin h-8 w-8 text-white" fill="none" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+            </div>
+            <p className="text-gray-600 font-medium">Chargement...</p>
           </div>
         )}
 
         {/* Error */}
         {error && (
-          <div className="card border-2 border-red-500 text-center py-8 mb-8">
-            <p className="text-red-500 font-semibold mb-2">❌ Erreur</p>
-            <p className="opacity-75">{error}</p>
+          <div className="bg-white rounded-3xl shadow-lg border-2 border-red-200 p-8 mb-8">
+            <div className="flex items-center gap-3 mb-3">
+              <div className="w-12 h-12 rounded-full bg-red-100 flex items-center justify-center">
+                <svg className="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </div>
+              <p className="text-red-900 font-bold text-xl">Erreur</p>
+            </div>
+            <p className="text-red-700 ml-15">{error}</p>
           </div>
         )}
 
@@ -160,37 +171,44 @@ export default function TeamsPage() {
           <div className="space-y-8">
             {/* Section Mon équipe */}
             {userTeam && (
-              <div className="card border-2" style={{ borderColor: 'var(--color-primary)' }}>
-                <h2 className="text-2xl font-bold mb-4">Mon équipe</h2>
+              <div className="bg-white rounded-3xl shadow-lg border-2 border-primary-500 p-8">
+                <div className="flex items-center gap-3 mb-6 pb-4 border-b border-gray-100">
+                  <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-primary-500 to-primary-600 flex items-center justify-center">
+                    <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                    </svg>
+                  </div>
+                  <h2 className="text-2xl font-bold text-secondary-600">Mon équipe</h2>
+                </div>
 
-                <div className="space-y-4">
+                <div className="space-y-6">
                   <div>
-                    <h3 className="text-xl font-semibold mb-1">{userTeam.name}</h3>
+                    <h3 className="text-2xl font-bold text-secondary-600 mb-2">{userTeam.name}</h3>
                     {userTeam.description && (
-                      <p className="opacity-75 mb-3">{userTeam.description}</p>
+                      <p className="text-gray-600">{userTeam.description}</p>
                     )}
                   </div>
 
                   {/* Stats */}
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                    <div>
-                      <p className="text-sm opacity-75 mb-1">Membres</p>
-                      <p className="text-2xl font-bold" style={{ color: 'var(--color-primary)' }}>
+                  <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                    <div className="bg-gradient-to-br from-primary-50 to-orange-50 rounded-2xl p-5 border border-primary-100">
+                      <p className="text-sm text-gray-600 mb-2 font-medium">👥 Membres</p>
+                      <p className="text-3xl font-bold text-primary-600">
                         {userTeam.members_count || 0}
                       </p>
                     </div>
-                    <div>
-                      <p className="text-sm opacity-75 mb-1">Distance totale</p>
-                      <p className="text-2xl font-bold" style={{ color: 'var(--color-primary)' }}>
-                        {(userTeam.total_distance || 0).toFixed(1)} km
+                    <div className="bg-gradient-to-br from-primary-50 to-orange-50 rounded-2xl p-5 border border-primary-100">
+                      <p className="text-sm text-gray-600 mb-2 font-medium">🏃 Distance totale</p>
+                      <p className="text-3xl font-bold text-primary-600">
+                        {(userTeam.total_distance || 0).toFixed(1)} <span className="text-lg">km</span>
                       </p>
                     </div>
-                    <div>
-                      <p className="text-sm opacity-75 mb-1">Classement</p>
-                      <p className="text-2xl font-bold" style={{ color: 'var(--color-primary)' }}>
-                        {getUserTeamRank() || '-'}
+                    <div className="bg-gradient-to-br from-primary-50 to-orange-50 rounded-2xl p-5 border border-primary-100">
+                      <p className="text-sm text-gray-600 mb-2 font-medium">🏆 Classement</p>
+                      <p className="text-3xl font-bold text-primary-600">
+                        {getUserTeamRank() ? `${getUserTeamRank()}e` : '-'}
                         {getUserTeamRank() && getUserTeamRank()! <= 3 && (
-                          <span className="ml-2">
+                          <span className="ml-2 text-2xl">
                             {getUserTeamRank() === 1 && '🥇'}
                             {getUserTeamRank() === 2 && '🥈'}
                             {getUserTeamRank() === 3 && '🥉'}
@@ -201,14 +219,23 @@ export default function TeamsPage() {
                   </div>
 
                   {/* Bouton quitter */}
-                  <div className="pt-4 border-t" style={{ borderColor: 'rgba(0,0,0,0.1)' }}>
+                  <div className="pt-6 border-t border-gray-100">
                     <button
                       onClick={handleLeaveTeam}
                       disabled={leavingTeam}
-                      className="px-4 py-2 rounded-lg border-2 border-red-500 text-red-500 font-medium hover:bg-red-50 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-                      style={{ borderRadius: 'var(--radius)' }}
+                      className="px-6 py-3 bg-white text-red-600 font-bold rounded-xl border-2 border-red-200 hover:border-red-300 hover:bg-red-50 hover:shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-[1.02] active:scale-[0.98]"
                     >
-                      {leavingTeam ? '⏳ Chargement...' : '🚪 Quitter l\'équipe'}
+                      {leavingTeam ? (
+                        <span className="flex items-center justify-center gap-2">
+                          <svg className="animate-spin h-5 w-5" fill="none" viewBox="0 0 24 24">
+                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                          </svg>
+                          Chargement...
+                        </span>
+                      ) : (
+                        '🚪 Quitter l\'équipe'
+                      )}
                     </button>
                   </div>
                 </div>
@@ -217,21 +244,35 @@ export default function TeamsPage() {
 
             {/* Section Créer une équipe */}
             {!userTeam && (
-              <div className="card">
-                <h2 className="text-2xl font-bold mb-4">Créer une équipe</h2>
+              <div className="bg-white rounded-3xl shadow-lg border border-gray-100 p-8">
+                <div className="flex items-center gap-3 mb-6 pb-4 border-b border-gray-100">
+                  <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-primary-500 to-primary-600 flex items-center justify-center">
+                    <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                    </svg>
+                  </div>
+                  <h2 className="text-2xl font-bold text-secondary-600">Créer une équipe</h2>
+                </div>
 
-                <form onSubmit={handleCreateTeam} className="space-y-4">
+                <form onSubmit={handleCreateTeam} className="space-y-6">
                   {/* Erreur de création */}
                   {createError && (
-                    <div className="p-4 rounded-lg border-2 border-red-500 bg-red-50 text-red-700">
-                      <p className="font-semibold">❌ Erreur</p>
-                      <p className="text-sm mt-1">{createError}</p>
+                    <div className="p-5 rounded-2xl bg-red-50 border-2 border-red-200 shadow-sm">
+                      <div className="flex items-center gap-3 mb-2">
+                        <div className="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center">
+                          <svg className="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                          </svg>
+                        </div>
+                        <p className="font-semibold text-red-900 text-lg">Erreur</p>
+                      </div>
+                      <p className="text-red-700 ml-13">{createError}</p>
                     </div>
                   )}
 
                   {/* Nom */}
                   <div>
-                    <label htmlFor="teamName" className="block font-semibold mb-2">
+                    <label htmlFor="teamName" className="block text-sm font-semibold text-secondary-600 mb-2">
                       Nom de l'équipe <span className="text-red-500">*</span>
                     </label>
                     <input
@@ -242,15 +283,15 @@ export default function TeamsPage() {
                       required
                       maxLength={50}
                       placeholder="Ex: Les Runners du dimanche"
-                      className="input"
+                      className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-primary-500 focus:outline-none transition-colors text-secondary-600 placeholder:text-gray-400"
                     />
-                    <p className="text-sm opacity-75 mt-1">{teamName.length}/50 caractères</p>
+                    <p className="text-sm text-gray-500 mt-2">{teamName.length}/50 caractères</p>
                   </div>
 
                   {/* Description */}
                   <div>
-                    <label htmlFor="teamDescription" className="block font-semibold mb-2">
-                      Description
+                    <label htmlFor="teamDescription" className="block text-sm font-semibold text-secondary-600 mb-2">
+                      Description (optionnel)
                     </label>
                     <textarea
                       id="teamDescription"
@@ -259,9 +300,9 @@ export default function TeamsPage() {
                       maxLength={200}
                       rows={3}
                       placeholder="Décris ton équipe et son ambiance..."
-                      className="input resize-none"
+                      className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-primary-500 focus:outline-none transition-colors text-secondary-600 placeholder:text-gray-400 resize-none"
                     />
-                    <p className="text-sm opacity-75 mt-1">
+                    <p className="text-sm text-gray-500 mt-2">
                       {teamDescription.length}/200 caractères
                     </p>
                   </div>
@@ -270,9 +311,19 @@ export default function TeamsPage() {
                   <button
                     type="submit"
                     disabled={creatingTeam || !teamName.trim()}
-                    className="btn-primary disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="w-full px-8 py-4 bg-gradient-to-r from-primary-500 to-primary-600 text-white font-bold rounded-2xl hover:from-primary-600 hover:to-primary-700 transition-all shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-[1.02] active:scale-[0.98]"
                   >
-                    {creatingTeam ? '⏳ Création en cours...' : '✨ Créer mon équipe'}
+                    {creatingTeam ? (
+                      <span className="flex items-center justify-center gap-2">
+                        <svg className="animate-spin h-5 w-5" fill="none" viewBox="0 0 24 24">
+                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        Création en cours...
+                      </span>
+                    ) : (
+                      '✨ Créer mon équipe'
+                    )}
                   </button>
                 </form>
               </div>
@@ -280,13 +331,22 @@ export default function TeamsPage() {
 
             {/* Section Classement */}
             <div>
-              <h2 className="text-2xl font-bold mb-6">🏆 Classement des équipes</h2>
+              <div className="flex items-center gap-3 mb-6">
+                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-primary-500 to-primary-600 flex items-center justify-center">
+                  <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
+                  </svg>
+                </div>
+                <h2 className="text-3xl font-bold text-secondary-600">Classement des équipes</h2>
+              </div>
 
               {teams.length === 0 ? (
-                <div className="card text-center py-12">
-                  <p className="text-2xl mb-4">🏃‍♂️</p>
-                  <h3 className="text-xl font-semibold mb-2">Aucune équipe pour le moment</h3>
-                  <p className="opacity-75">Sois le premier à créer une équipe !</p>
+                <div className="bg-white rounded-3xl shadow-lg border border-gray-100 p-12 text-center">
+                  <div className="w-20 h-20 mx-auto mb-6 rounded-full bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center">
+                    <span className="text-4xl">🏃‍♂️</span>
+                  </div>
+                  <h3 className="text-2xl font-bold text-secondary-600 mb-2">Aucune équipe pour le moment</h3>
+                  <p className="text-gray-600">Sois le premier à créer une équipe !</p>
                 </div>
               ) : (
                 <div className="space-y-4">
