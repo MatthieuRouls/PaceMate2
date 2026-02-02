@@ -22,7 +22,7 @@ export default function TeamCard({ team, position }: TeamCardProps) {
     <div
       className={`
         bg-white rounded-3xl shadow-lg border-2 p-6 transition-all hover:shadow-xl transform hover:scale-[1.01]
-        ${isTopThree ? 'border-primary-500 bg-gradient-to-br from-primary-50/50 to-orange-50/50' : 'border-gray-100 hover:border-gray-200'}
+        ${isTopThree ? 'border-primary-500 bg-gradient-to-br from-primary-50/50 to-primary-100/50' : 'border-gray-100 hover:border-gray-200'}
       `}
     >
       <div className="flex items-center gap-5">

@@ -14,13 +14,13 @@ export default function Badge({
   className = '',
 }: BadgeProps) {
   const variantStyles = {
-    'level-1': 'bg-green-100 text-green-700 border border-green-200',
-    'level-2': 'bg-blue-100 text-blue-700 border border-blue-200',
+    'level-1': 'bg-primary-100 text-primary-700 border border-primary-200',
+    'level-2': 'bg-primary-100 text-primary-700 border border-primary-200',
     'level-3': 'bg-yellow-100 text-yellow-700 border border-yellow-200',
-    'level-4': 'bg-orange-100 text-orange-700 border border-orange-200',
+    'level-4': 'bg-primary-200 text-primary-800 border border-primary-300',
     'level-5': 'bg-red-100 text-red-700 border border-red-200',
-    primary: 'bg-blue-100 text-blue-700 border border-blue-200',
-    success: 'bg-green-100 text-green-700 border border-green-200',
+    primary: 'bg-primary-100 text-primary-700 border border-primary-200',
+    success: 'bg-primary-100 text-primary-700 border border-primary-200',
     warning: 'bg-yellow-100 text-yellow-700 border border-yellow-200',
     danger: 'bg-red-100 text-red-700 border border-red-200',
     info: 'bg-gray-100 text-gray-700 border border-gray-200',

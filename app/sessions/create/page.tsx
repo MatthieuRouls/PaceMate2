@@ -134,7 +134,7 @@ export default function CreateSessionPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-orange-50/30">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-primary-100/30">
       {/* Header fixe */}
       <div className="sticky top-0 z-10 bg-white/80 backdrop-blur-xl border-b border-gray-200">
         <div className="max-w-5xl mx-auto px-6 py-6">
@@ -314,7 +314,7 @@ export default function CreateSessionPage() {
                     relative cursor-pointer rounded-2xl p-5 border-2 transition-all duration-200 hover:scale-105
                     ${
                       formData.session_type === type.value
-                        ? 'border-primary-500 bg-gradient-to-br from-primary-50 to-orange-50 shadow-lg'
+                        ? 'border-primary-500 bg-gradient-to-br from-primary-50 to-primary-100 shadow-lg'
                         : 'border-gray-200 bg-white hover:border-gray-300 hover:shadow-md'
                     }
                   `}
@@ -363,7 +363,7 @@ export default function CreateSessionPage() {
                     flex items-center gap-5 p-5 rounded-2xl border-2 cursor-pointer transition-all duration-200 hover:shadow-md
                     ${
                       formData.level_required === level
-                        ? 'border-primary-500 bg-gradient-to-r from-primary-50 to-orange-50 shadow-lg'
+                        ? 'border-primary-500 bg-gradient-to-r from-primary-50 to-primary-100 shadow-lg'
                         : 'border-gray-200 bg-white hover:border-gray-300'
                     }
                   `}

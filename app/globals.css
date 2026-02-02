@@ -2,28 +2,28 @@
 
 /* Theme customization for Tailwind v4 */
 @theme {
-  /* Main brand colors - Orange and Navy Blue */
-  --color-primary-50: #fff5f0;
-  --color-primary-100: #ffe4d6;
-  --color-primary-200: #ffc4ad;
-  --color-primary-300: #ff9d7a;
-  --color-primary-400: #ff8a5c;
-  --color-primary-500: #ff6b35;
-  --color-primary-600: #ff5722;
-  --color-primary-700: #e64a19;
-  --color-primary-800: #cc3d14;
-  --color-primary-900: #b3330f;
+  /* Main brand colors - Green and Dark Gray */
+  --color-primary-50: #e6f9f2;
+  --color-primary-100: #c2f1de;
+  --color-primary-200: #8de7c0;
+  --color-primary-300: #58dda2;
+  --color-primary-400: #32d18a;
+  --color-primary-500: #2dbc7c;
+  --color-primary-600: #28a76f;
+  --color-primary-700: #228a5c;
+  --color-primary-800: #1b6e49;
+  --color-primary-900: #155236;
 
-  --color-secondary-50: #f0f4f9;
-  --color-secondary-100: #d8e3f0;
-  --color-secondary-200: #adc4de;
-  --color-secondary-300: #7a9fcc;
-  --color-secondary-400: #4d7fb8;
-  --color-secondary-500: #1a3a6b;
-  --color-secondary-600: #0a1f44;
-  --color-secondary-700: #081733;
-  --color-secondary-800: #060f22;
-  --color-secondary-900: #040811;
+  --color-secondary-50: #f5f5f5;
+  --color-secondary-100: #e8e8e8;
+  --color-secondary-200: #d1d1d1;
+  --color-secondary-300: #ababab;
+  --color-secondary-400: #6b6b6b;
+  --color-secondary-500: #4a4a4a;
+  --color-secondary-600: #2c2c2c;
+  --color-secondary-700: #242424;
+  --color-secondary-800: #1c1c1c;
+  --color-secondary-900: #141414;
 }
 
 /* Base styles */
@@ -39,7 +39,7 @@
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     background-color: #ffffff;
-    color: #0a1f44;
+    color: #2c2c2c;
   }
 
   /* Smooth transitions */
@@ -53,7 +53,7 @@
   input:focus-visible,
   textarea:focus-visible,
   select:focus-visible {
-    outline: 2px solid #ff6b35;
+    outline: 2px solid #32d18a;
     outline-offset: 2px;
   }
 

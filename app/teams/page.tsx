@@ -128,7 +128,7 @@ export default function TeamsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-orange-50/30">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-primary-100/30">
       {/* Header */}
       <div className="bg-white/80 backdrop-blur-xl border-b border-gray-200">
         <div className="max-w-6xl mx-auto px-6 py-8">
@@ -191,19 +191,19 @@ export default function TeamsPage() {
 
                   {/* Stats */}
                   <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                    <div className="bg-gradient-to-br from-primary-50 to-orange-50 rounded-2xl p-5 border border-primary-100">
+                    <div className="bg-gradient-to-br from-primary-50 to-primary-100 rounded-2xl p-5 border border-primary-100">
                       <p className="text-sm text-gray-600 mb-2 font-medium">👥 Membres</p>
                       <p className="text-3xl font-bold text-primary-600">
                         {userTeam.members_count || 0}
                       </p>
                     </div>
-                    <div className="bg-gradient-to-br from-primary-50 to-orange-50 rounded-2xl p-5 border border-primary-100">
+                    <div className="bg-gradient-to-br from-primary-50 to-primary-100 rounded-2xl p-5 border border-primary-100">
                       <p className="text-sm text-gray-600 mb-2 font-medium">🏃 Distance totale</p>
                       <p className="text-3xl font-bold text-primary-600">
                         {(userTeam.total_distance || 0).toFixed(1)} <span className="text-lg">km</span>
                       </p>
                     </div>
-                    <div className="bg-gradient-to-br from-primary-50 to-orange-50 rounded-2xl p-5 border border-primary-100">
+                    <div className="bg-gradient-to-br from-primary-50 to-primary-100 rounded-2xl p-5 border border-primary-100">
                       <p className="text-sm text-gray-600 mb-2 font-medium">🏆 Classement</p>
                       <p className="text-3xl font-bold text-primary-600">
                         {getUserTeamRank() ? `${getUserTeamRank()}e` : '-'}
