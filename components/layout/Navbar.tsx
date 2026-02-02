@@ -15,16 +15,11 @@ export default function Navbar() {
   const [authDrawerOpen, setAuthDrawerOpen] = useState(false);
   const [authMode, setAuthMode] = useState<'login' | 'signup'>('login');
 
-  // Debug: log les changements d'état
-  console.log('🔍 Navbar render - loading:', loading, 'profile:', profile ? 'yes' : 'no');
-
   const handleSignOut = async () => {
     setDropdownOpen(false);
     await signOut();
-    // Attendre que onAuthStateChange mette à jour l'état
-    await new Promise(resolve => setTimeout(resolve, 300));
-    // Utiliser window.location.href pour forcer un rechargement complet
-    window.location.href = '/';
+    // Utiliser router.replace pour éviter les recompilations
+    router.replace('/');
   };
 
   const isAuthPage = pathname?.startsWith('/auth');

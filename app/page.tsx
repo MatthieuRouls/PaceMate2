@@ -18,10 +18,9 @@ export default function Home() {
   // Redirect to dashboard if user is logged in
   useEffect(() => {
     if (!authLoading && profile) {
-      console.log('🔄 Homepage: User is logged in, redirecting to dashboard');
-      window.location.href = '/dashboard';
+      router.replace('/dashboard');
     }
-  }, [authLoading, profile]);
+  }, [authLoading, profile, router]);
 
   useEffect(() => {
     async function fetchData() {
