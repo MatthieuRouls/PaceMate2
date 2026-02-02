@@ -2,14 +2,25 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { Session, Team } from '@/lib/types';
 import SessionCard from '@/components/ui/SessionCard';
 import { getUpcomingSessions, getTopTeams } from '@/lib/actions';
+import { useAuth } from '@/components/providers/AuthProvider';
 
 export default function Home() {
+  const router = useRouter();
+  const { profile, loading: authLoading } = useAuth();
   const [upcomingSessions, setUpcomingSessions] = useState<Session[]>([]);
   const [topTeams, setTopTeams] = useState<Team[]>([]);
   const [loading, setLoading] = useState(true);
+
+  // Redirect to dashboard if user is logged in
+  useEffect(() => {
+    if (!authLoading && profile) {
+      router.push('/dashboard');
+    }
+  }, [authLoading, profile, router]);
 
   useEffect(() => {
     async function fetchData() {

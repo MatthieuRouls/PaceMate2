@@ -1,12 +1,14 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useAuth } from '@/components/providers/AuthProvider';
 import { resendConfirmationEmail } from '@/lib/supabase-auth';
 
 export default function LoginPage() {
-  const { signIn } = useAuth();
+  const router = useRouter();
+  const { signIn, profile, loading: authLoading } = useAuth();
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -15,6 +17,13 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const [needsEmailConfirmation, setNeedsEmailConfirmation] = useState(false);
   const [resending, setResending] = useState(false);
+
+  // Redirect to dashboard if already logged in
+  useEffect(() => {
+    if (!authLoading && profile) {
+      router.push('/dashboard');
+    }
+  }, [authLoading, profile, router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -34,7 +43,7 @@ export default function LoginPage() {
 
       if (result.success) {
         await new Promise(resolve => setTimeout(resolve, 500));
-        window.location.href = '/sessions';
+        window.location.href = '/dashboard';
       } else {
         const errorMsg = result.error || 'Erreur lors de la connexion';
         setError(errorMsg);

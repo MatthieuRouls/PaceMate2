@@ -50,7 +50,9 @@ export default function AuthDrawer({ isOpen, onClose, mode, onSwitchMode }: Auth
         if (data.user) {
           // Success! Close drawer
           onClose();
-          // Redirect to dashboard - AuthProvider will pick up the session automatically
+          // Wait for AuthProvider's onAuthStateChange to update the profile
+          // before redirecting to ensure dashboard sees authenticated state
+          await new Promise(resolve => setTimeout(resolve, 500));
           window.location.href = '/dashboard';
         }
       } else {
