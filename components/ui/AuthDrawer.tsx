@@ -1,8 +1,9 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { X } from 'lucide-react';
-import { supabase } from '@/lib/supabase';
+import { useAuth } from '../providers/AuthProvider';
 
 interface AuthDrawerProps {
   isOpen: boolean;
@@ -12,6 +13,8 @@ interface AuthDrawerProps {
 }
 
 export default function AuthDrawer({ isOpen, onClose, mode, onSwitchMode }: AuthDrawerProps) {
+  const router = useRouter();
+  const { signIn, signUp } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [username, setUsername] = useState('');
@@ -35,48 +38,31 @@ export default function AuthDrawer({ isOpen, onClose, mode, onSwitchMode }: Auth
 
     try {
       if (mode === 'login') {
-        // Use client-side Supabase directly
-        const { data, error: signInError } = await supabase.auth.signInWithPassword({
-          email,
-          password,
-        });
+        const result = await signIn(email, password);
 
-        if (signInError) {
-          setError(translateError(signInError.message));
-          setLoading(false);
-          return;
-        }
-
-        if (data.user) {
-          // Success! Close drawer
+        if (result.success) {
           onClose();
-          // Wait for AuthProvider's onAuthStateChange to update the profile
-          // before redirecting to ensure dashboard sees authenticated state
-          await new Promise(resolve => setTimeout(resolve, 500));
-          window.location.href = '/dashboard';
+          // Attendre que onAuthStateChange mette à jour le profile
+          await new Promise(resolve => setTimeout(resolve, 800));
+          router.push('/dashboard');
+        } else {
+          setError(result.error || 'Erreur lors de la connexion');
         }
       } else {
-        // Use client-side Supabase for signup
-        const { data, error: signUpError } = await supabase.auth.signUp({
-          email,
-          password,
-          options: {
-            data: {
-              username: username,
-            },
-          },
-        });
-
-        if (signUpError) {
-          setError(translateError(signUpError.message));
+        if (!username) {
+          setError('Veuillez entrer un nom d\'utilisateur');
           setLoading(false);
           return;
         }
 
-        if (data.user) {
+        const result = await signUp(email, password, username);
+
+        if (result.success) {
           setError('');
           alert('Compte créé ! Vérifiez votre email pour confirmer votre inscription.');
           onClose();
+        } else {
+          setError(result.error || 'Erreur lors de l\'inscription');
         }
       }
     } catch (err: any) {
@@ -84,21 +70,6 @@ export default function AuthDrawer({ isOpen, onClose, mode, onSwitchMode }: Auth
     } finally {
       setLoading(false);
     }
-  };
-
-  const translateError = (error: string): string => {
-    const errorMap: Record<string, string> = {
-      'Invalid login credentials': 'Email ou mot de passe incorrect',
-      'Email not confirmed': 'Veuillez confirmer votre email',
-      'User already registered': 'Cet email est déjà utilisé',
-    };
-
-    for (const [key, value] of Object.entries(errorMap)) {
-      if (error.includes(key)) {
-        return value;
-      }
-    }
-    return error;
   };
 
   if (!isOpen) return null;

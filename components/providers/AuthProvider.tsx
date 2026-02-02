@@ -4,7 +4,7 @@ import { createContext, useContext, useEffect, useState } from 'react';
 import { User } from '@supabase/supabase-js';
 import { supabase } from '@/lib/supabase';
 import type { Profile } from '@/lib/types';
-import { signIn as signInAction, signUp as signUpAction, signOut as signOutAction } from '@/lib/supabase-auth';
+import { signOut as signOutAction } from '@/lib/supabase-auth';
 
 interface AuthContextType {
   user: User | null;
@@ -17,30 +17,70 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+// Traduction des erreurs Supabase
+function translateError(error: string): string {
+  const errorMap: Record<string, string> = {
+    'Invalid login credentials': 'Email ou mot de passe incorrect',
+    'User already registered': 'Cet email est déjà utilisé',
+    'Email not confirmed': 'Veuillez confirmer votre email',
+    'Password should be at least 6 characters': 'Le mot de passe doit contenir au moins 6 caractères',
+    'Unable to validate email address: invalid format': 'Format d\'email invalide',
+    'Signup requires a valid password': 'Mot de passe requis',
+    'User not found': 'Utilisateur non trouvé',
+    'Email rate limit exceeded': 'Trop de tentatives, veuillez réessayer plus tard',
+  };
+
+  // Recherche exacte
+  if (errorMap[error]) {
+    return errorMap[error];
+  }
+
+  // Recherche partielle
+  for (const [key, value] of Object.entries(errorMap)) {
+    if (error.includes(key)) {
+      return value;
+    }
+  }
+
+  return error;
+}
+
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
 
-  // Récupérer le profil depuis la table profiles
-  const fetchProfile = async (userId: string) => {
-    try {
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('id', userId)
-        .single();
+  // Récupérer le profil depuis la table profiles avec retry
+  const fetchProfile = async (userId: string, retries = 3): Promise<Profile | null> => {
+    for (let i = 0; i < retries; i++) {
+      try {
+        const { data, error } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('id', userId)
+          .single();
 
-      if (error) {
+        if (error) {
+          if (i < retries - 1) {
+            // Attendre avant de réessayer (backoff exponentiel)
+            await new Promise(resolve => setTimeout(resolve, 300 * (i + 1)));
+            continue;
+          }
+          console.error('Error fetching profile:', error);
+          return null;
+        }
+
+        return data;
+      } catch (error) {
+        if (i < retries - 1) {
+          await new Promise(resolve => setTimeout(resolve, 300 * (i + 1)));
+          continue;
+        }
         console.error('Error fetching profile:', error);
         return null;
       }
-
-      return data;
-    } catch (error) {
-      console.error('Error fetching profile:', error);
-      return null;
     }
+    return null;
   };
 
   // Initialiser l'état d'authentification au chargement
@@ -87,94 +127,95 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const signIn = async (email: string, password: string) => {
-    console.log('🔑 AuthProvider: signIn appelé');
-    const result = await signInAction(email, password);
-    console.log('🔑 AuthProvider: Résultat signInAction:', result);
+    try {
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
 
-    if (result.success && result.user) {
-      console.log('✅ AuthProvider: Utilisateur authentifié:', result.user.email);
-      setUser(result.user);
-
-      // Attendre que le profil soit disponible (au cas où il vient d'être créé)
-      let userProfile = null;
-      let attempts = 0;
-      const maxAttempts = 3;
-
-      while (!userProfile && attempts < maxAttempts) {
-        console.log(`🔍 AuthProvider: Tentative ${attempts + 1}/${maxAttempts} de chargement du profil`);
-        userProfile = await fetchProfile(result.user.id);
-        if (!userProfile && attempts < maxAttempts - 1) {
-          console.log('⏳ AuthProvider: Attente de 300ms avant nouvelle tentative');
-          await new Promise(resolve => setTimeout(resolve, 300));
-        }
-        attempts++;
+      if (error) {
+        return {
+          success: false,
+          error: translateError(error.message),
+        };
       }
 
-      if (userProfile) {
-        console.log('✅ AuthProvider: Profil chargé:', userProfile.username);
-        setProfile(userProfile);
-      } else {
-        console.error('❌ AuthProvider: Impossible de charger le profil après', maxAttempts, 'tentatives');
+      if (!data.user) {
+        return {
+          success: false,
+          error: 'Erreur lors de la connexion',
+        };
       }
-    } else {
-      console.error('❌ AuthProvider: Échec de l\'authentification');
+
+      // onAuthStateChange va mettre à jour user et profile automatiquement
+      return {
+        success: true,
+      };
+    } catch (error) {
+      console.error('SignIn error:', error);
+      return {
+        success: false,
+        error: 'Une erreur est survenue lors de la connexion',
+      };
     }
-
-    return result;
   };
 
   const signUp = async (email: string, password: string, username: string) => {
-    const result = await signUpAction(email, password, username);
+    try {
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          data: {
+            username: username,
+          },
+        },
+      });
 
-    if (result.success && result.user) {
-      setUser(result.user);
-
-      // Attendre que le trigger PostgreSQL crée le profil
-      // Retry avec backoff si le profil n'existe pas encore
-      let userProfile = null;
-      let attempts = 0;
-      const maxAttempts = 5;
-
-      while (!userProfile && attempts < maxAttempts) {
-        await new Promise(resolve => setTimeout(resolve, 500 * (attempts + 1)));
-        userProfile = await fetchProfile(result.user.id);
-        attempts++;
+      if (error) {
+        return {
+          success: false,
+          error: translateError(error.message),
+        };
       }
 
-      setProfile(userProfile);
-    }
+      if (!data.user) {
+        return {
+          success: false,
+          error: 'Erreur lors de la création du compte',
+        };
+      }
 
-    return result;
+      // onAuthStateChange va mettre à jour user et profile automatiquement
+      return {
+        success: true,
+      };
+    } catch (error) {
+      console.error('SignUp error:', error);
+      return {
+        success: false,
+        error: 'Une erreur est survenue lors de l\'inscription',
+      };
+    }
   };
 
   const signOut = async () => {
     try {
-      console.log('🚪 Déconnexion en cours...');
+      // 1. Déconnexion côté serveur pour supprimer les cookies HTTPOnly
+      await signOutAction();
 
-      // 1. Déconnexion côté client pour déclencher onAuthStateChange
-      // qui mettra automatiquement à jour user et profile à null
-      const { error: clientError } = await supabase.auth.signOut();
-      if (clientError) {
-        console.error('❌ Erreur lors de la déconnexion client:', clientError);
-        // En cas d'erreur côté client, forcer la mise à jour
+      // 2. Déconnexion côté client - déclenche onAuthStateChange qui va mettre à jour l'état
+      const { error } = await supabase.auth.signOut();
+
+      if (error) {
+        console.error('Erreur lors de la déconnexion:', error);
+        // Forcer la mise à jour de l'état en cas d'erreur
         setUser(null);
         setProfile(null);
-      } else {
-        console.log('✅ Session client supprimée');
       }
-
-      // 2. Déconnexion côté serveur pour supprimer les cookies HTTPOnly
-      const serverResult = await signOutAction();
-      if (!serverResult.success) {
-        console.error('❌ Erreur lors de la déconnexion serveur:', serverResult.error);
-      } else {
-        console.log('✅ Cookies serveur supprimés');
-      }
-
-      console.log('✅ Déconnexion terminée');
     } catch (error) {
-      console.error('❌ Erreur lors de la déconnexion:', error);
-      // En cas d'erreur, on force la déconnexion locale
+      console.error('Erreur lors de la déconnexion:', error);
+      // Forcer la mise à jour de l'état en cas d'erreur
       setUser(null);
       setProfile(null);
     }

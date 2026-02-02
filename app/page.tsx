@@ -209,16 +209,10 @@ export default function Home() {
               </p>
               <div className="flex gap-4 justify-center pt-4">
                 <Link
-                  href="/auth/signup"
+                  href="/sessions"
                   className="px-8 py-4 rounded-xl bg-primary-500 text-white font-semibold shadow-lg hover:bg-primary-600 transition-all hover:scale-105"
                 >
-                  Créer mon compte
-                </Link>
-                <Link
-                  href="/sessions"
-                  className="px-8 py-4 rounded-xl bg-white/10 backdrop-blur-xl border border-white/20 text-white font-semibold hover:bg-white/20 transition-all hover:scale-105"
-                >
-                  En savoir plus
+                  Découvrir les sessions
                 </Link>
               </div>
             </div>

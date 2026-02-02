@@ -18,10 +18,9 @@ export default function Navbar() {
   const handleSignOut = async () => {
     setDropdownOpen(false);
     await signOut();
-    // Attendre un peu que le listener onAuthStateChange se déclenche
-    await new Promise(resolve => setTimeout(resolve, 200));
+    // Attendre que onAuthStateChange mette à jour l'état
+    await new Promise(resolve => setTimeout(resolve, 300));
     // Utiliser window.location.href pour forcer un rechargement complet
-    // et s'assurer que toutes les données en cache sont effacées
     window.location.href = '/';
   };
 
