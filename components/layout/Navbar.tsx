@@ -34,7 +34,7 @@ export default function Navbar() {
         {/* Logo */}
         <Link href={profile ? "/dashboard" : "/"} className="flex items-center gap-3 hover:opacity-80 transition-opacity">
           <Image
-            src="/logo.svg"
+            src="/PaceMateLogo_vert.svg"
             alt="PaceMate Logo"
             width={40}
             height={40}
