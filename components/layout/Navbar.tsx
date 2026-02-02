@@ -15,6 +15,9 @@ export default function Navbar() {
   const [authDrawerOpen, setAuthDrawerOpen] = useState(false);
   const [authMode, setAuthMode] = useState<'login' | 'signup'>('login');
 
+  // Debug: log les changements d'état
+  console.log('🔍 Navbar render - loading:', loading, 'profile:', profile ? 'yes' : 'no');
+
   const handleSignOut = async () => {
     setDropdownOpen(false);
     await signOut();

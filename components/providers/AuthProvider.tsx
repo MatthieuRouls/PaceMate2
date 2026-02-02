@@ -85,19 +85,25 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   // Initialiser l'état d'authentification au chargement
   useEffect(() => {
+    console.log('🔄 AuthProvider: Initializing auth...');
     const initAuth = async () => {
       try {
         const { data: { session } } = await supabase.auth.getSession();
+        console.log('🔄 AuthProvider: Session retrieved:', session ? 'yes' : 'no');
 
         if (session?.user) {
           setUser(session.user);
           const userProfile = await fetchProfile(session.user.id);
           setProfile(userProfile);
+          console.log('✅ AuthProvider: User and profile set');
+        } else {
+          console.log('✅ AuthProvider: No session, user not logged in');
         }
       } catch (error) {
-        console.error('Error initializing auth:', error);
+        console.error('❌ Error initializing auth:', error);
       } finally {
         setLoading(false);
+        console.log('✅ AuthProvider: Loading set to false');
       }
     };
 
@@ -106,15 +112,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     // Écouter les changements d'authentification
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
-        console.log('Auth state changed:', event);
+        console.log('🔄 Auth state changed:', event, session ? 'with session' : 'no session');
 
         if (session?.user) {
           setUser(session.user);
           const userProfile = await fetchProfile(session.user.id);
           setProfile(userProfile);
+          console.log('✅ Profile updated after auth change');
         } else {
           setUser(null);
           setProfile(null);
+          console.log('✅ User/profile cleared after auth change');
         }
 
         setLoading(false);
@@ -201,23 +209,30 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const signOut = async () => {
     try {
+      console.log('🚪 AuthProvider: Signing out...');
+
       // 1. Déconnexion côté serveur pour supprimer les cookies HTTPOnly
       await signOutAction();
+      console.log('✅ Server-side sign out complete');
 
       // 2. Déconnexion côté client - déclenche onAuthStateChange qui va mettre à jour l'état
       const { error } = await supabase.auth.signOut();
 
       if (error) {
-        console.error('Erreur lors de la déconnexion:', error);
+        console.error('❌ Erreur lors de la déconnexion client:', error);
         // Forcer la mise à jour de l'état en cas d'erreur
         setUser(null);
         setProfile(null);
+        setLoading(false);
+      } else {
+        console.log('✅ Client-side sign out complete');
       }
     } catch (error) {
-      console.error('Erreur lors de la déconnexion:', error);
+      console.error('❌ Erreur lors de la déconnexion:', error);
       // Forcer la mise à jour de l'état en cas d'erreur
       setUser(null);
       setProfile(null);
+      setLoading(false);
     }
   };
 
