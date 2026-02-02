@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { usePathname, useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { Bell } from 'lucide-react';
@@ -32,9 +33,13 @@ export default function Navbar() {
       <div className="flex items-center justify-between">
         {/* Logo */}
         <Link href={profile ? "/dashboard" : "/"} className="flex items-center gap-3 hover:opacity-80 transition-opacity">
-          <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-primary-500 to-primary-400 flex items-center justify-center text-white font-bold shadow-lg">
-            P
-          </div>
+          <Image
+            src="/logo.svg"
+            alt="PaceMate Logo"
+            width={40}
+            height={40}
+            className="w-10 h-10"
+          />
           <span className="text-2xl font-bold text-secondary-600">
             PaceMate
           </span>
