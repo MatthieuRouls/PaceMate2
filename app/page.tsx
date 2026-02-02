@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
@@ -8,10 +8,6 @@ import { Session, Team } from '@/lib/types';
 import SessionCard from '@/components/ui/SessionCard';
 import { getUpcomingSessions, getTopTeams } from '@/lib/actions';
 import { useAuth } from '@/components/providers/AuthProvider';
-import gsap from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
-
-gsap.registerPlugin(ScrollTrigger);
 
 export default function Home() {
   const router = useRouter();
@@ -19,13 +15,6 @@ export default function Home() {
   const [upcomingSessions, setUpcomingSessions] = useState<Session[]>([]);
   const [topTeams, setTopTeams] = useState<Team[]>([]);
   const [loading, setLoading] = useState(true);
-
-  // Refs for GSAP animations
-  const heroRef = useRef<HTMLDivElement>(null);
-  const sloganRef = useRef<HTMLHeadingElement>(null);
-  const scrollIndicatorRef = useRef<HTMLDivElement>(null);
-  const sessionsRef = useRef<HTMLElement>(null);
-  const teamsRef = useRef<HTMLElement>(null);
 
   // Redirect to dashboard if user is logged in
   useEffect(() => {
@@ -52,114 +41,12 @@ export default function Home() {
     fetchData();
   }, []);
 
-  // GSAP Animations
-  useEffect(() => {
-    const ctx = gsap.context(() => {
-      // Hero entrance animation
-      const tl = gsap.timeline({ defaults: { ease: 'power3.out' } });
-
-      tl.from(sloganRef.current, {
-        y: 100,
-        opacity: 0,
-        duration: 1.2,
-        delay: 0.5,
-      })
-      .from(scrollIndicatorRef.current, {
-        opacity: 0,
-        y: -20,
-        duration: 0.8,
-      }, '-=0.4');
-
-      // Parallax effect on hero image
-      gsap.to(heroRef.current, {
-        scrollTrigger: {
-          trigger: heroRef.current,
-          start: 'top top',
-          end: 'bottom top',
-          scrub: 1,
-        },
-        y: 200,
-        scale: 1.1,
-      });
-
-      // Fade out slogan on scroll
-      gsap.to(sloganRef.current, {
-        scrollTrigger: {
-          trigger: heroRef.current,
-          start: 'top top',
-          end: 'bottom top',
-          scrub: 1,
-        },
-        opacity: 0,
-        y: -100,
-      });
-
-      // Sessions section reveal
-      if (sessionsRef.current) {
-        gsap.from(sessionsRef.current, {
-          scrollTrigger: {
-            trigger: sessionsRef.current,
-            start: 'top 80%',
-            end: 'top 50%',
-            scrub: 1,
-          },
-          opacity: 0,
-          y: 100,
-        });
-
-        // Animate session cards
-        const cards = sessionsRef.current.querySelectorAll('.session-card');
-        gsap.from(cards, {
-          scrollTrigger: {
-            trigger: sessionsRef.current,
-            start: 'top 70%',
-          },
-          opacity: 0,
-          y: 60,
-          stagger: 0.15,
-          duration: 0.8,
-          ease: 'power2.out',
-        });
-      }
-
-      // Teams section reveal
-      if (teamsRef.current) {
-        gsap.from(teamsRef.current, {
-          scrollTrigger: {
-            trigger: teamsRef.current,
-            start: 'top 80%',
-            end: 'top 50%',
-            scrub: 1,
-          },
-          opacity: 0,
-          y: 100,
-        });
-
-        // Animate team cards
-        const teamCards = teamsRef.current.querySelectorAll('.team-card');
-        gsap.from(teamCards, {
-          scrollTrigger: {
-            trigger: teamsRef.current,
-            start: 'top 70%',
-          },
-          opacity: 0,
-          y: 60,
-          stagger: 0.15,
-          duration: 0.8,
-          ease: 'power2.out',
-        });
-      }
-    });
-
-    return () => ctx.revert();
-  }, [loading, upcomingSessions, topTeams]);
-
   return (
     <div className="min-h-screen bg-white">
       {/* Hero Section - Full Page */}
       <section className="relative h-screen w-full overflow-hidden">
-        {/* Hero Image with parallax */}
-        <div ref={heroRef} className="absolute inset-0 z-0">
+        {/* Hero Image */}
+        <div className="absolute inset-0 z-0">
           <Image
             src="/PhotoAccueil.jpeg"
             alt="Runners"
@@ -174,10 +61,7 @@ export default function Home() {
 
         {/* Slogan */}
         <div className="relative z-10 h-full flex items-center justify-center px-6">
-          <h1
-            ref={sloganRef}
-            className="text-center"
-          >
+          <h1 className="text-center">
             <div className="text-6xl md:text-8xl lg:text-9xl font-bold text-white mb-6 leading-tight">
               Cours avec
               <br />
@@ -190,10 +74,7 @@ export default function Home() {
         </div>
 
         {/* Scroll Indicator */}
-        <div
-          ref={scrollIndicatorRef}
-          className="absolute bottom-12 left-1/2 -translate-x-1/2 z-10 animate-bounce"
-        >
+        <div className="absolute bottom-12 left-1/2 -translate-x-1/2 z-10 animate-bounce">
           <div className="flex flex-col items-center gap-2 text-white/80">
             <span className="text-sm font-medium tracking-wider uppercase">Découvrir</span>
             <svg
@@ -214,10 +95,7 @@ export default function Home() {
       </section>
 
       {/* Sessions Feed Section */}
-      <section
-        ref={sessionsRef}
-        className="py-32 px-4 sm:px-6 lg:px-8 bg-white"
-      >
+      <section className="py-32 px-4 sm:px-6 lg:px-8 bg-white">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-20">
             <h2 className="text-5xl md:text-6xl font-bold text-secondary-600 mb-6">
@@ -236,9 +114,7 @@ export default function Home() {
           ) : upcomingSessions.length > 0 ? (
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
               {upcomingSessions.map((session) => (
-                <div key={session.id} className="session-card">
-                  <SessionCard session={session} />
-                </div>
+                <SessionCard key={session.id} session={session} />
               ))}
             </div>
           ) : (
@@ -277,10 +153,7 @@ export default function Home() {
       </section>
 
       {/* Top Teams Section */}
-      <section
-        ref={teamsRef}
-        className="py-32 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-white to-gray-50"
-      >
+      <section className="py-32 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-white to-gray-50">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-20">
             <h2 className="text-5xl md:text-6xl font-bold text-secondary-600 mb-6">
@@ -305,7 +178,7 @@ export default function Home() {
                 return (
                   <div
                     key={team.id}
-                    className="team-card bg-white rounded-3xl p-8 shadow-lg hover:shadow-2xl transition-all border-2 border-gray-100 hover:border-primary-500"
+                    className="bg-white rounded-3xl p-8 shadow-lg hover:shadow-2xl transition-all border-2 border-gray-100 hover:border-primary-500"
                   >
                     <div className="flex items-start justify-between mb-6">
                       <span className="text-6xl">{medals[index]}</span>
