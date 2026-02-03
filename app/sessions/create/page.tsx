@@ -92,7 +92,12 @@ export default function CreateSessionPage() {
     }
   };
 
-  const sessionTypes = [
+  const sessionTypes: Array<{
+    value: 'casual' | 'recovery' | 'tempo' | 'long_run' | 'intervals';
+    label: string;
+    icon: string;
+    description: string;
+  }> = [
     { value: 'casual', label: 'Sortie détente', icon: '🚶', description: 'Rythme tranquille' },
     { value: 'recovery', label: 'Récupération', icon: '🧘', description: 'Allure modérée' },
     { value: 'tempo', label: 'Allure soutenue', icon: '🏃', description: 'Rythme challengeant' },
