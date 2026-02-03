@@ -821,6 +821,83 @@ export async function leaveSession(sessionId: string): Promise<ActionResult> {
 }
 
 /**
+ * Supprimer une session (uniquement pour le créateur)
+ */
+export async function deleteSession(sessionId: string): Promise<ActionResult> {
+  try {
+    // Récupérer l'utilisateur connecté
+    const user = await getCurrentUser();
+    if (!user) {
+      return {
+        success: false,
+        error: 'Non authentifié',
+      };
+    }
+
+    const supabase = await getServerSupabaseClient();
+
+    // Vérifier que l'utilisateur est bien le créateur de la session
+    const { data: session, error: fetchError } = await supabase
+      .from('sessions')
+      .select('creator_id')
+      .eq('id', sessionId)
+      .single();
+
+    if (fetchError || !session) {
+      return {
+        success: false,
+        error: 'Session introuvable',
+      };
+    }
+
+    if (session.creator_id !== user.id) {
+      return {
+        success: false,
+        error: 'Vous n\'êtes pas autorisé à supprimer cette session',
+      };
+    }
+
+    // Supprimer d'abord tous les participants
+    const { error: deleteParticipantsError } = await supabase
+      .from('session_participants')
+      .delete()
+      .eq('session_id', sessionId);
+
+    if (deleteParticipantsError) {
+      console.error('Error deleting session participants:', deleteParticipantsError);
+      return {
+        success: false,
+        error: 'Erreur lors de la suppression des participants',
+      };
+    }
+
+    // Supprimer la session
+    const { error: deleteError } = await supabase
+      .from('sessions')
+      .delete()
+      .eq('id', sessionId);
+
+    if (deleteError) {
+      console.error('Error deleting session:', deleteError);
+      return {
+        success: false,
+        error: 'Erreur lors de la suppression de la session',
+      };
+    }
+
+    return {
+      success: true,
+    };
+  } catch (error) {
+    console.error('Unexpected error in deleteSession:', error);
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'Une erreur inattendue s\'est produite',
+    };
+  }
+}
+
+/**
  * Noter une session et gagner des XP
  */
 export async function rateSession(

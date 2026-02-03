@@ -10,9 +10,11 @@ import {
   joinSession,
   leaveSession,
   rateSession,
+  deleteSession,
 } from '@/lib/actions';
 import RatingModal from '@/components/ui/RatingModal';
-import { ArrowLeft, Calendar, MapPin, Users, Clock, Target, Zap } from 'lucide-react';
+import { ArrowLeft, Calendar, MapPin, Users, Clock, Target, Zap, Trash2 } from 'lucide-react';
+import { useAuth } from '@/components/providers/AuthProvider';
 
 // Désactiver la pré-génération statique
 export const dynamic = 'force-dynamic';
@@ -27,6 +29,7 @@ export default function SessionDetailsPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const sessionId = params.id as string;
+  const { profile } = useAuth();
 
   // Mode debug pour tester la notation (ajoutez ?testRating=true à l'URL)
   const debugTestRating = searchParams.get('testRating') === 'true';
@@ -181,6 +184,30 @@ export default function SessionDetailsPage() {
       alert(result.error || 'Erreur lors de l\'envoi de la note');
     }
   };
+
+  const handleDelete = async () => {
+    if (!session) return;
+
+    const confirmed = window.confirm(
+      'Êtes-vous sûr de vouloir supprimer cette session ? Cette action est irréversible et tous les participants seront désincrits.'
+    );
+    if (!confirmed) return;
+
+    setActionLoading(true);
+    const result = await deleteSession(sessionId);
+
+    if (result.success) {
+      alert('Session supprimée avec succès');
+      router.push('/sessions');
+    } else {
+      alert(result.error || 'Erreur lors de la suppression de la session');
+    }
+
+    setActionLoading(false);
+  };
+
+  // Check if current user is the creator
+  const isCreator = profile && session && session.creator_id === profile.id;
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-white to-gray-50 pt-24 pb-12 px-4 sm:px-6 lg:px-8">
@@ -382,8 +409,26 @@ export default function SessionDetailsPage() {
 
             {/* Actions Card */}
             <div className="bg-white rounded-3xl p-8 shadow-lg border-2 border-gray-100">
+              {/* Creator actions */}
+              {isCreator && !isSessionPast() && (
+                <div className="space-y-4 mb-6">
+                  <div className="flex items-center justify-center gap-2 py-4 px-6 rounded-2xl bg-secondary-600/10 text-secondary-600">
+                    <span className="text-2xl">👑</span>
+                    <span className="font-bold text-lg">Vous êtes l'organisateur de cette session</span>
+                  </div>
+                  <button
+                    onClick={handleDelete}
+                    disabled={actionLoading}
+                    className="w-full py-4 rounded-2xl border-2 border-red-500 text-red-500 font-bold hover:bg-red-50 transition-all disabled:opacity-50 flex items-center justify-center gap-2"
+                  >
+                    <Trash2 className="w-5 h-5" />
+                    {actionLoading ? '⏳ Suppression...' : 'Supprimer la session'}
+                  </button>
+                </div>
+              )}
+
               {/* Not joined yet */}
-              {!userStatus && !isSessionPast() && (
+              {!userStatus && !isSessionPast() && !isCreator && (
                 <button
                   onClick={handleJoin}
                   disabled={actionLoading || isSessionFull()}
@@ -399,7 +444,7 @@ export default function SessionDetailsPage() {
               )}
 
               {/* Already joined */}
-              {userStatus && userStatus.status === 'confirmed' && !isSessionPast() && (
+              {userStatus && userStatus.status === 'confirmed' && !isSessionPast() && !isCreator && (
                 <div className="space-y-4">
                   <div className="flex items-center justify-center gap-2 py-4 px-6 rounded-2xl bg-primary-500/10 text-primary-600">
                     <span className="text-2xl">✓</span>
