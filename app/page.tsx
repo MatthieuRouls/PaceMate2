@@ -52,7 +52,7 @@ export default function Home() {
         {/* Hero Image */}
         <div className="absolute inset-0 z-0">
           <Image
-            src="/PhotoAccueil.jpeg"
+            src="/Accueil.jpeg"
             alt="Runners"
             fill
             priority
@@ -67,12 +67,12 @@ export default function Home() {
         <div className="relative z-10 h-full flex items-center justify-center px-6">
           <h1 className="text-center">
             <div className="text-6xl md:text-8xl lg:text-9xl font-bold text-white mb-6 leading-tight">
-              Cours avec
+              Trouve ton
               <br />
-              <span className="text-primary-500">ta tribu</span>
+              <span className="text-primary-500">Mate</span>
             </div>
             <p className="text-xl md:text-2xl lg:text-3xl text-white/90 font-light">
-              Trouve ton rythme, ensemble
+              Au bon pace
             </p>
           </h1>
         </div>
