@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname, useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Bell } from 'lucide-react';
 import { useAuth } from '../providers/AuthProvider';
 import AuthDrawer from '../ui/AuthDrawer';
@@ -15,6 +15,9 @@ export default function Navbar() {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [authDrawerOpen, setAuthDrawerOpen] = useState(false);
   const [authMode, setAuthMode] = useState<'login' | 'signup'>('login');
+  const [scrolled, setScrolled] = useState(false);
+
+  const isHomepage = pathname === '/';
 
   const handleSignOut = async () => {
     setDropdownOpen(false);
@@ -28,19 +31,39 @@ export default function Navbar() {
     return null;
   }
 
+  // Detect scroll on homepage
+  useEffect(() => {
+    if (!isHomepage) {
+      setScrolled(true);
+      return;
+    }
+
+    const handleScroll = () => {
+      const scrollPosition = window.scrollY;
+      setScrolled(scrollPosition > 100);
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [isHomepage]);
+
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 px-4 sm:px-6 lg:px-8 py-4 bg-white/80 backdrop-blur-xl border-b border-gray-100">
+    <nav className={`fixed top-0 left-0 right-0 z-50 px-4 sm:px-6 lg:px-8 py-4 transition-all duration-300 ${
+      scrolled
+        ? 'bg-white/90 backdrop-blur-xl border-b border-gray-100 shadow-sm'
+        : 'bg-transparent'
+    }`}>
       <div className="flex items-center justify-between">
         {/* Logo */}
         <Link href={profile ? "/dashboard" : "/"} className="flex items-center gap-3 hover:opacity-80 transition-opacity">
           <Image
-            src="/PaceMateLogo_vert.svg"
+            src={scrolled ? "/PaceMateLogo_vert.svg" : "/PaceMateLogo_vert.svg"}
             alt="PaceMate Logo"
             width={40}
             height={40}
             className="w-10 h-10"
           />
-          <span className="text-2xl font-bold text-secondary-600">
+          <span className={`text-2xl font-bold transition-colors ${scrolled ? 'text-secondary-600' : 'text-white'}`}>
             PaceMate
           </span>
         </Link>
@@ -54,7 +77,9 @@ export default function Navbar() {
                 className={`text-sm font-medium transition-colors ${
                   pathname?.startsWith('/sessions')
                     ? 'text-primary-500'
-                    : 'text-secondary-600/80 hover:text-primary-500'
+                    : scrolled
+                    ? 'text-secondary-600/80 hover:text-primary-500'
+                    : 'text-white/90 hover:text-white'
                 }`}
               >
                 Sessions
@@ -64,7 +89,9 @@ export default function Navbar() {
                 className={`text-sm font-medium transition-colors ${
                   pathname?.startsWith('/mes-sorties')
                     ? 'text-primary-500'
-                    : 'text-secondary-600/80 hover:text-primary-500'
+                    : scrolled
+                    ? 'text-secondary-600/80 hover:text-primary-500'
+                    : 'text-white/90 hover:text-white'
                 }`}
               >
                 Mes sorties
@@ -74,7 +101,9 @@ export default function Navbar() {
                 className={`text-sm font-medium transition-colors ${
                   pathname?.startsWith('/sessions/create')
                     ? 'text-primary-500'
-                    : 'text-secondary-600/80 hover:text-primary-500'
+                    : scrolled
+                    ? 'text-secondary-600/80 hover:text-primary-500'
+                    : 'text-white/90 hover:text-white'
                 }`}
               >
                 Créer une sortie
@@ -84,7 +113,9 @@ export default function Navbar() {
                 className={`text-sm font-medium transition-colors ${
                   pathname?.startsWith('/teams')
                     ? 'text-primary-500'
-                    : 'text-secondary-600/80 hover:text-primary-500'
+                    : scrolled
+                    ? 'text-secondary-600/80 hover:text-primary-500'
+                    : 'text-white/90 hover:text-white'
                 }`}
               >
                 Équipes
@@ -94,8 +125,10 @@ export default function Navbar() {
             {/* User actions */}
             <div className="flex items-center gap-3">
               {/* Notifications */}
-              <button className="relative w-10 h-10 rounded-lg hover:bg-gray-100 flex items-center justify-center transition-colors">
-                <Bell className="w-5 h-5 text-secondary-600" />
+              <button className={`relative w-10 h-10 rounded-lg flex items-center justify-center transition-colors ${
+                scrolled ? 'hover:bg-gray-100' : 'hover:bg-white/20'
+              }`}>
+                <Bell className={`w-5 h-5 transition-colors ${scrolled ? 'text-secondary-600' : 'text-white'}`} />
                 {/* Badge for unread notifications */}
                 <span className="absolute top-2 right-2 w-2 h-2 bg-primary-500 rounded-full"></span>
               </button>
@@ -111,11 +144,11 @@ export default function Navbar() {
                       {profile.username.substring(0, 2).toUpperCase()}
                     </div>
                   </div>
-                  <span className="hidden md:block font-medium text-secondary-600">
+                  <span className={`hidden md:block font-medium transition-colors ${scrolled ? 'text-secondary-600' : 'text-white'}`}>
                     {profile.username}
                   </span>
                   <svg
-                    className={`hidden md:block w-4 h-4 text-secondary-600 transition-transform ${dropdownOpen ? 'rotate-180' : ''}`}
+                    className={`hidden md:block w-4 h-4 transition-all ${scrolled ? 'text-secondary-600' : 'text-white'} ${dropdownOpen ? 'rotate-180' : ''}`}
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -187,7 +220,9 @@ export default function Navbar() {
                 className={`text-sm font-medium transition-colors ${
                   pathname?.startsWith('/sessions')
                     ? 'text-primary-500'
-                    : 'text-secondary-600/80 hover:text-primary-500'
+                    : scrolled
+                    ? 'text-secondary-600/80 hover:text-primary-500'
+                    : 'text-white/90 hover:text-white'
                 }`}
               >
                 Sessions
@@ -197,7 +232,9 @@ export default function Navbar() {
                 className={`text-sm font-medium transition-colors ${
                   pathname?.startsWith('/teams')
                     ? 'text-primary-500'
-                    : 'text-secondary-600/80 hover:text-primary-500'
+                    : scrolled
+                    ? 'text-secondary-600/80 hover:text-primary-500'
+                    : 'text-white/90 hover:text-white'
                 }`}
               >
                 Équipes
@@ -210,7 +247,9 @@ export default function Navbar() {
                   setAuthMode('login');
                   setAuthDrawerOpen(true);
                 }}
-                className="px-5 py-2 font-medium text-secondary-600 hover:text-primary-500 transition-colors"
+                className={`px-5 py-2 font-medium transition-colors ${
+                  scrolled ? 'text-secondary-600 hover:text-primary-500' : 'text-white hover:text-primary-500'
+                }`}
               >
                 Connexion
               </button>
