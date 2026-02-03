@@ -199,25 +199,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const signOut = async () => {
     try {
+      // Forcer immédiatement la mise à jour de l'état
+      setUser(null);
+      setProfile(null);
+
       // 1. Déconnexion côté serveur pour supprimer les cookies HTTPOnly
       await signOutAction();
 
-      // 2. Déconnexion côté client - déclenche onAuthStateChange qui va mettre à jour l'état
-      const { error } = await supabase.auth.signOut();
-
-      if (error) {
-        console.error('Erreur lors de la déconnexion:', error);
-        // Forcer la mise à jour de l'état en cas d'erreur
-        setUser(null);
-        setProfile(null);
-        setLoading(false);
-      }
+      // 2. Déconnexion côté client
+      await supabase.auth.signOut();
     } catch (error) {
       console.error('Erreur lors de la déconnexion:', error);
-      // Forcer la mise à jour de l'état en cas d'erreur
+      // Même en cas d'erreur, on force la déconnexion côté client
       setUser(null);
       setProfile(null);
-      setLoading(false);
     }
   };
 

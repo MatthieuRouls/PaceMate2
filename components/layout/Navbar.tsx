@@ -22,8 +22,8 @@ export default function Navbar() {
   const handleSignOut = async () => {
     setDropdownOpen(false);
     await signOut();
-    // Utiliser router.replace pour éviter les recompilations
-    router.replace('/');
+    // Forcer un rechargement complet de la page pour réinitialiser tout l'état
+    window.location.href = '/';
   };
 
   const isAuthPage = pathname?.startsWith('/auth');
