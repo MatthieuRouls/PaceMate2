@@ -143,7 +143,7 @@ export default function SessionCard({ session, onClick, showJoinButton = true }:
               <span className="px-4 py-2 rounded-lg bg-gray-100 text-gray-600 text-sm font-medium">
                 Complet
               </span>
-            ) : showJoinButton ? (
+            ) : showJoinButton && onClick ? (
               <Link
                 href={`/sessions/${session.id}`}
                 onClick={handleJoinClick}
@@ -151,6 +151,10 @@ export default function SessionCard({ session, onClick, showJoinButton = true }:
               >
                 Rejoindre
               </Link>
+            ) : showJoinButton && !onClick ? (
+              <span className="px-4 py-2 rounded-lg bg-primary-500 text-white text-sm font-medium">
+                Voir détails
+              </span>
             ) : null}
           </div>
         </div>
