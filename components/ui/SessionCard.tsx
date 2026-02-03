@@ -5,9 +5,11 @@ import { Session } from '@/lib/types';
 
 interface SessionCardProps {
   session: Session;
+  onClick?: () => void;
+  showJoinButton?: boolean;
 }
 
-export default function SessionCard({ session }: SessionCardProps) {
+export default function SessionCard({ session, onClick, showJoinButton = true }: SessionCardProps) {
   // Format date
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
@@ -36,9 +38,16 @@ export default function SessionCard({ session }: SessionCardProps) {
   // Duration calculation (simple mock - you can replace with actual calculation)
   const estimatedDuration = Math.round((session.distance_km * parseFloat(session.target_pace?.split(':')[0] || '5')) / 60);
 
-  return (
-    <Link href={`/sessions/${session.id}`} className="block">
-      <div className="group bg-white rounded-2xl p-6 shadow-md hover:shadow-xl transition-all hover:scale-[1.02] cursor-pointer border border-gray-100">
+  const handleJoinClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    // Will navigate via Link
+  };
+
+  const cardContent = (
+    <div
+      className="group bg-white rounded-2xl p-6 shadow-md hover:shadow-xl transition-all hover:scale-[1.02] cursor-pointer border border-gray-100"
+      onClick={onClick}
+    >
         <div className="space-y-4">
           {/* Header */}
           <div className="flex items-start justify-between">
@@ -134,14 +143,27 @@ export default function SessionCard({ session }: SessionCardProps) {
               <span className="px-4 py-2 rounded-lg bg-gray-100 text-gray-600 text-sm font-medium">
                 Complet
               </span>
-            ) : (
-              <button className="px-4 py-2 rounded-lg bg-primary-500 text-white text-sm font-medium shadow-md hover:bg-primary-600 transition-all group-hover:scale-105">
+            ) : showJoinButton ? (
+              <Link
+                href={`/sessions/${session.id}`}
+                onClick={handleJoinClick}
+                className="px-4 py-2 rounded-lg bg-primary-500 text-white text-sm font-medium shadow-md hover:bg-primary-600 transition-all group-hover:scale-105"
+              >
                 Rejoindre
-              </button>
-            )}
+              </Link>
+            ) : null}
           </div>
         </div>
       </div>
+  );
+
+  if (onClick) {
+    return cardContent;
+  }
+
+  return (
+    <Link href={`/sessions/${session.id}`} className="block">
+      {cardContent}
     </Link>
   );
 }

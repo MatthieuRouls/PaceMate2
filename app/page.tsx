@@ -6,6 +6,7 @@ import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { Session, Team } from '@/lib/types';
 import SessionCard from '@/components/ui/SessionCard';
+import SessionDetailsDrawer from '@/components/ui/SessionDetailsDrawer';
 import { getUpcomingSessions, getTopTeams } from '@/lib/actions';
 import { useAuth } from '@/components/providers/AuthProvider';
 
@@ -15,6 +16,8 @@ export default function Home() {
   const [upcomingSessions, setUpcomingSessions] = useState<Session[]>([]);
   const [topTeams, setTopTeams] = useState<Team[]>([]);
   const [loading, setLoading] = useState(true);
+  const [selectedSession, setSelectedSession] = useState<Session | null>(null);
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
   // Redirect to dashboard if user is logged in
   useEffect(() => {
@@ -114,7 +117,14 @@ export default function Home() {
           ) : upcomingSessions.length > 0 ? (
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
               {upcomingSessions.map((session) => (
-                <SessionCard key={session.id} session={session} />
+                <SessionCard
+                  key={session.id}
+                  session={session}
+                  onClick={() => {
+                    setSelectedSession(session);
+                    setIsDrawerOpen(true);
+                  }}
+                />
               ))}
             </div>
           ) : (
@@ -310,6 +320,16 @@ export default function Home() {
           </div>
         </div>
       </footer>
+
+      {/* Session Details Drawer */}
+      <SessionDetailsDrawer
+        session={selectedSession}
+        isOpen={isDrawerOpen}
+        onClose={() => {
+          setIsDrawerOpen(false);
+          setTimeout(() => setSelectedSession(null), 300);
+        }}
+      />
     </div>
   );
 }
