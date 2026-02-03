@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import SessionCard from '@/components/ui/SessionCard';
 import { Session } from '@/lib/types';
 import { getUserSessions } from '@/lib/actions';
+import LoadingSpinner from '@/components/ui/LoadingSpinner';
 
 export default function MesSortiesPage() {
   const { profile, loading } = useAuth();
@@ -47,7 +48,7 @@ export default function MesSortiesPage() {
   if (loading || !profile) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-3 border-primary-500 border-t-transparent"></div>
+        <LoadingSpinner size="md" />
       </div>
     );
   }
@@ -92,7 +93,7 @@ export default function MesSortiesPage() {
         {/* Content */}
         {sessionsLoading ? (
           <div className="flex justify-center py-20">
-            <div className="animate-spin rounded-full h-12 w-12 border-3 border-primary-500 border-t-transparent"></div>
+            <LoadingSpinner size="md" />
           </div>
         ) : (
           <>

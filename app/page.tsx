@@ -9,6 +9,7 @@ import SessionCard from '@/components/ui/SessionCard';
 import SessionDetailsDrawer from '@/components/ui/SessionDetailsDrawer';
 import { getUpcomingSessions, getTopTeams } from '@/lib/actions';
 import { useAuth } from '@/components/providers/AuthProvider';
+import LoadingSpinner from '@/components/ui/LoadingSpinner';
 
 export default function Home() {
   const router = useRouter();
@@ -116,7 +117,7 @@ export default function Home() {
 
           {loading ? (
             <div className="flex justify-center py-20">
-              <div className="w-16 h-16 rounded-full border-4 border-primary-500 border-t-transparent animate-spin" />
+              <LoadingSpinner size="lg" />
             </div>
           ) : upcomingSessions.length > 0 ? (
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -185,7 +186,7 @@ export default function Home() {
 
           {loading ? (
             <div className="flex justify-center py-20">
-              <div className="w-16 h-16 rounded-full border-4 border-primary-500 border-t-transparent animate-spin" />
+              <LoadingSpinner size="lg" />
             </div>
           ) : topTeams.length > 0 ? (
             <div className="grid md:grid-cols-3 gap-8">

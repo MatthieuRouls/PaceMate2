@@ -7,6 +7,7 @@ import SessionCard from '@/components/ui/SessionCard';
 import SessionDetailsDrawer from '@/components/ui/SessionDetailsDrawer';
 import { getAllUpcomingSessions } from '@/lib/actions';
 import { Filter } from 'lucide-react';
+import LoadingSpinner from '@/components/ui/LoadingSpinner';
 
 type FilterLevel = 'all' | 'beginner' | 'intermediate' | 'advanced';
 
@@ -134,7 +135,7 @@ export default function SessionsPage() {
         {/* Loading */}
         {loading && (
           <div className="flex justify-center py-20">
-            <div className="w-16 h-16 rounded-full border-4 border-primary-500 border-t-transparent animate-spin" />
+            <LoadingSpinner size="lg" />
           </div>
         )}
 

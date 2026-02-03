@@ -7,6 +7,7 @@ import { useRouter } from 'next/navigation';
 import SessionCard from '@/components/ui/SessionCard';
 import { getUpcomingSessions } from '@/lib/actions';
 import { Session } from '@/lib/types';
+import LoadingSpinner from '@/components/ui/LoadingSpinner';
 
 export default function DashboardPage() {
   const { profile, loading } = useAuth();
@@ -45,7 +46,7 @@ export default function DashboardPage() {
   if (loading || !profile) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-3 border-primary-500 border-t-transparent"></div>
+        <LoadingSpinner size="md" />
       </div>
     );
   }
@@ -164,7 +165,7 @@ export default function DashboardPage() {
 
           {sessionsLoading ? (
             <div className="flex justify-center py-16">
-              <div className="animate-spin rounded-full h-10 w-10 border-3 border-primary-500 border-t-transparent"></div>
+              <LoadingSpinner size="sm" />
             </div>
           ) : upcomingSessions.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

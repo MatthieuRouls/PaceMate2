@@ -11,6 +11,7 @@ import {
   getUserUpcomingSessions,
   getUserSessionHistory,
 } from '@/lib/actions';
+import LoadingSpinner from '@/components/ui/LoadingSpinner';
 
 // Désactiver la pré-génération statique
 export const dynamic = 'force-dynamic';
@@ -106,12 +107,8 @@ export default function ProfilePage() {
 
         {/* Loading */}
         {(loading || authLoading) && (
-          <div className="text-center py-12">
-            <div
-              className="inline-block animate-spin rounded-full h-12 w-12 border-b-2"
-              style={{ borderColor: 'var(--color-primary)' }}
-            ></div>
-            <p className="mt-4 opacity-75">Chargement...</p>
+          <div className="flex justify-center py-20">
+            <LoadingSpinner size="md" />
           </div>
         )}
 

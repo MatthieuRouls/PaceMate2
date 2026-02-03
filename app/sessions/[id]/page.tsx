@@ -13,6 +13,7 @@ import {
   deleteSession,
 } from '@/lib/actions';
 import RatingModal from '@/components/ui/RatingModal';
+import LoadingSpinner from '@/components/ui/LoadingSpinner';
 import { ArrowLeft, Calendar, MapPin, Users, Clock, Target, Zap, Trash2 } from 'lucide-react';
 import { useAuth } from '@/components/providers/AuthProvider';
 
@@ -231,7 +232,7 @@ export default function SessionDetailsPage() {
         {/* Loading */}
         {loading && (
           <div className="flex justify-center py-20">
-            <div className="w-16 h-16 rounded-full border-4 border-primary-500 border-t-transparent animate-spin" />
+            <LoadingSpinner size="lg" />
           </div>
         )}
 
