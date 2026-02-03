@@ -998,3 +998,76 @@ export async function getTopTeams(limit: number = 3) {
     return [];
   }
 }
+
+/**
+ * Récupérer les sessions auxquelles l'utilisateur est inscrit
+ */
+export async function getUserSessions() {
+  try {
+    const user = await getCurrentUser();
+    if (!user) {
+      return { upcoming: [], past: [] };
+    }
+
+    const supabase = await getServerSupabaseClient();
+    const now = new Date().toISOString();
+
+    // Récupérer les IDs des sessions auxquelles l'utilisateur participe
+    const { data: participations, error: participationsError } = await supabase
+      .from('session_participants')
+      .select('session_id, status')
+      .eq('user_id', user.id)
+      .eq('status', 'confirmed');
+
+    if (participationsError) {
+      console.error('Error fetching user participations:', participationsError);
+      return { upcoming: [], past: [] };
+    }
+
+    if (!participations || participations.length === 0) {
+      return { upcoming: [], past: [] };
+    }
+
+    const sessionIds = participations.map((p) => p.session_id);
+
+    // Récupérer les détails des sessions
+    const { data: sessions, error: sessionsError } = await supabase
+      .from('sessions')
+      .select(`
+        *,
+        creator:profiles!sessions_creator_id_fkey(id, username)
+      `)
+      .in('id', sessionIds)
+      .order('start_time', { ascending: true });
+
+    if (sessionsError) {
+      console.error('Error fetching sessions:', sessionsError);
+      return { upcoming: [], past: [] };
+    }
+
+    // Compter les participants pour chaque session
+    const sessionsWithCounts = await Promise.all(
+      (sessions || []).map(async (session) => {
+        const { count } = await supabase
+          .from('session_participants')
+          .select('*', { count: 'exact', head: true })
+          .eq('session_id', session.id)
+          .eq('status', 'confirmed');
+
+        return {
+          ...session,
+          participants_count: count || 0,
+        };
+      })
+    );
+
+    // Séparer les sessions à venir et passées
+    const upcoming = sessionsWithCounts.filter((s) => s.start_time >= now);
+    const past = sessionsWithCounts.filter((s) => s.start_time < now);
+
+    return { upcoming, past };
+  } catch (error) {
+    console.error('Error in getUserSessions:', error);
+    return { upcoming: [], past: [] };
+  }
+}

@@ -5,6 +5,7 @@ import { useAuth } from '@/components/providers/AuthProvider';
 import { useRouter } from 'next/navigation';
 import SessionCard from '@/components/ui/SessionCard';
 import { Session } from '@/lib/types';
+import { getUserSessions } from '@/lib/actions';
 
 export default function MesSortiesPage() {
   const { profile, loading } = useAuth();
@@ -21,11 +22,22 @@ export default function MesSortiesPage() {
   }, [loading, profile, router]);
 
   useEffect(() => {
-    // TODO: Fetch user's registered sessions from API
-    // For now, using mock data
-    setUpcomingSessions([]);
-    setPastSessions([]);
-    setSessionsLoading(false);
+    async function fetchUserSessions() {
+      if (!profile) return;
+
+      try {
+        setSessionsLoading(true);
+        const { upcoming, past } = await getUserSessions();
+        setUpcomingSessions(upcoming);
+        setPastSessions(past);
+      } catch (error) {
+        console.error('Error fetching user sessions:', error);
+      } finally {
+        setSessionsLoading(false);
+      }
+    }
+
+    fetchUserSessions();
   }, [profile]);
 
   if (loading || !profile) {
