@@ -14,6 +14,18 @@
   --color-primary-800: #1c7a4e;
   --color-primary-900: #155b3a;
 
+  /* Forest green (vert sapin) for accents */
+  --color-forest-50: #e8f5e8;
+  --color-forest-100: #c8e6c8;
+  --color-forest-200: #a4d4a4;
+  --color-forest-300: #7fc27f;
+  --color-forest-400: #5fb05f;
+  --color-forest-500: #3f9e3f;
+  --color-forest-600: #2d7a2d;
+  --color-forest-700: #1f5a1f;
+  --color-forest-800: #154015;
+  --color-forest-900: #0d2b0d;
+
   --color-secondary-50: #f5f5f5;
   --color-secondary-100: #e8e8e8;
   --color-secondary-200: #d1d1d1;

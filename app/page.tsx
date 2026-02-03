@@ -98,17 +98,17 @@ export default function Home() {
       </section>
 
       {/* Sessions Feed Section */}
-      <section className="py-32 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-primary-500/10 via-blue-50 to-purple-50">
+      <section className="py-32 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-primary-50 via-white to-forest-50">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-20">
             <div className="inline-flex items-center gap-3 mb-6 bg-white/80 backdrop-blur-sm rounded-2xl px-6 py-3 shadow-lg border-2 border-primary-500/30">
               <div className="w-3 h-3 rounded-full bg-primary-500 animate-pulse"></div>
               <span className="text-sm font-bold text-primary-600 uppercase tracking-wider">En direct</span>
             </div>
-            <h2 className="text-5xl md:text-6xl font-bold bg-gradient-to-r from-primary-500 via-blue-500 to-purple-500 bg-clip-text text-transparent mb-6">
+            <h2 className="text-5xl md:text-6xl font-bold bg-gradient-to-r from-primary-500 to-forest-700 bg-clip-text text-transparent mb-6">
               Sessions à venir
             </h2>
-            <div className="w-32 h-2 bg-gradient-to-r from-primary-500 via-blue-500 to-purple-500 mx-auto mb-8 rounded-full" />
+            <div className="w-32 h-2 bg-gradient-to-r from-primary-500 to-forest-700 mx-auto mb-8 rounded-full" />
             <p className="text-xl text-secondary-600/80 max-w-2xl mx-auto font-medium">
               Rejoins une session ou organise la tienne. La communauté t'attend.
             </p>
@@ -133,7 +133,7 @@ export default function Home() {
             </div>
           ) : (
             <div className="text-center py-20 bg-white/60 backdrop-blur-sm rounded-3xl border-2 border-primary-500/20">
-              <div className="w-24 h-24 mx-auto mb-6 rounded-full bg-gradient-to-br from-primary-500 to-blue-500 flex items-center justify-center shadow-xl">
+              <div className="w-24 h-24 mx-auto mb-6 rounded-full bg-gradient-to-br from-primary-500 to-forest-700 flex items-center justify-center shadow-xl">
                 <svg
                   className="w-12 h-12 text-white"
                   fill="none"
@@ -155,7 +155,7 @@ export default function Home() {
           <div className="text-center mt-16">
             <Link
               href="/sessions"
-              className="inline-flex items-center gap-3 px-10 py-5 bg-gradient-to-r from-primary-500 via-blue-500 to-purple-500 text-white font-bold text-lg rounded-2xl transition-all shadow-xl hover:shadow-2xl transform hover:scale-105"
+              className="inline-flex items-center gap-3 px-10 py-5 bg-gradient-to-r from-primary-500 to-primary-600 text-white font-bold text-lg rounded-2xl transition-all shadow-xl hover:shadow-2xl transform hover:scale-105"
             >
               ✨ Toutes les sessions
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -167,17 +167,17 @@ export default function Home() {
       </section>
 
       {/* Top Teams Section */}
-      <section className="py-32 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-yellow-50 via-orange-50 to-pink-50">
+      <section className="py-32 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-forest-50 via-white to-secondary-50">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-20">
-            <div className="inline-flex items-center gap-3 mb-6 bg-white/80 backdrop-blur-sm rounded-2xl px-6 py-3 shadow-lg border-2 border-orange-500/30">
+            <div className="inline-flex items-center gap-3 mb-6 bg-white/80 backdrop-blur-sm rounded-2xl px-6 py-3 shadow-lg border-2 border-forest-500/30">
               <span className="text-2xl">🏆</span>
-              <span className="text-sm font-bold text-orange-600 uppercase tracking-wider">Champions</span>
+              <span className="text-sm font-bold text-forest-700 uppercase tracking-wider">Champions</span>
             </div>
-            <h2 className="text-5xl md:text-6xl font-bold bg-gradient-to-r from-yellow-500 via-orange-500 to-pink-500 bg-clip-text text-transparent mb-6">
+            <h2 className="text-5xl md:text-6xl font-bold bg-gradient-to-r from-forest-700 to-secondary-600 bg-clip-text text-transparent mb-6">
               Équipes leaders
             </h2>
-            <div className="w-32 h-2 bg-gradient-to-r from-yellow-500 via-orange-500 to-pink-500 mx-auto mb-8 rounded-full" />
+            <div className="w-32 h-2 bg-gradient-to-r from-forest-700 to-secondary-600 mx-auto mb-8 rounded-full" />
             <p className="text-xl text-secondary-600/80 max-w-2xl mx-auto font-medium">
               Les équipes les plus actives qui font vibrer la communauté
             </p>
@@ -193,14 +193,14 @@ export default function Home() {
                 const position = index + 1;
                 const medals = ['🥇', '🥈', '🥉'];
                 const gradients = [
-                  'from-yellow-400 to-orange-500',
-                  'from-gray-300 to-gray-400',
-                  'from-orange-400 to-orange-600'
+                  'from-primary-400 to-primary-600',
+                  'from-secondary-300 to-secondary-500',
+                  'from-forest-600 to-forest-800'
                 ];
                 const borderColors = [
-                  'border-yellow-500/50',
-                  'border-gray-400/50',
-                  'border-orange-500/50'
+                  'border-primary-500/50',
+                  'border-secondary-400/50',
+                  'border-forest-600/50'
                 ];
 
                 return (
@@ -246,8 +246,8 @@ export default function Home() {
               })}
             </div>
           ) : (
-            <div className="text-center py-20 bg-white/60 backdrop-blur-sm rounded-3xl border-2 border-orange-500/20">
-              <div className="w-24 h-24 mx-auto mb-6 rounded-full bg-gradient-to-br from-yellow-500 to-orange-500 flex items-center justify-center shadow-xl">
+            <div className="text-center py-20 bg-white/60 backdrop-blur-sm rounded-3xl border-2 border-forest-500/20">
+              <div className="w-24 h-24 mx-auto mb-6 rounded-full bg-gradient-to-br from-forest-600 to-forest-800 flex items-center justify-center shadow-xl">
                 <svg
                   className="w-12 h-12 text-white"
                   fill="none"
@@ -269,7 +269,7 @@ export default function Home() {
           <div className="text-center mt-16">
             <Link
               href="/teams"
-              className="inline-flex items-center gap-3 px-10 py-5 bg-gradient-to-r from-yellow-500 via-orange-500 to-pink-500 text-white font-bold text-lg rounded-2xl transition-all shadow-xl hover:shadow-2xl transform hover:scale-105"
+              className="inline-flex items-center gap-3 px-10 py-5 bg-gradient-to-r from-forest-700 to-secondary-600 text-white font-bold text-lg rounded-2xl transition-all shadow-xl hover:shadow-2xl transform hover:scale-105"
             >
               🏆 Voir toutes les équipes
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -281,11 +281,11 @@ export default function Home() {
       </section>
 
       {/* Footer CTA */}
-      <section className="py-32 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-primary-500 via-blue-500 to-purple-600 relative overflow-hidden">
+      <section className="py-32 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-forest-800 via-secondary-600 to-secondary-700 relative overflow-hidden">
         {/* Decorative elements */}
         <div className="absolute inset-0 opacity-10">
-          <div className="absolute top-20 left-20 w-64 h-64 bg-white rounded-full blur-3xl"></div>
-          <div className="absolute bottom-20 right-20 w-96 h-96 bg-white rounded-full blur-3xl"></div>
+          <div className="absolute top-20 left-20 w-64 h-64 bg-primary-500 rounded-full blur-3xl"></div>
+          <div className="absolute bottom-20 right-20 w-96 h-96 bg-primary-500 rounded-full blur-3xl"></div>
         </div>
 
         <div className="max-w-5xl mx-auto text-center relative z-10">
@@ -301,7 +301,7 @@ export default function Home() {
           </p>
           <Link
             href="/sessions"
-            className="inline-flex items-center gap-3 px-12 py-6 bg-white text-primary-600 font-bold text-xl rounded-2xl transition-all shadow-2xl hover:shadow-white/30 transform hover:scale-105"
+            className="inline-flex items-center gap-3 px-12 py-6 bg-gradient-to-r from-primary-500 to-primary-600 text-white font-bold text-xl rounded-2xl transition-all shadow-2xl hover:shadow-primary-500/50 transform hover:scale-105"
           >
             ⚡ Commencer maintenant
             <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">

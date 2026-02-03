@@ -243,13 +243,13 @@ export default function MesSortiesPage() {
               <div className="text-4xl font-bold text-white mb-2">{pastCreated.length + pastJoined.length}</div>
               <div className="text-sm text-white/90 font-medium">Sessions complétées</div>
             </div>
-            <div className="bg-gradient-to-br from-blue-500 to-blue-600 rounded-3xl p-6 shadow-xl text-center transform hover:scale-105 transition-all">
+            <div className="bg-gradient-to-br from-primary-600 to-primary-700 rounded-3xl p-6 shadow-xl text-center transform hover:scale-105 transition-all">
               <div className="text-4xl font-bold text-white mb-2">
                 {[...pastCreated, ...pastJoined].reduce((sum, s) => sum + s.distance_km, 0)} km
               </div>
               <div className="text-sm text-white/90 font-medium">Distance totale</div>
             </div>
-            <div className="bg-gradient-to-br from-yellow-500 to-orange-500 rounded-3xl p-6 shadow-xl text-center transform hover:scale-105 transition-all">
+            <div className="bg-gradient-to-br from-forest-700 to-forest-800 rounded-3xl p-6 shadow-xl text-center transform hover:scale-105 transition-all">
               <div className="text-4xl font-bold text-white mb-2">
                 {pastCreated.length > 0 ? (
                   <span>👑 {pastCreated.length}</span>
@@ -259,7 +259,7 @@ export default function MesSortiesPage() {
               </div>
               <div className="text-sm text-white/90 font-medium">Sessions organisées</div>
             </div>
-            <div className="bg-gradient-to-br from-purple-500 to-pink-500 rounded-3xl p-6 shadow-xl text-center transform hover:scale-105 transition-all">
+            <div className="bg-gradient-to-br from-secondary-600 to-secondary-700 rounded-3xl p-6 shadow-xl text-center transform hover:scale-105 transition-all">
               <div className="text-4xl font-bold text-white mb-2">
                 {[...pastCreated, ...pastJoined].reduce((sum, s) => sum + (s.participants_count || 0), 0)}
               </div>
