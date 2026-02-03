@@ -11,8 +11,10 @@ export default function MesSortiesPage() {
   const { profile, loading } = useAuth();
   const router = useRouter();
   const [activeTab, setActiveTab] = useState<'upcoming' | 'past'>('upcoming');
-  const [upcomingSessions, setUpcomingSessions] = useState<Session[]>([]);
-  const [pastSessions, setPastSessions] = useState<Session[]>([]);
+  const [upcomingCreated, setUpcomingCreated] = useState<Session[]>([]);
+  const [upcomingJoined, setUpcomingJoined] = useState<Session[]>([]);
+  const [pastCreated, setPastCreated] = useState<Session[]>([]);
+  const [pastJoined, setPastJoined] = useState<Session[]>([]);
   const [sessionsLoading, setSessionsLoading] = useState(true);
 
   useEffect(() => {
@@ -27,9 +29,11 @@ export default function MesSortiesPage() {
 
       try {
         setSessionsLoading(true);
-        const { upcoming, past } = await getUserSessions();
-        setUpcomingSessions(upcoming);
-        setPastSessions(past);
+        const { upcomingJoined, pastJoined, upcomingCreated, pastCreated } = await getUserSessions();
+        setUpcomingCreated(upcomingCreated);
+        setUpcomingJoined(upcomingJoined);
+        setPastCreated(pastCreated);
+        setPastJoined(pastJoined);
       } catch (error) {
         console.error('Error fetching user sessions:', error);
       } finally {
@@ -100,13 +104,7 @@ export default function MesSortiesPage() {
           <>
             {activeTab === 'upcoming' && (
               <>
-                {upcomingSessions.length > 0 ? (
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {upcomingSessions.map((session) => (
-                      <SessionCard key={session.id} session={session} />
-                    ))}
-                  </div>
-                ) : (
+                {upcomingCreated.length === 0 && upcomingJoined.length === 0 ? (
                   <div className="text-center py-20 bg-white rounded-2xl shadow-md border border-gray-100">
                     <div className="w-20 h-20 rounded-full bg-primary-500/10 flex items-center justify-center mx-auto mb-6">
                       <svg className="w-10 h-10 text-primary-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -134,19 +132,55 @@ export default function MesSortiesPage() {
                       </a>
                     </div>
                   </div>
+                ) : (
+                  <div className="space-y-12">
+                    {/* Mes créations */}
+                    {upcomingCreated.length > 0 && (
+                      <div>
+                        <div className="flex items-center gap-3 mb-6">
+                          <div className="flex items-center gap-2 px-4 py-2 rounded-xl bg-gradient-to-r from-primary-500 to-primary-600 text-white shadow-md">
+                            <span className="text-xl">👑</span>
+                            <span className="font-bold">Mes créations</span>
+                          </div>
+                          <span className="text-sm text-secondary-600/70 font-medium">
+                            {upcomingCreated.length} session{upcomingCreated.length > 1 ? 's' : ''}
+                          </span>
+                        </div>
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                          {upcomingCreated.map((session) => (
+                            <SessionCard key={session.id} session={session} />
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Mes participations */}
+                    {upcomingJoined.length > 0 && (
+                      <div>
+                        <div className="flex items-center gap-3 mb-6">
+                          <div className="flex items-center gap-2 px-4 py-2 rounded-xl bg-white border-2 border-primary-500 text-primary-600 shadow-md">
+                            <span className="text-xl">🏃</span>
+                            <span className="font-bold">Mes participations</span>
+                          </div>
+                          <span className="text-sm text-secondary-600/70 font-medium">
+                            {upcomingJoined.length} session{upcomingJoined.length > 1 ? 's' : ''}
+                          </span>
+                        </div>
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                          {upcomingJoined.map((session) => (
+                            <SessionCard key={session.id} session={session} />
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
                 )}
               </>
             )}
 
             {activeTab === 'past' && (
               <>
-                {pastSessions.length > 0 ? (
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {pastSessions.map((session) => (
-                      <SessionCard key={session.id} session={session} />
-                    ))}
-                  </div>
-                ) : (
+                {pastCreated.length === 0 && pastJoined.length === 0 ? (
                   <div className="text-center py-20 bg-white rounded-2xl shadow-md border border-gray-100">
                     <div className="w-20 h-20 rounded-full bg-secondary-600/10 flex items-center justify-center mx-auto mb-6">
                       <svg className="w-10 h-10 text-secondary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -160,6 +194,48 @@ export default function MesSortiesPage() {
                       Ton historique apparaîtra ici après tes premières sessions
                     </p>
                   </div>
+                ) : (
+                  <div className="space-y-12">
+                    {/* Mes créations passées */}
+                    {pastCreated.length > 0 && (
+                      <div>
+                        <div className="flex items-center gap-3 mb-6">
+                          <div className="flex items-center gap-2 px-4 py-2 rounded-xl bg-gradient-to-r from-primary-500 to-primary-600 text-white shadow-md">
+                            <span className="text-xl">👑</span>
+                            <span className="font-bold">Mes créations</span>
+                          </div>
+                          <span className="text-sm text-secondary-600/70 font-medium">
+                            {pastCreated.length} session{pastCreated.length > 1 ? 's' : ''}
+                          </span>
+                        </div>
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                          {pastCreated.map((session) => (
+                            <SessionCard key={session.id} session={session} />
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Mes participations passées */}
+                    {pastJoined.length > 0 && (
+                      <div>
+                        <div className="flex items-center gap-3 mb-6">
+                          <div className="flex items-center gap-2 px-4 py-2 rounded-xl bg-white border-2 border-primary-500 text-primary-600 shadow-md">
+                            <span className="text-xl">🏃</span>
+                            <span className="font-bold">Mes participations</span>
+                          </div>
+                          <span className="text-sm text-secondary-600/70 font-medium">
+                            {pastJoined.length} session{pastJoined.length > 1 ? 's' : ''}
+                          </span>
+                        </div>
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                          {pastJoined.map((session) => (
+                            <SessionCard key={session.id} session={session} />
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
                 )}
               </>
             )}
@@ -167,22 +243,30 @@ export default function MesSortiesPage() {
         )}
 
         {/* Stats Summary (if has past sessions) */}
-        {activeTab === 'past' && pastSessions.length > 0 && (
+        {activeTab === 'past' && (pastCreated.length > 0 || pastJoined.length > 0) && (
           <div className="mt-12 grid grid-cols-1 md:grid-cols-4 gap-6">
             <div className="bg-white rounded-2xl p-6 shadow-md border border-gray-100 text-center">
-              <div className="text-3xl font-bold text-primary-500 mb-2">24</div>
+              <div className="text-3xl font-bold text-primary-500 mb-2">{pastCreated.length + pastJoined.length}</div>
               <div className="text-sm text-secondary-600/70">Sessions complétées</div>
             </div>
             <div className="bg-white rounded-2xl p-6 shadow-md border border-gray-100 text-center">
-              <div className="text-3xl font-bold text-primary-500 mb-2">186 km</div>
+              <div className="text-3xl font-bold text-primary-500 mb-2">
+                {[...pastCreated, ...pastJoined].reduce((sum, s) => sum + s.distance_km, 0)} km
+              </div>
               <div className="text-sm text-secondary-600/70">Distance totale</div>
             </div>
             <div className="bg-white rounded-2xl p-6 shadow-md border border-gray-100 text-center">
-              <div className="text-3xl font-bold text-primary-500 mb-2">5'23"</div>
-              <div className="text-sm text-secondary-600/70">Allure moyenne</div>
+              <div className="text-3xl font-bold text-primary-500 mb-2">
+                {pastCreated.length > 0 && (
+                  <span className="text-xl">👑 {pastCreated.length}</span>
+                )}
+              </div>
+              <div className="text-sm text-secondary-600/70">Sessions organisées</div>
             </div>
             <div className="bg-white rounded-2xl p-6 shadow-md border border-gray-100 text-center">
-              <div className="text-3xl font-bold text-primary-500 mb-2">48</div>
+              <div className="text-3xl font-bold text-primary-500 mb-2">
+                {[...pastCreated, ...pastJoined].reduce((sum, s) => sum + (s.participants_count || 0), 0)}
+              </div>
               <div className="text-sm text-secondary-600/70">Runners rencontrés</div>
             </div>
           </div>

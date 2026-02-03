@@ -1122,17 +1122,31 @@ export async function getAllUpcomingSessions() {
 }
 
 /**
- * Récupérer les sessions auxquelles l'utilisateur est inscrit
+ * Récupérer les sessions auxquelles l'utilisateur est inscrit ou qu'il a créées
  */
 export async function getUserSessions() {
   try {
     const user = await getCurrentUser();
     if (!user) {
-      return { upcoming: [], past: [] };
+      return { upcomingJoined: [], pastJoined: [], upcomingCreated: [], pastCreated: [] };
     }
 
     const supabase = await getServerSupabaseClient();
     const now = new Date().toISOString();
+
+    // Récupérer les sessions créées par l'utilisateur
+    const { data: createdSessions, error: createdError } = await supabase
+      .from('sessions')
+      .select(`
+        *,
+        creator:profiles!sessions_creator_id_fkey(id, username)
+      `)
+      .eq('creator_id', user.id)
+      .order('start_time', { ascending: true });
+
+    if (createdError) {
+      console.error('Error fetching created sessions:', createdError);
+    }
 
     // Récupérer les IDs des sessions auxquelles l'utilisateur participe
     const { data: participations, error: participationsError } = await supabase
@@ -1143,33 +1157,32 @@ export async function getUserSessions() {
 
     if (participationsError) {
       console.error('Error fetching user participations:', participationsError);
-      return { upcoming: [], past: [] };
     }
 
-    if (!participations || participations.length === 0) {
-      return { upcoming: [], past: [] };
+    const sessionIds = participations?.map((p) => p.session_id) || [];
+
+    // Récupérer les détails des sessions rejointes (exclure celles créées par l'utilisateur)
+    let joinedSessions = [];
+    if (sessionIds.length > 0) {
+      const { data: sessions, error: sessionsError } = await supabase
+        .from('sessions')
+        .select(`
+          *,
+          creator:profiles!sessions_creator_id_fkey(id, username)
+        `)
+        .in('id', sessionIds)
+        .neq('creator_id', user.id) // Exclure les sessions créées par l'utilisateur
+        .order('start_time', { ascending: true});
+
+      if (!sessionsError && sessions) {
+        joinedSessions = sessions;
+      }
     }
 
-    const sessionIds = participations.map((p) => p.session_id);
-
-    // Récupérer les détails des sessions
-    const { data: sessions, error: sessionsError } = await supabase
-      .from('sessions')
-      .select(`
-        *,
-        creator:profiles!sessions_creator_id_fkey(id, username)
-      `)
-      .in('id', sessionIds)
-      .order('start_time', { ascending: true });
-
-    if (sessionsError) {
-      console.error('Error fetching sessions:', sessionsError);
-      return { upcoming: [], past: [] };
-    }
-
-    // Compter les participants pour chaque session
+    // Compter les participants pour toutes les sessions
+    const allSessions = [...(createdSessions || []), ...joinedSessions];
     const sessionsWithCounts = await Promise.all(
-      (sessions || []).map(async (session) => {
+      allSessions.map(async (session) => {
         const { count } = await supabase
           .from('session_participants')
           .select('*', { count: 'exact', head: true })
@@ -1183,13 +1196,17 @@ export async function getUserSessions() {
       })
     );
 
-    // Séparer les sessions à venir et passées
-    const upcoming = sessionsWithCounts.filter((s) => s.start_time >= now);
-    const past = sessionsWithCounts.filter((s) => s.start_time < now);
+    // Séparer par type et par date
+    const createdSessionIds = new Set((createdSessions || []).map(s => s.id));
 
-    return { upcoming, past };
+    const upcomingCreated = sessionsWithCounts.filter((s) => createdSessionIds.has(s.id) && s.start_time >= now);
+    const pastCreated = sessionsWithCounts.filter((s) => createdSessionIds.has(s.id) && s.start_time < now);
+    const upcomingJoined = sessionsWithCounts.filter((s) => !createdSessionIds.has(s.id) && s.start_time >= now);
+    const pastJoined = sessionsWithCounts.filter((s) => !createdSessionIds.has(s.id) && s.start_time < now);
+
+    return { upcomingJoined, pastJoined, upcomingCreated, pastCreated };
   } catch (error) {
     console.error('Error in getUserSessions:', error);
-    return { upcoming: [], past: [] };
+    return { upcomingJoined: [], pastJoined: [], upcomingCreated: [], pastCreated: [] };
   }
 }
