@@ -53,45 +53,39 @@ export default function MesSortiesPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-white to-gray-50 pt-24 pb-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-gradient-to-br from-primary-500/5 via-white to-primary-500/10 pt-24 pb-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-4xl font-bold text-secondary-600 mb-2">
+        <div className="mb-8 bg-white/60 backdrop-blur-sm rounded-3xl p-8 border-2 border-primary-500/20 shadow-xl">
+          <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-primary-500 to-primary-600 bg-clip-text text-transparent mb-3">
             Mes sorties
           </h1>
-          <p className="text-lg text-secondary-600/70">
+          <p className="text-lg text-secondary-600/80">
             Gère tes sessions inscrites et consulte ton historique
           </p>
         </div>
 
         {/* Tabs */}
-        <div className="flex items-center gap-4 mb-8 border-b border-gray-200">
+        <div className="flex items-center gap-3 mb-8 bg-white/80 backdrop-blur-sm rounded-2xl p-2 shadow-lg border border-primary-500/20">
           <button
             onClick={() => setActiveTab('upcoming')}
-            className={`pb-4 px-2 font-semibold transition-all relative ${
+            className={`flex-1 py-3 px-6 font-bold rounded-xl transition-all ${
               activeTab === 'upcoming'
-                ? 'text-primary-500'
-                : 'text-secondary-600/60 hover:text-secondary-600'
+                ? 'bg-gradient-to-r from-primary-500 to-primary-600 text-white shadow-lg'
+                : 'text-secondary-600/70 hover:bg-primary-500/5'
             }`}
           >
-            À venir
-            {activeTab === 'upcoming' && (
-              <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary-500"></div>
-            )}
+            ✨ À venir
           </button>
           <button
             onClick={() => setActiveTab('past')}
-            className={`pb-4 px-2 font-semibold transition-all relative ${
+            className={`flex-1 py-3 px-6 font-bold rounded-xl transition-all ${
               activeTab === 'past'
-                ? 'text-primary-500'
-                : 'text-secondary-600/60 hover:text-secondary-600'
+                ? 'bg-gradient-to-r from-primary-500 to-primary-600 text-white shadow-lg'
+                : 'text-secondary-600/70 hover:bg-primary-500/5'
             }`}
           >
-            Historique
-            {activeTab === 'past' && (
-              <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary-500"></div>
-            )}
+            📊 Historique
           </button>
         </div>
 
@@ -105,28 +99,28 @@ export default function MesSortiesPage() {
             {activeTab === 'upcoming' && (
               <>
                 {upcomingCreated.length === 0 && upcomingJoined.length === 0 ? (
-                  <div className="text-center py-20 bg-white rounded-2xl shadow-md border border-gray-100">
-                    <div className="w-20 h-20 rounded-full bg-primary-500/10 flex items-center justify-center mx-auto mb-6">
-                      <svg className="w-10 h-10 text-primary-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <div className="text-center py-20 bg-gradient-to-br from-primary-500/10 via-white to-primary-500/5 rounded-3xl shadow-xl border-2 border-primary-500/30">
+                    <div className="w-24 h-24 rounded-full bg-gradient-to-br from-primary-500 to-primary-600 flex items-center justify-center mx-auto mb-6 shadow-lg">
+                      <svg className="w-12 h-12 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                       </svg>
                     </div>
-                    <h3 className="text-xl font-bold text-secondary-600 mb-2">
+                    <h3 className="text-2xl font-bold text-secondary-600 mb-3">
                       Aucune sortie prévue
                     </h3>
-                    <p className="text-secondary-600/70 mb-6">
+                    <p className="text-lg text-secondary-600/70 mb-8">
                       Inscris-toi à une session ou crée la tienne
                     </p>
                     <div className="flex gap-4 justify-center">
                       <a
                         href="/sessions"
-                        className="px-6 py-3 rounded-xl bg-primary-500 text-white font-semibold hover:bg-primary-600 transition-all shadow-lg hover:scale-105"
+                        className="px-8 py-4 rounded-xl bg-gradient-to-r from-primary-500 to-primary-600 text-white font-bold hover:shadow-2xl transition-all shadow-lg hover:scale-105"
                       >
                         Découvrir les sessions
                       </a>
                       <a
                         href="/sessions/create"
-                        className="px-6 py-3 rounded-xl bg-white border-2 border-primary-200 text-primary-600 font-semibold hover:bg-primary-50 transition-all"
+                        className="px-8 py-4 rounded-xl bg-white border-2 border-primary-500 text-primary-600 font-bold hover:bg-primary-50 transition-all shadow-lg hover:scale-105"
                       >
                         Créer une sortie
                       </a>
@@ -181,16 +175,16 @@ export default function MesSortiesPage() {
             {activeTab === 'past' && (
               <>
                 {pastCreated.length === 0 && pastJoined.length === 0 ? (
-                  <div className="text-center py-20 bg-white rounded-2xl shadow-md border border-gray-100">
-                    <div className="w-20 h-20 rounded-full bg-secondary-600/10 flex items-center justify-center mx-auto mb-6">
-                      <svg className="w-10 h-10 text-secondary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <div className="text-center py-20 bg-gradient-to-br from-secondary-600/5 via-white to-primary-500/5 rounded-3xl shadow-xl border-2 border-gray-200">
+                    <div className="w-24 h-24 rounded-full bg-gradient-to-br from-secondary-600 to-gray-800 flex items-center justify-center mx-auto mb-6 shadow-lg">
+                      <svg className="w-12 h-12 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                       </svg>
                     </div>
-                    <h3 className="text-xl font-bold text-secondary-600 mb-2">
+                    <h3 className="text-2xl font-bold text-secondary-600 mb-3">
                       Aucune sortie passée
                     </h3>
-                    <p className="text-secondary-600/70 mb-6">
+                    <p className="text-lg text-secondary-600/70 mb-6">
                       Ton historique apparaîtra ici après tes premières sessions
                     </p>
                   </div>
@@ -245,29 +239,31 @@ export default function MesSortiesPage() {
         {/* Stats Summary (if has past sessions) */}
         {activeTab === 'past' && (pastCreated.length > 0 || pastJoined.length > 0) && (
           <div className="mt-12 grid grid-cols-1 md:grid-cols-4 gap-6">
-            <div className="bg-white rounded-2xl p-6 shadow-md border border-gray-100 text-center">
-              <div className="text-3xl font-bold text-primary-500 mb-2">{pastCreated.length + pastJoined.length}</div>
-              <div className="text-sm text-secondary-600/70">Sessions complétées</div>
+            <div className="bg-gradient-to-br from-primary-500 to-primary-600 rounded-3xl p-6 shadow-xl text-center transform hover:scale-105 transition-all">
+              <div className="text-4xl font-bold text-white mb-2">{pastCreated.length + pastJoined.length}</div>
+              <div className="text-sm text-white/90 font-medium">Sessions complétées</div>
             </div>
-            <div className="bg-white rounded-2xl p-6 shadow-md border border-gray-100 text-center">
-              <div className="text-3xl font-bold text-primary-500 mb-2">
+            <div className="bg-gradient-to-br from-blue-500 to-blue-600 rounded-3xl p-6 shadow-xl text-center transform hover:scale-105 transition-all">
+              <div className="text-4xl font-bold text-white mb-2">
                 {[...pastCreated, ...pastJoined].reduce((sum, s) => sum + s.distance_km, 0)} km
               </div>
-              <div className="text-sm text-secondary-600/70">Distance totale</div>
+              <div className="text-sm text-white/90 font-medium">Distance totale</div>
             </div>
-            <div className="bg-white rounded-2xl p-6 shadow-md border border-gray-100 text-center">
-              <div className="text-3xl font-bold text-primary-500 mb-2">
-                {pastCreated.length > 0 && (
-                  <span className="text-xl">👑 {pastCreated.length}</span>
+            <div className="bg-gradient-to-br from-yellow-500 to-orange-500 rounded-3xl p-6 shadow-xl text-center transform hover:scale-105 transition-all">
+              <div className="text-4xl font-bold text-white mb-2">
+                {pastCreated.length > 0 ? (
+                  <span>👑 {pastCreated.length}</span>
+                ) : (
+                  <span>0</span>
                 )}
               </div>
-              <div className="text-sm text-secondary-600/70">Sessions organisées</div>
+              <div className="text-sm text-white/90 font-medium">Sessions organisées</div>
             </div>
-            <div className="bg-white rounded-2xl p-6 shadow-md border border-gray-100 text-center">
-              <div className="text-3xl font-bold text-primary-500 mb-2">
+            <div className="bg-gradient-to-br from-purple-500 to-pink-500 rounded-3xl p-6 shadow-xl text-center transform hover:scale-105 transition-all">
+              <div className="text-4xl font-bold text-white mb-2">
                 {[...pastCreated, ...pastJoined].reduce((sum, s) => sum + (s.participants_count || 0), 0)}
               </div>
-              <div className="text-sm text-secondary-600/70">Runners rencontrés</div>
+              <div className="text-sm text-white/90 font-medium">Runners rencontrés</div>
             </div>
           </div>
         )}
