@@ -132,13 +132,13 @@ export default function TeamsPage() {
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-primary-100/30">
       {/* Header */}
       <div className="bg-white/80 backdrop-blur-xl border-b border-gray-200">
-        <div className="max-w-6xl mx-auto px-6 py-8">
-          <h1 className="text-4xl font-bold text-secondary-600 mb-2">Équipes</h1>
-          <p className="text-gray-600">Rejoins une équipe et grimpe dans le classement</p>
+        <div className="max-w-6xl mx-auto px-6 py-5">
+          <h1 className="text-2xl md:text-3xl font-bold text-secondary-600 mb-1">Équipes</h1>
+          <p className="text-sm text-gray-600">Rejoins une équipe et grimpe dans le classement</p>
         </div>
       </div>
 
-      <div className="max-w-6xl mx-auto px-6 py-8">
+      <div className="max-w-6xl mx-auto px-6 py-6">
         {/* Loading */}
         {loading && (
           <div className="flex justify-center py-20">
@@ -163,39 +163,39 @@ export default function TeamsPage() {
 
         {/* Contenu principal */}
         {!loading && !error && (
-          <div className="space-y-8">
+          <div className="space-y-5">
             {/* Section Mon équipe */}
             {userTeam && (
-              <div className="bg-white rounded-3xl shadow-lg border-2 border-primary-500 p-8">
-                <div className="flex items-center gap-3 mb-6 pb-4 border-b border-gray-100">
-                  <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-primary-500 to-primary-600 flex items-center justify-center">
-                    <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="bg-white rounded-2xl shadow-lg border border-primary-500 p-5">
+                <div className="flex items-center gap-2 mb-4 pb-3 border-b border-gray-100">
+                  <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-primary-500 to-primary-600 flex items-center justify-center">
+                    <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
                     </svg>
                   </div>
-                  <h2 className="text-2xl font-bold text-secondary-600">Mon équipe</h2>
+                  <h2 className="text-lg font-bold text-secondary-600">Mon équipe</h2>
                 </div>
 
-                <div className="space-y-6">
+                <div className="space-y-4">
                   <div>
-                    <h3 className="text-2xl font-bold text-secondary-600 mb-2">{userTeam.name}</h3>
+                    <h3 className="text-xl font-bold text-secondary-600 mb-1">{userTeam.name}</h3>
                     {userTeam.description && (
-                      <p className="text-gray-600">{userTeam.description}</p>
+                      <p className="text-sm text-gray-600">{userTeam.description}</p>
                     )}
                   </div>
 
                   {/* Stats */}
-                  <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                    <div className="bg-gradient-to-br from-primary-50 to-primary-100 rounded-2xl p-5 border border-primary-100">
-                      <p className="text-sm text-gray-600 mb-2 font-medium">👥 Membres</p>
-                      <p className="text-3xl font-bold text-primary-600">
+                  <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                    <div className="bg-gradient-to-br from-primary-50 to-primary-100 rounded-xl p-3 border border-primary-100">
+                      <p className="text-xs text-gray-600 mb-1 font-medium">👥 Membres</p>
+                      <p className="text-2xl font-bold text-primary-600">
                         {userTeam.members_count || 0}
                       </p>
                     </div>
-                    <div className="bg-gradient-to-br from-primary-50 to-primary-100 rounded-2xl p-5 border border-primary-100">
-                      <p className="text-sm text-gray-600 mb-2 font-medium">🏃 Distance totale</p>
-                      <p className="text-3xl font-bold text-primary-600">
-                        {(userTeam.total_distance || 0).toFixed(1)} <span className="text-lg">km</span>
+                    <div className="bg-gradient-to-br from-primary-50 to-primary-100 rounded-xl p-3 border border-primary-100">
+                      <p className="text-xs text-gray-600 mb-1 font-medium">🏃 Distance totale</p>
+                      <p className="text-2xl font-bold text-primary-600">
+                        {(userTeam.total_distance || 0).toFixed(1)} <span className="text-sm">km</span>
                       </p>
                     </div>
                     <div className="bg-gradient-to-br from-primary-50 to-primary-100 rounded-2xl p-5 border border-primary-100">
@@ -326,25 +326,25 @@ export default function TeamsPage() {
 
             {/* Section Classement */}
             <div>
-              <div className="flex items-center gap-3 mb-6">
-                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-primary-500 to-primary-600 flex items-center justify-center">
-                  <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="flex items-center gap-2 mb-4">
+                <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-primary-500 to-primary-600 flex items-center justify-center">
+                  <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
                   </svg>
                 </div>
-                <h2 className="text-3xl font-bold text-secondary-600">Classement des équipes</h2>
+                <h2 className="text-lg font-bold text-secondary-600">Classement des équipes</h2>
               </div>
 
               {teams.length === 0 ? (
-                <div className="bg-white rounded-3xl shadow-lg border border-gray-100 p-12 text-center">
-                  <div className="w-20 h-20 mx-auto mb-6 rounded-full bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center">
-                    <span className="text-4xl">🏃‍♂️</span>
+                <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-8 text-center">
+                  <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center">
+                    <span className="text-3xl">🏃‍♂️</span>
                   </div>
-                  <h3 className="text-2xl font-bold text-secondary-600 mb-2">Aucune équipe pour le moment</h3>
-                  <p className="text-gray-600">Sois le premier à créer une équipe !</p>
+                  <h3 className="text-lg font-bold text-secondary-600 mb-1">Aucune équipe pour le moment</h3>
+                  <p className="text-sm text-gray-600">Sois le premier à créer une équipe !</p>
                 </div>
               ) : (
-                <div className="space-y-4">
+                <div className="space-y-3">
                   {teams.map((team, index) => (
                     <TeamCard key={team.id} team={team} position={index + 1} />
                   ))}

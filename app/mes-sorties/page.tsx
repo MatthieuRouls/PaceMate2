@@ -54,25 +54,25 @@ export default function MesSortiesPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary-500/5 via-white to-primary-500/10 pt-24 pb-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-gradient-to-br from-primary-500/5 via-white to-primary-500/10 pt-20 pb-8 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
-        <div className="mb-8 bg-white/60 backdrop-blur-sm rounded-3xl p-8 border-2 border-primary-500/20 shadow-xl">
-          <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-primary-500 to-primary-600 bg-clip-text text-transparent mb-3">
+        <div className="mb-4 bg-white/60 backdrop-blur-sm rounded-2xl p-5 border border-primary-500/20 shadow-lg">
+          <h1 className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-primary-500 to-primary-600 bg-clip-text text-transparent mb-1">
             Mes sorties
           </h1>
-          <p className="text-lg text-secondary-600/80">
+          <p className="text-sm text-secondary-600/80">
             Gère tes sessions inscrites et consulte ton historique
           </p>
         </div>
 
         {/* Tabs */}
-        <div className="flex items-center gap-3 mb-8 bg-white/80 backdrop-blur-sm rounded-2xl p-2 shadow-lg border border-primary-500/20">
+        <div className="flex items-center gap-2 mb-6 bg-white/80 backdrop-blur-sm rounded-xl p-1.5 shadow-lg border border-primary-500/20">
           <button
             onClick={() => setActiveTab('upcoming')}
-            className={`flex-1 py-3 px-6 font-bold rounded-xl transition-all ${
+            className={`flex-1 py-2 px-4 text-sm font-bold rounded-lg transition-all ${
               activeTab === 'upcoming'
-                ? 'bg-gradient-to-r from-primary-500 to-primary-600 text-white shadow-lg'
+                ? 'bg-gradient-to-r from-primary-500 to-primary-600 text-white shadow-md'
                 : 'text-secondary-600/70 hover:bg-primary-500/5'
             }`}
           >
@@ -80,9 +80,9 @@ export default function MesSortiesPage() {
           </button>
           <button
             onClick={() => setActiveTab('past')}
-            className={`flex-1 py-3 px-6 font-bold rounded-xl transition-all ${
+            className={`flex-1 py-2 px-4 text-sm font-bold rounded-lg transition-all ${
               activeTab === 'past'
-                ? 'bg-gradient-to-r from-primary-500 to-primary-600 text-white shadow-lg'
+                ? 'bg-gradient-to-r from-primary-500 to-primary-600 text-white shadow-md'
                 : 'text-secondary-600/70 hover:bg-primary-500/5'
             }`}
           >
@@ -128,20 +128,20 @@ export default function MesSortiesPage() {
                     </div>
                   </div>
                 ) : (
-                  <div className="space-y-12">
+                  <div className="space-y-6">
                     {/* Mes créations */}
                     {upcomingCreated.length > 0 && (
                       <div>
-                        <div className="flex items-center gap-3 mb-6">
-                          <div className="flex items-center gap-2 px-4 py-2 rounded-xl bg-gradient-to-r from-primary-500 to-primary-600 text-white shadow-md">
-                            <span className="text-xl">👑</span>
-                            <span className="font-bold">Mes créations</span>
+                        <div className="flex items-center gap-2 mb-4">
+                          <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-gradient-to-r from-primary-500 to-primary-600 text-white shadow-sm">
+                            <span className="text-base">👑</span>
+                            <span className="font-bold text-sm">Mes créations</span>
                           </div>
-                          <span className="text-sm text-secondary-600/70 font-medium">
+                          <span className="text-xs text-secondary-600/70 font-medium">
                             {upcomingCreated.length} session{upcomingCreated.length > 1 ? 's' : ''}
                           </span>
                         </div>
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                           {upcomingCreated.map((session) => (
                             <SessionCard key={session.id} session={session} />
                           ))}
@@ -153,15 +153,15 @@ export default function MesSortiesPage() {
                     {upcomingJoined.length > 0 && (
                       <div>
                         <div className="flex items-center gap-3 mb-6">
-                          <div className="flex items-center gap-2 px-4 py-2 rounded-xl bg-white border-2 border-primary-500 text-primary-600 shadow-md">
-                            <span className="text-xl">🏃</span>
-                            <span className="font-bold">Mes participations</span>
+                          <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white border border-primary-500 text-primary-600 shadow-sm">
+                            <span className="text-base">🏃</span>
+                            <span className="font-bold text-sm">Mes participations</span>
                           </div>
                           <span className="text-sm text-secondary-600/70 font-medium">
                             {upcomingJoined.length} session{upcomingJoined.length > 1 ? 's' : ''}
                           </span>
                         </div>
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                           {upcomingJoined.map((session) => (
                             <SessionCard key={session.id} session={session} />
                           ))}
@@ -190,20 +190,20 @@ export default function MesSortiesPage() {
                     </p>
                   </div>
                 ) : (
-                  <div className="space-y-12">
+                  <div className="space-y-6">
                     {/* Mes créations passées */}
                     {pastCreated.length > 0 && (
                       <div>
-                        <div className="flex items-center gap-3 mb-6">
-                          <div className="flex items-center gap-2 px-4 py-2 rounded-xl bg-gradient-to-r from-primary-500 to-primary-600 text-white shadow-md">
-                            <span className="text-xl">👑</span>
-                            <span className="font-bold">Mes créations</span>
+                        <div className="flex items-center gap-2 mb-4">
+                          <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-gradient-to-r from-primary-500 to-primary-600 text-white shadow-sm">
+                            <span className="text-base">👑</span>
+                            <span className="font-bold text-sm">Mes créations</span>
                           </div>
-                          <span className="text-sm text-secondary-600/70 font-medium">
+                          <span className="text-xs text-secondary-600/70 font-medium">
                             {pastCreated.length} session{pastCreated.length > 1 ? 's' : ''}
                           </span>
                         </div>
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                           {pastCreated.map((session) => (
                             <SessionCard key={session.id} session={session} />
                           ))}
@@ -215,15 +215,15 @@ export default function MesSortiesPage() {
                     {pastJoined.length > 0 && (
                       <div>
                         <div className="flex items-center gap-3 mb-6">
-                          <div className="flex items-center gap-2 px-4 py-2 rounded-xl bg-white border-2 border-primary-500 text-primary-600 shadow-md">
-                            <span className="text-xl">🏃</span>
-                            <span className="font-bold">Mes participations</span>
+                          <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white border border-primary-500 text-primary-600 shadow-sm">
+                            <span className="text-base">🏃</span>
+                            <span className="font-bold text-sm">Mes participations</span>
                           </div>
                           <span className="text-sm text-secondary-600/70 font-medium">
                             {pastJoined.length} session{pastJoined.length > 1 ? 's' : ''}
                           </span>
                         </div>
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                           {pastJoined.map((session) => (
                             <SessionCard key={session.id} session={session} />
                           ))}
@@ -239,32 +239,32 @@ export default function MesSortiesPage() {
 
         {/* Stats Summary (if has past sessions) */}
         {activeTab === 'past' && (pastCreated.length > 0 || pastJoined.length > 0) && (
-          <div className="mt-12 grid grid-cols-1 md:grid-cols-4 gap-6">
-            <div className="bg-gradient-to-br from-primary-500 to-primary-600 rounded-3xl p-6 shadow-xl text-center transform hover:scale-105 transition-all">
-              <div className="text-4xl font-bold text-white mb-2">{pastCreated.length + pastJoined.length}</div>
-              <div className="text-sm text-white/90 font-medium">Sessions complétées</div>
+          <div className="mt-6 grid grid-cols-2 md:grid-cols-4 gap-3">
+            <div className="bg-gradient-to-br from-primary-500 to-primary-600 rounded-2xl p-4 shadow-lg text-center transform hover:scale-105 transition-all">
+              <div className="text-3xl font-bold text-white mb-1">{pastCreated.length + pastJoined.length}</div>
+              <div className="text-xs text-white/90 font-medium">Sessions complétées</div>
             </div>
-            <div className="bg-gradient-to-br from-primary-600 to-primary-700 rounded-3xl p-6 shadow-xl text-center transform hover:scale-105 transition-all">
-              <div className="text-4xl font-bold text-white mb-2">
+            <div className="bg-gradient-to-br from-primary-600 to-primary-700 rounded-2xl p-4 shadow-lg text-center transform hover:scale-105 transition-all">
+              <div className="text-3xl font-bold text-white mb-1">
                 {[...pastCreated, ...pastJoined].reduce((sum, s) => sum + s.distance_km, 0)} km
               </div>
-              <div className="text-sm text-white/90 font-medium">Distance totale</div>
+              <div className="text-xs text-white/90 font-medium">Distance totale</div>
             </div>
-            <div className="bg-gradient-to-br from-forest-700 to-forest-800 rounded-3xl p-6 shadow-xl text-center transform hover:scale-105 transition-all">
-              <div className="text-4xl font-bold text-white mb-2">
+            <div className="bg-gradient-to-br from-forest-700 to-forest-800 rounded-2xl p-4 shadow-lg text-center transform hover:scale-105 transition-all">
+              <div className="text-3xl font-bold text-white mb-1">
                 {pastCreated.length > 0 ? (
                   <span>👑 {pastCreated.length}</span>
                 ) : (
                   <span>0</span>
                 )}
               </div>
-              <div className="text-sm text-white/90 font-medium">Sessions organisées</div>
+              <div className="text-xs text-white/90 font-medium">Sessions organisées</div>
             </div>
-            <div className="bg-gradient-to-br from-secondary-600 to-secondary-700 rounded-3xl p-6 shadow-xl text-center transform hover:scale-105 transition-all">
-              <div className="text-4xl font-bold text-white mb-2">
+            <div className="bg-gradient-to-br from-secondary-600 to-secondary-700 rounded-2xl p-4 shadow-lg text-center transform hover:scale-105 transition-all">
+              <div className="text-3xl font-bold text-white mb-1">
                 {[...pastCreated, ...pastJoined].reduce((sum, s) => sum + (s.participants_count || 0), 0)}
               </div>
-              <div className="text-sm text-white/90 font-medium">Runners rencontrés</div>
+              <div className="text-xs text-white/90 font-medium">Runners rencontrés</div>
             </div>
           </div>
         )}

@@ -57,23 +57,23 @@ export default function SessionsPage() {
   }, [filterLevel, sessions]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary-50 via-white to-forest-50 pt-24 pb-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-gradient-to-br from-primary-50 via-white to-forest-50 pt-20 pb-8 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-12 bg-white/70 backdrop-blur-md rounded-3xl p-8 shadow-2xl border-2 border-primary-500/20">
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6 bg-white/70 backdrop-blur-md rounded-2xl p-5 shadow-lg border border-primary-500/20">
           <div>
-            <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-primary-500 to-forest-700 bg-clip-text text-transparent mb-3">
+            <h1 className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-primary-500 to-forest-700 bg-clip-text text-transparent mb-1">
               Sessions de running
             </h1>
-            <p className="text-lg text-secondary-600/80">
+            <p className="text-sm text-secondary-600/80">
               Trouve ta prochaine sortie et rejoins la communauté
             </p>
           </div>
           <Link
             href="/sessions/create"
-            className="inline-flex items-center gap-2 px-8 py-4 rounded-xl bg-gradient-to-r from-primary-500 to-primary-600 text-white font-bold shadow-lg hover:shadow-2xl hover:scale-105 transition-all"
+            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-gradient-to-r from-primary-500 to-primary-600 text-white text-sm font-bold shadow-md hover:shadow-lg hover:scale-105 transition-all"
           >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
             </svg>
             Créer une sortie
@@ -81,53 +81,53 @@ export default function SessionsPage() {
         </div>
 
         {/* Filtres */}
-        <div className="bg-gradient-to-br from-white/90 to-primary-500/5 backdrop-blur-md rounded-3xl p-6 shadow-xl border-2 border-primary-500/30 mb-8">
-          <div className="flex items-center gap-3 mb-4">
-            <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-primary-500 to-primary-600 flex items-center justify-center shadow-md">
-              <Filter className="w-5 h-5 text-white" />
+        <div className="bg-gradient-to-br from-white/90 to-primary-500/5 backdrop-blur-md rounded-2xl p-4 shadow-lg border border-primary-500/20 mb-6">
+          <div className="flex items-center gap-2 mb-3">
+            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-primary-500 to-primary-600 flex items-center justify-center shadow-md">
+              <Filter className="w-4 h-4 text-white" />
             </div>
-            <h2 className="text-lg font-bold text-secondary-600">Filtrer par niveau</h2>
+            <h2 className="text-sm font-bold text-secondary-600">Filtrer par niveau</h2>
           </div>
-          <div className="flex flex-wrap gap-3">
+          <div className="flex flex-wrap gap-2">
             <button
               onClick={() => setFilterLevel('all')}
-              className={`px-6 py-3 rounded-xl font-bold transition-all ${
+              className={`px-4 py-2 rounded-lg text-sm font-bold transition-all ${
                 filterLevel === 'all'
-                  ? 'bg-gradient-to-r from-primary-500 to-primary-600 text-white shadow-lg scale-105'
-                  : 'bg-white/80 text-secondary-600 hover:bg-white hover:shadow-md'
+                  ? 'bg-gradient-to-r from-primary-500 to-primary-600 text-white shadow-md scale-105'
+                  : 'bg-white/80 text-secondary-600 hover:bg-white hover:shadow-sm'
               }`}
             >
-              🌟 Tous les niveaux
+              🌟 Tous
             </button>
             <button
               onClick={() => setFilterLevel('beginner')}
-              className={`px-6 py-3 rounded-xl font-bold transition-all ${
+              className={`px-4 py-2 rounded-lg text-sm font-bold transition-all ${
                 filterLevel === 'beginner'
-                  ? 'bg-gradient-to-r from-primary-300 to-primary-500 text-white shadow-lg scale-105'
-                  : 'bg-white/80 text-secondary-600 hover:bg-white hover:shadow-md'
+                  ? 'bg-gradient-to-r from-primary-300 to-primary-500 text-white shadow-md scale-105'
+                  : 'bg-white/80 text-secondary-600 hover:bg-white hover:shadow-sm'
               }`}
             >
-              🌱 Débutant (1-2 ⭐)
+              🌱 Débutant
             </button>
             <button
               onClick={() => setFilterLevel('intermediate')}
-              className={`px-6 py-3 rounded-xl font-bold transition-all ${
+              className={`px-4 py-2 rounded-lg text-sm font-bold transition-all ${
                 filterLevel === 'intermediate'
-                  ? 'bg-gradient-to-r from-primary-600 to-forest-700 text-white shadow-lg scale-105'
-                  : 'bg-white/80 text-secondary-600 hover:bg-white hover:shadow-md'
+                  ? 'bg-gradient-to-r from-primary-600 to-forest-700 text-white shadow-md scale-105'
+                  : 'bg-white/80 text-secondary-600 hover:bg-white hover:shadow-sm'
               }`}
             >
-              🔥 Intermédiaire (3 ⭐)
+              🔥 Intermédiaire
             </button>
             <button
               onClick={() => setFilterLevel('advanced')}
-              className={`px-6 py-3 rounded-xl font-bold transition-all ${
+              className={`px-4 py-2 rounded-lg text-sm font-bold transition-all ${
                 filterLevel === 'advanced'
-                  ? 'bg-gradient-to-r from-forest-800 to-secondary-600 text-white shadow-lg scale-105'
-                  : 'bg-white/80 text-secondary-600 hover:bg-white hover:shadow-md'
+                  ? 'bg-gradient-to-r from-forest-800 to-secondary-600 text-white shadow-md scale-105'
+                  : 'bg-white/80 text-secondary-600 hover:bg-white hover:shadow-sm'
               }`}
             >
-              🚀 Avancé (4-5 ⭐)
+              🚀 Avancé
             </button>
           </div>
         </div>
@@ -197,7 +197,7 @@ export default function SessionsPage() {
                     session{filteredSessions.length > 1 ? 's' : ''} trouvée{filteredSessions.length > 1 ? 's' : ''}
                   </span>
                 </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
                   {filteredSessions.map((session) => (
                     <SessionCard
                       key={session.id}
