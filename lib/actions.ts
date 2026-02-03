@@ -1000,6 +1000,51 @@ export async function getTopTeams(limit: number = 3) {
 }
 
 /**
+ * Récupérer toutes les sessions à venir (pour la page /sessions)
+ */
+export async function getAllUpcomingSessions() {
+  try {
+    const supabase = await getServerSupabaseClient();
+    const now = new Date().toISOString();
+
+    const { data: sessions, error } = await supabase
+      .from('sessions')
+      .select(`
+        *,
+        creator:profiles!sessions_creator_id_fkey(id, username)
+      `)
+      .gte('start_time', now)
+      .order('start_time', { ascending: true });
+
+    if (error) {
+      console.error('Error fetching all sessions:', error);
+      return [];
+    }
+
+    // Compter les participants pour chaque session
+    const sessionsWithDetails = await Promise.all(
+      (sessions || []).map(async (session) => {
+        const { count } = await supabase
+          .from('session_participants')
+          .select('*', { count: 'exact', head: true })
+          .eq('session_id', session.id)
+          .eq('status', 'confirmed');
+
+        return {
+          ...session,
+          participants_count: count || 0,
+        };
+      })
+    );
+
+    return sessionsWithDetails;
+  } catch (error) {
+    console.error('Error in getAllUpcomingSessions:', error);
+    return [];
+  }
+}
+
+/**
  * Récupérer les sessions auxquelles l'utilisateur est inscrit
  */
 export async function getUserSessions() {
