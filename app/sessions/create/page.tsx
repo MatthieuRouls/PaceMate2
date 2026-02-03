@@ -4,14 +4,15 @@ import { useState, FormEvent } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { createSession, CreateSessionData } from '@/lib/actions';
+import { Check, ChevronRight, ChevronLeft } from 'lucide-react';
 
-// Désactiver la pré-génération statique
 export const dynamic = 'force-dynamic';
 
 export default function CreateSessionPage() {
   const router = useRouter();
+  const [currentStep, setCurrentStep] = useState(1);
+  const totalSteps = 5;
 
-  // State du formulaire
   const [formData, setFormData] = useState<CreateSessionData>({
     title: '',
     description: '',
@@ -28,7 +29,6 @@ export default function CreateSessionPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Gestion du changement de champs
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
   ) => {
@@ -44,12 +44,6 @@ export default function CreateSessionPage() {
     }
   };
 
-  // Gestion du changement de niveau (radio buttons)
-  const handleLevelChange = (level: number) => {
-    setFormData((prev) => ({ ...prev, level_required: level }));
-  };
-
-  // Soumission du formulaire
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setLoading(true);
@@ -59,7 +53,6 @@ export default function CreateSessionPage() {
       const result = await createSession(formData);
 
       if (result.success) {
-        // Redirection vers le feed
         router.push('/sessions');
       } else {
         setError(result.error || 'Une erreur est survenue');
@@ -72,440 +65,433 @@ export default function CreateSessionPage() {
     }
   };
 
-  // Styles pour les labels d'étoiles
-  const getLevelLabel = (level: number): string => {
-    const labels = [
-      'Débutant',
-      'Débutant confirmé',
-      'Intermédiaire',
-      'Confirmé',
-      'Expert',
-    ];
-    return labels[level - 1] || '';
+  const nextStep = () => {
+    if (currentStep < totalSteps) {
+      setCurrentStep(currentStep + 1);
+    }
   };
 
-  const getLevelStars = (level: number): string => {
-    return '⭐'.repeat(level);
+  const prevStep = () => {
+    if (currentStep > 1) {
+      setCurrentStep(currentStep - 1);
+    }
   };
 
-  const getLevelDescription = (level: number): string => {
-    const descriptions = [
-      'Première expérience en course à pied',
-      'Pratique régulière depuis quelques mois',
-      'Course régulière, bon niveau général',
-      'Pratique intensive, objectifs compétitifs',
-      'Niveau très avancé, performances élevées',
-    ];
-    return descriptions[level - 1] || '';
+  const canProceed = () => {
+    switch (currentStep) {
+      case 1:
+        return formData.title.trim().length > 0;
+      case 2:
+        return formData.start_time && formData.distance_km > 0;
+      case 3:
+        return formData.session_type && formData.level_required > 0;
+      case 4:
+        return formData.location_name.trim().length > 0;
+      default:
+        return true;
+    }
   };
 
-  // Types de session
   const sessionTypes = [
-    {
-      value: 'casual',
-      label: 'Sortie détente',
-      icon: '🚶',
-      description: 'Rythme tranquille et convivial',
-    },
-    {
-      value: 'recovery',
-      label: 'Récupération',
-      icon: '🧘',
-      description: 'Allure très modérée',
-    },
-    {
-      value: 'tempo',
-      label: 'Allure soutenue',
-      icon: '🏃',
-      description: 'Rythme challengeant',
-    },
-    {
-      value: 'long_run',
-      label: 'Sortie longue',
-      icon: '🗓️',
-      description: 'Endurance fondamentale',
-    },
-    {
-      value: 'intervals',
-      label: 'Fractionné',
-      icon: '⚡',
-      description: 'Séance intensive',
-    },
+    { value: 'casual', label: 'Sortie détente', icon: '🚶', description: 'Rythme tranquille' },
+    { value: 'recovery', label: 'Récupération', icon: '🧘', description: 'Allure modérée' },
+    { value: 'tempo', label: 'Allure soutenue', icon: '🏃', description: 'Rythme challengeant' },
+    { value: 'long_run', label: 'Sortie longue', icon: '🗓️', description: 'Endurance fondamentale' },
+    { value: 'intervals', label: 'Fractionné', icon: '⚡', description: 'Séance intensive' },
   ];
 
+  const levelLabels = ['Débutant', 'Débutant confirmé', 'Intermédiaire', 'Confirmé', 'Expert'];
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-primary-100/30">
-      {/* Header fixe */}
-      <div className="sticky top-0 z-10 bg-white/80 backdrop-blur-xl border-b border-gray-200">
-        <div className="max-w-5xl mx-auto px-6 py-6">
+    <div className="min-h-screen bg-gradient-to-br from-primary-50 via-white to-forest-50 pt-20 pb-8 px-4">
+      <div className="max-w-3xl mx-auto">
+        {/* Header */}
+        <div className="mb-6 text-center">
+          <h1 className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-primary-500 to-forest-700 bg-clip-text text-transparent mb-2">
+            Créer une sortie
+          </h1>
+          <p className="text-sm text-secondary-600/80">
+            {currentStep === 5 ? 'Vérifie et confirme ta sortie' : 'Remplis les informations étape par étape'}
+          </p>
+        </div>
+
+        {/* Stepper */}
+        <div className="mb-8">
           <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-3xl font-bold text-secondary-600 mb-1">Créer une sortie</h1>
-              <p className="text-gray-600">
-                Propose une session et trouve des partenaires de course
-              </p>
-            </div>
-            <Link
-              href="/sessions"
-              className="px-4 py-2 text-sm font-medium text-gray-700 hover:text-gray-900 transition-colors"
-            >
-              ← Retour
-            </Link>
+            {[1, 2, 3, 4, 5].map((step) => (
+              <div key={step} className="flex items-center flex-1">
+                <div className="flex flex-col items-center relative flex-1">
+                  <div
+                    className={`w-10 h-10 rounded-full flex items-center justify-center font-bold transition-all ${
+                      step < currentStep
+                        ? 'bg-gradient-to-br from-primary-500 to-primary-600 text-white'
+                        : step === currentStep
+                        ? 'bg-gradient-to-br from-primary-500 to-primary-600 text-white ring-4 ring-primary-500/30'
+                        : 'bg-gray-200 text-gray-400'
+                    }`}
+                  >
+                    {step < currentStep ? <Check className="w-5 h-5" /> : step}
+                  </div>
+                  <span className="text-xs mt-1 font-medium text-gray-600 hidden md:block">
+                    {step === 1 && 'Infos'}
+                    {step === 2 && 'Date'}
+                    {step === 3 && 'Type'}
+                    {step === 4 && 'Lieu'}
+                    {step === 5 && 'Recap'}
+                  </span>
+                </div>
+                {step < 5 && (
+                  <div
+                    className={`h-1 flex-1 transition-all ${
+                      step < currentStep ? 'bg-primary-500' : 'bg-gray-200'
+                    }`}
+                  />
+                )}
+              </div>
+            ))}
           </div>
         </div>
-      </div>
 
-      {/* Formulaire */}
-      <div className="max-w-5xl mx-auto px-6 py-8">
-        <form onSubmit={handleSubmit} className="space-y-6">
-          {/* Message d'erreur */}
-          {error && (
-            <div className="p-5 rounded-2xl bg-red-50 border-2 border-red-200 shadow-sm">
-              <div className="flex items-center gap-3 mb-2">
-                <div className="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center">
-                  <svg className="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                  </svg>
+        {/* Form Card */}
+        <div className="bg-white rounded-2xl shadow-xl border border-primary-500/20 p-6 md:p-8 min-h-[400px]">
+          <form onSubmit={handleSubmit}>
+            {/* Step 1: Basic Info */}
+            {currentStep === 1 && (
+              <div className="space-y-4 animate-fadeIn">
+                <h2 className="text-xl font-bold text-secondary-600 mb-4">📝 Informations de base</h2>
+
+                <div>
+                  <label className="block text-sm font-medium text-secondary-600 mb-2">
+                    Titre de la sortie *
+                  </label>
+                  <input
+                    type="text"
+                    name="title"
+                    value={formData.title}
+                    onChange={handleChange}
+                    placeholder="Ex: Sortie matinale au parc"
+                    className="w-full px-4 py-3 rounded-lg border border-gray-200 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 outline-none transition-all"
+                    required
+                  />
                 </div>
-                <p className="font-semibold text-red-900 text-lg">Une erreur est survenue</p>
-              </div>
-              <p className="text-red-700 ml-13">{error}</p>
-            </div>
-          )}
 
-          {/* Section 1: Informations générales */}
-          <div className="bg-white rounded-3xl shadow-lg border border-gray-100 p-8">
-            <div className="flex items-center gap-3 mb-6 pb-4 border-b border-gray-100">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary-500 to-primary-600 flex items-center justify-center">
-                <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
+                <div>
+                  <label className="block text-sm font-medium text-secondary-600 mb-2">
+                    Description (optionnel)
+                  </label>
+                  <textarea
+                    name="description"
+                    value={formData.description}
+                    onChange={handleChange}
+                    placeholder="Décris ta sortie, l'ambiance, les points de passage..."
+                    rows={4}
+                    className="w-full px-4 py-3 rounded-lg border border-gray-200 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 outline-none transition-all resize-none"
+                  />
+                </div>
               </div>
-              <h2 className="text-2xl font-bold text-secondary-600">Informations générales</h2>
-            </div>
+            )}
 
-            <div className="space-y-6">
-              {/* Titre */}
-              <div>
-                <label className="block text-sm font-semibold text-secondary-600 mb-2">
-                  Titre de la sortie *
-                </label>
-                <input
-                  type="text"
-                  name="title"
-                  value={formData.title}
-                  onChange={handleChange}
-                  required
-                  maxLength={100}
-                  placeholder="Ex: Sortie matinale au parc"
-                  className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-primary-500 focus:outline-none transition-colors text-secondary-600 placeholder:text-gray-400"
-                />
-              </div>
+            {/* Step 2: Date & Distance */}
+            {currentStep === 2 && (
+              <div className="space-y-4 animate-fadeIn">
+                <h2 className="text-xl font-bold text-secondary-600 mb-4">📅 Date et distance</h2>
 
-              {/* Description */}
-              <div>
-                <label className="block text-sm font-semibold text-secondary-600 mb-2">
-                  Description *
-                </label>
-                <textarea
-                  name="description"
-                  value={formData.description}
-                  onChange={handleChange}
-                  required
-                  maxLength={500}
-                  rows={4}
-                  placeholder="Décris l'ambiance et le parcours de la sortie..."
-                  className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-primary-500 focus:outline-none transition-colors text-secondary-600 placeholder:text-gray-400 resize-none"
-                />
-                <p className="text-sm text-gray-500 mt-2">
-                  {formData.description?.length || 0}/500 caractères
-                </p>
-              </div>
-            </div>
-          </div>
+                <div>
+                  <label className="block text-sm font-medium text-secondary-600 mb-2">
+                    Date et heure *
+                  </label>
+                  <input
+                    type="datetime-local"
+                    name="start_time"
+                    value={formData.start_time}
+                    onChange={handleChange}
+                    className="w-full px-4 py-3 rounded-lg border border-gray-200 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 outline-none transition-all"
+                    required
+                  />
+                </div>
 
-          {/* Section 2: Date, Lieu et Distance */}
-          <div className="bg-white rounded-3xl shadow-lg border border-gray-100 p-8">
-            <div className="flex items-center gap-3 mb-6 pb-4 border-b border-gray-100">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary-500 to-primary-600 flex items-center justify-center">
-                <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                </svg>
-              </div>
-              <h2 className="text-2xl font-bold text-secondary-600">Date, lieu et distance</h2>
-            </div>
-
-            <div className="grid md:grid-cols-2 gap-6">
-              {/* Date et heure */}
-              <div>
-                <label className="block text-sm font-semibold text-secondary-600 mb-2">
-                  Date et heure *
-                </label>
-                <input
-                  type="datetime-local"
-                  name="start_time"
-                  value={formData.start_time}
-                  onChange={handleChange}
-                  required
-                  className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-primary-500 focus:outline-none transition-colors text-secondary-600"
-                />
-              </div>
-
-              {/* Distance */}
-              <div>
-                <label className="block text-sm font-semibold text-secondary-600 mb-2">
-                  Distance (km) *
-                </label>
-                <input
-                  type="number"
-                  name="distance_km"
-                  value={formData.distance_km.toString()}
-                  onChange={handleChange}
-                  required
-                  min={1}
-                  max={100}
-                  step={0.5}
-                  className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-primary-500 focus:outline-none transition-colors text-secondary-600"
-                />
-              </div>
-
-              {/* Lieu */}
-              <div className="md:col-span-2">
-                <label className="block text-sm font-semibold text-secondary-600 mb-2">
-                  Lieu de rendez-vous *
-                </label>
-                <div className="relative">
-                  <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                    </svg>
+                <div>
+                  <label className="block text-sm font-medium text-secondary-600 mb-2">
+                    Distance (km) * : {formData.distance_km} km
+                  </label>
+                  <input
+                    type="range"
+                    name="distance_km"
+                    min="1"
+                    max="50"
+                    step="0.5"
+                    value={formData.distance_km}
+                    onChange={handleChange}
+                    className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-primary-500"
+                  />
+                  <div className="flex justify-between text-xs text-gray-500 mt-1">
+                    <span>1 km</span>
+                    <span>50 km</span>
                   </div>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-secondary-600 mb-2">
+                    Allure cible (optionnel)
+                  </label>
+                  <input
+                    type="text"
+                    name="target_pace"
+                    value={formData.target_pace}
+                    onChange={handleChange}
+                    placeholder="Ex: 5'30/km"
+                    className="w-full px-4 py-3 rounded-lg border border-gray-200 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 outline-none transition-all"
+                  />
+                </div>
+              </div>
+            )}
+
+            {/* Step 3: Type & Level */}
+            {currentStep === 3 && (
+              <div className="space-y-5 animate-fadeIn">
+                <h2 className="text-xl font-bold text-secondary-600 mb-4">🏃 Type et niveau</h2>
+
+                <div>
+                  <label className="block text-sm font-medium text-secondary-600 mb-3">
+                    Type de sortie *
+                  </label>
+                  <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                    {sessionTypes.map((type) => (
+                      <button
+                        key={type.value}
+                        type="button"
+                        onClick={() => setFormData({ ...formData, session_type: type.value })}
+                        className={`p-3 rounded-lg border-2 transition-all text-left ${
+                          formData.session_type === type.value
+                            ? 'border-primary-500 bg-primary-50'
+                            : 'border-gray-200 hover:border-primary-300'
+                        }`}
+                      >
+                        <div className="text-2xl mb-1">{type.icon}</div>
+                        <div className="text-sm font-bold text-secondary-600">{type.label}</div>
+                        <div className="text-xs text-gray-500">{type.description}</div>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-secondary-600 mb-3">
+                    Niveau requis * : {levelLabels[formData.level_required - 1]}
+                  </label>
+                  <div className="space-y-2">
+                    {[1, 2, 3, 4, 5].map((level) => (
+                      <button
+                        key={level}
+                        type="button"
+                        onClick={() => setFormData({ ...formData, level_required: level })}
+                        className={`w-full p-3 rounded-lg border-2 transition-all text-left ${
+                          formData.level_required === level
+                            ? 'border-primary-500 bg-primary-50'
+                            : 'border-gray-200 hover:border-primary-300'
+                        }`}
+                      >
+                        <div className="flex items-center justify-between">
+                          <span className="text-sm font-bold text-secondary-600">{levelLabels[level - 1]}</span>
+                          <span className="text-lg">{'⭐'.repeat(level)}</span>
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-2 p-3 bg-gray-50 rounded-lg">
+                  <input
+                    type="checkbox"
+                    name="walk_breaks_ok"
+                    checked={formData.walk_breaks_ok}
+                    onChange={handleChange}
+                    className="w-4 h-4 accent-primary-500"
+                  />
+                  <label className="text-sm text-secondary-600">
+                    Pauses marche autorisées
+                  </label>
+                </div>
+              </div>
+            )}
+
+            {/* Step 4: Location & Participants */}
+            {currentStep === 4 && (
+              <div className="space-y-4 animate-fadeIn">
+                <h2 className="text-xl font-bold text-secondary-600 mb-4">📍 Localisation</h2>
+
+                <div>
+                  <label className="block text-sm font-medium text-secondary-600 mb-2">
+                    Lieu de rendez-vous *
+                  </label>
                   <input
                     type="text"
                     name="location_name"
                     value={formData.location_name}
                     onChange={handleChange}
+                    placeholder="Ex: Entrée du parc Monceau"
+                    className="w-full px-4 py-3 rounded-lg border border-gray-200 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 outline-none transition-all"
                     required
-                    placeholder="Ex: Parc de la Tête d'Or, Lyon"
-                    className="w-full pl-12 pr-4 py-3 rounded-xl border-2 border-gray-200 focus:border-primary-500 focus:outline-none transition-colors text-secondary-600 placeholder:text-gray-400"
                   />
                 </div>
-              </div>
-            </div>
-          </div>
 
-          {/* Section 3: Type de sortie */}
-          <div className="bg-white rounded-3xl shadow-lg border border-gray-100 p-8">
-            <div className="flex items-center gap-3 mb-6 pb-4 border-b border-gray-100">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary-500 to-primary-600 flex items-center justify-center">
-                <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
-                </svg>
-              </div>
-              <h2 className="text-2xl font-bold text-secondary-600">Type de sortie</h2>
-            </div>
-
-            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-              {sessionTypes.map((type) => (
-                <label
-                  key={type.value}
-                  className={`
-                    relative cursor-pointer rounded-2xl p-5 border-2 transition-all duration-200 hover:scale-105
-                    ${
-                      formData.session_type === type.value
-                        ? 'border-primary-500 bg-gradient-to-br from-primary-50 to-primary-100 shadow-lg'
-                        : 'border-gray-200 bg-white hover:border-gray-300 hover:shadow-md'
-                    }
-                  `}
-                >
+                <div>
+                  <label className="block text-sm font-medium text-secondary-600 mb-2">
+                    Nombre maximum de participants : {formData.max_participants}
+                  </label>
                   <input
-                    type="radio"
-                    name="session_type"
-                    value={type.value}
-                    checked={formData.session_type === type.value}
+                    type="range"
+                    name="max_participants"
+                    min="2"
+                    max="20"
+                    value={formData.max_participants}
                     onChange={handleChange}
-                    className="sr-only"
+                    className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-primary-500"
                   />
-                  <div className="text-3xl mb-3">{type.icon}</div>
-                  <div className="font-bold text-secondary-600 mb-1">
-                    {type.label}
-                  </div>
-                  <div className="text-sm text-gray-600">{type.description}</div>
-                  {formData.session_type === type.value && (
-                    <div className="absolute top-3 right-3 w-6 h-6 rounded-full bg-primary-500 flex items-center justify-center shadow-md">
-                      <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                      </svg>
-                    </div>
-                  )}
-                </label>
-              ))}
-            </div>
-          </div>
-
-          {/* Section 4: Niveau requis */}
-          <div className="bg-white rounded-3xl shadow-lg border border-gray-100 p-8">
-            <div className="flex items-center gap-3 mb-6 pb-4 border-b border-gray-100">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary-500 to-primary-600 flex items-center justify-center">
-                <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                </svg>
-              </div>
-              <h2 className="text-2xl font-bold text-secondary-600">Niveau requis</h2>
-            </div>
-
-            <div className="space-y-3">
-              {[1, 2, 3, 4, 5].map((level) => (
-                <label
-                  key={level}
-                  className={`
-                    flex items-center gap-5 p-5 rounded-2xl border-2 cursor-pointer transition-all duration-200 hover:shadow-md
-                    ${
-                      formData.level_required === level
-                        ? 'border-primary-500 bg-gradient-to-r from-primary-50 to-primary-100 shadow-lg'
-                        : 'border-gray-200 bg-white hover:border-gray-300'
-                    }
-                  `}
-                >
-                  <input
-                    type="radio"
-                    name="level_required"
-                    value={level}
-                    checked={formData.level_required === level}
-                    onChange={() => handleLevelChange(level)}
-                    className="w-5 h-5 text-primary-500 focus:ring-primary-500"
-                  />
-                  <div className="flex-1">
-                    <div className="flex items-center gap-3 mb-1">
-                      <span className="text-xl">{getLevelStars(level)}</span>
-                      <span className="font-bold text-secondary-600 text-lg">
-                        {getLevelLabel(level)}
-                      </span>
-                    </div>
-                    <p className="text-sm text-gray-600">{getLevelDescription(level)}</p>
-                  </div>
-                </label>
-              ))}
-            </div>
-          </div>
-
-          {/* Section 5: Détails avancés */}
-          <div className="bg-white rounded-3xl shadow-lg border border-gray-100 p-8">
-            <div className="flex items-center gap-3 mb-6 pb-4 border-b border-gray-100">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary-500 to-primary-600 flex items-center justify-center">
-                <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
-                </svg>
-              </div>
-              <h2 className="text-2xl font-bold text-secondary-600">Paramètres avancés</h2>
-            </div>
-
-            <div className="space-y-6">
-              <div className="grid md:grid-cols-2 gap-6">
-                {/* Allure cible */}
-                <div>
-                  <label className="block text-sm font-semibold text-secondary-600 mb-2">
-                    Allure cible (optionnel)
-                  </label>
-                  <div className="relative">
-                    <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">
-                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                      </svg>
-                    </div>
-                    <input
-                      type="text"
-                      name="target_pace"
-                      value={formData.target_pace}
-                      onChange={handleChange}
-                      placeholder="Ex: 5:30"
-                      pattern="[0-9]{1,2}:[0-9]{2}"
-                      className="w-full pl-12 pr-4 py-3 rounded-xl border-2 border-gray-200 focus:border-primary-500 focus:outline-none transition-colors text-secondary-600 placeholder:text-gray-400"
-                    />
-                  </div>
-                  <p className="text-xs text-gray-500 mt-1.5">
-                    Format: min:sec (ex: 5:30 pour 5min30/km)
-                  </p>
-                </div>
-
-                {/* Participants max */}
-                <div>
-                  <label className="block text-sm font-semibold text-secondary-600 mb-2">
-                    Participants maximum
-                  </label>
-                  <div className="relative">
-                    <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">
-                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-                      </svg>
-                    </div>
-                    <input
-                      type="number"
-                      name="max_participants"
-                      value={formData.max_participants.toString()}
-                      onChange={handleChange}
-                      min={2}
-                      max={20}
-                      className="w-full pl-12 pr-4 py-3 rounded-xl border-2 border-gray-200 focus:border-primary-500 focus:outline-none transition-colors text-secondary-600"
-                    />
+                  <div className="flex justify-between text-xs text-gray-500 mt-1">
+                    <span>2 personnes</span>
+                    <span>20 personnes</span>
                   </div>
                 </div>
               </div>
+            )}
 
-              {/* Pauses marche */}
-              <label className="flex items-start gap-4 cursor-pointer p-5 rounded-2xl border-2 border-gray-200 hover:border-gray-300 hover:shadow-md transition-all bg-white">
-                <input
-                  type="checkbox"
-                  name="walk_breaks_ok"
-                  checked={formData.walk_breaks_ok}
-                  onChange={handleChange}
-                  className="w-5 h-5 text-primary-500 rounded focus:ring-primary-500 mt-0.5"
-                />
-                <div>
-                  <span className="font-bold text-secondary-600 block mb-1">
-                    Pauses marche autorisées
-                  </span>
-                  <span className="text-sm text-gray-600">
-                    Idéal pour les débutants ou les sorties longues. Permet d'alterner marche et course.
-                  </span>
+            {/* Step 5: Summary */}
+            {currentStep === 5 && (
+              <div className="space-y-4 animate-fadeIn">
+                <h2 className="text-xl font-bold text-secondary-600 mb-4">✅ Récapitulatif</h2>
+
+                <div className="space-y-3">
+                  <div className="p-4 bg-primary-50 rounded-lg">
+                    <div className="font-bold text-secondary-600 mb-1">{formData.title}</div>
+                    {formData.description && (
+                      <div className="text-sm text-gray-600">{formData.description}</div>
+                    )}
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="p-3 bg-gray-50 rounded-lg">
+                      <div className="text-xs text-gray-500">Date</div>
+                      <div className="text-sm font-medium text-secondary-600">
+                        {new Date(formData.start_time).toLocaleDateString('fr-FR', {
+                          day: 'numeric',
+                          month: 'long',
+                          hour: '2-digit',
+                          minute: '2-digit',
+                        })}
+                      </div>
+                    </div>
+
+                    <div className="p-3 bg-gray-50 rounded-lg">
+                      <div className="text-xs text-gray-500">Distance</div>
+                      <div className="text-sm font-medium text-secondary-600">{formData.distance_km} km</div>
+                    </div>
+
+                    <div className="p-3 bg-gray-50 rounded-lg">
+                      <div className="text-xs text-gray-500">Type</div>
+                      <div className="text-sm font-medium text-secondary-600">
+                        {sessionTypes.find((t) => t.value === formData.session_type)?.label}
+                      </div>
+                    </div>
+
+                    <div className="p-3 bg-gray-50 rounded-lg">
+                      <div className="text-xs text-gray-500">Niveau</div>
+                      <div className="text-sm font-medium text-secondary-600">
+                        {levelLabels[formData.level_required - 1]}
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="p-3 bg-gray-50 rounded-lg">
+                    <div className="text-xs text-gray-500">Lieu</div>
+                    <div className="text-sm font-medium text-secondary-600">{formData.location_name}</div>
+                  </div>
+
+                  <div className="p-3 bg-gray-50 rounded-lg">
+                    <div className="text-xs text-gray-500">Participants max</div>
+                    <div className="text-sm font-medium text-secondary-600">{formData.max_participants} personnes</div>
+                  </div>
                 </div>
-              </label>
-            </div>
-          </div>
 
-          {/* Actions */}
-          <div className="sticky bottom-0 bg-gradient-to-t from-white via-white to-transparent pt-8 pb-6">
-            <div className="flex flex-col sm:flex-row gap-4">
-              <button
-                type="submit"
-                disabled={loading}
-                className="flex-1 px-8 py-4 bg-gradient-to-r from-primary-500 to-primary-600 text-white font-bold rounded-2xl hover:from-primary-600 hover:to-primary-700 transition-all shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-[1.02] active:scale-[0.98]"
-              >
-                {loading ? (
-                  <span className="flex items-center justify-center gap-2">
-                    <svg className="animate-spin h-5 w-5" fill="none" viewBox="0 0 24 24">
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                    </svg>
-                    Création en cours...
-                  </span>
-                ) : (
-                  'Créer la sortie'
+                {error && (
+                  <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
+                    <p className="text-sm text-red-600">{error}</p>
+                  </div>
                 )}
+              </div>
+            )}
+
+            {/* Navigation Buttons */}
+            <div className="flex items-center justify-between mt-8 pt-6 border-t border-gray-200">
+              <button
+                type="button"
+                onClick={prevStep}
+                disabled={currentStep === 1}
+                className={`inline-flex items-center gap-2 px-5 py-2.5 rounded-lg font-medium transition-all ${
+                  currentStep === 1
+                    ? 'text-gray-400 cursor-not-allowed'
+                    : 'text-secondary-600 hover:bg-gray-100'
+                }`}
+              >
+                <ChevronLeft className="w-4 h-4" />
+                Précédent
               </button>
-              <Link href="/sessions" className="sm:w-auto">
+
+              {currentStep < 5 ? (
                 <button
                   type="button"
-                  className="w-full px-8 py-4 bg-white text-secondary-600 font-bold rounded-2xl border-2 border-gray-200 hover:border-gray-300 hover:shadow-lg transition-all transform hover:scale-[1.02] active:scale-[0.98]"
+                  onClick={nextStep}
+                  disabled={!canProceed()}
+                  className={`inline-flex items-center gap-2 px-6 py-2.5 rounded-lg font-bold transition-all ${
+                    canProceed()
+                      ? 'bg-gradient-to-r from-primary-500 to-primary-600 text-white hover:shadow-lg hover:scale-105'
+                      : 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                  }`}
                 >
-                  Annuler
+                  Suivant
+                  <ChevronRight className="w-4 h-4" />
                 </button>
-              </Link>
+              ) : (
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="inline-flex items-center gap-2 px-8 py-2.5 rounded-lg bg-gradient-to-r from-primary-500 to-primary-600 text-white font-bold hover:shadow-lg hover:scale-105 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {loading ? 'Création...' : 'Créer la sortie'}
+                  <Check className="w-5 h-5" />
+                </button>
+              )}
             </div>
-          </div>
-        </form>
+          </form>
+        </div>
+
+        {/* Cancel Link */}
+        <div className="text-center mt-4">
+          <Link
+            href="/sessions"
+            className="text-sm text-gray-500 hover:text-secondary-600 transition-colors"
+          >
+            Annuler
+          </Link>
+        </div>
       </div>
+
+      <style jsx global>{`
+        @keyframes fadeIn {
+          from {
+            opacity: 0;
+            transform: translateY(10px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+
+        .animate-fadeIn {
+          animation: fadeIn 0.3s ease-out;
+        }
+      `}</style>
     </div>
   );
 }
