@@ -50,7 +50,7 @@ export default function Navbar() {
   return (
     <nav className={`fixed top-0 left-0 right-0 z-50 px-4 sm:px-6 lg:px-8 py-4 transition-all duration-300 ${
       scrolled
-        ? 'bg-secondary-700/95 backdrop-blur-xl border-b border-secondary-600 shadow-lg'
+        ? 'bg-white/90 backdrop-blur-xl border-b border-gray-100 shadow-sm'
         : 'bg-transparent'
     }`}>
       <div className="flex items-center justify-between">
@@ -63,7 +63,7 @@ export default function Navbar() {
             height={40}
             className="w-10 h-10"
           />
-          <span className="text-2xl font-bold text-white">
+          <span className={`text-2xl font-bold transition-colors ${scrolled ? 'text-secondary-600' : 'text-white'}`}>
             PaceMate
           </span>
         </Link>
@@ -76,8 +76,10 @@ export default function Navbar() {
                 href="/sessions"
                 className={`text-sm font-medium transition-colors ${
                   pathname?.startsWith('/sessions')
-                    ? 'text-primary-400'
-                    : 'text-white/80 hover:text-primary-400'
+                    ? 'text-primary-500'
+                    : scrolled
+                    ? 'text-secondary-600/80 hover:text-primary-500'
+                    : 'text-white/90 hover:text-white'
                 }`}
               >
                 Sessions
@@ -86,8 +88,10 @@ export default function Navbar() {
                 href="/mes-sorties"
                 className={`text-sm font-medium transition-colors ${
                   pathname?.startsWith('/mes-sorties')
-                    ? 'text-primary-400'
-                    : 'text-white/80 hover:text-primary-400'
+                    ? 'text-primary-500'
+                    : scrolled
+                    ? 'text-secondary-600/80 hover:text-primary-500'
+                    : 'text-white/90 hover:text-white'
                 }`}
               >
                 Mes sorties
@@ -96,29 +100,35 @@ export default function Navbar() {
                 href="/sessions/create"
                 className={`text-sm font-medium transition-colors ${
                   pathname?.startsWith('/sessions/create')
-                    ? 'text-primary-400'
-                    : 'text-white/80 hover:text-primary-400'
+                    ? 'text-primary-500'
+                    : scrolled
+                    ? 'text-secondary-600/80 hover:text-primary-500'
+                    : 'text-white/90 hover:text-white'
                 }`}
               >
-                Creer une sortie
+                Créer une sortie
               </Link>
               <Link
                 href="/teams"
                 className={`text-sm font-medium transition-colors ${
                   pathname?.startsWith('/teams')
-                    ? 'text-primary-400'
-                    : 'text-white/80 hover:text-primary-400'
+                    ? 'text-primary-500'
+                    : scrolled
+                    ? 'text-secondary-600/80 hover:text-primary-500'
+                    : 'text-white/90 hover:text-white'
                 }`}
               >
-                Equipes
+                Équipes
               </Link>
             </div>
 
             {/* User actions */}
             <div className="flex items-center gap-3">
               {/* Notifications */}
-              <button className="relative w-10 h-10 rounded-lg flex items-center justify-center transition-colors hover:bg-white/10">
-                <Bell className="w-5 h-5 text-white" />
+              <button className={`relative w-10 h-10 rounded-lg flex items-center justify-center transition-colors ${
+                scrolled ? 'hover:bg-gray-100' : 'hover:bg-white/20'
+              }`}>
+                <Bell className={`w-5 h-5 transition-colors ${scrolled ? 'text-secondary-600' : 'text-white'}`} />
                 {/* Badge for unread notifications */}
                 <span className="absolute top-2 right-2 w-2 h-2 bg-primary-500 rounded-full"></span>
               </button>
@@ -134,11 +144,11 @@ export default function Navbar() {
                       {profile.username.substring(0, 2).toUpperCase()}
                     </div>
                   </div>
-                  <span className="hidden md:block font-medium text-white">
+                  <span className={`hidden md:block font-medium transition-colors ${scrolled ? 'text-secondary-600' : 'text-white'}`}>
                     {profile.username}
                   </span>
                   <svg
-                    className={`hidden md:block w-4 h-4 transition-all text-white ${dropdownOpen ? 'rotate-180' : ''}`}
+                    className={`hidden md:block w-4 h-4 transition-all ${scrolled ? 'text-secondary-600' : 'text-white'} ${dropdownOpen ? 'rotate-180' : ''}`}
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -209,8 +219,10 @@ export default function Navbar() {
                 href="/sessions"
                 className={`text-sm font-medium transition-colors ${
                   pathname?.startsWith('/sessions')
-                    ? 'text-primary-400'
-                    : 'text-white/80 hover:text-primary-400'
+                    ? 'text-primary-500'
+                    : scrolled
+                    ? 'text-secondary-600/80 hover:text-primary-500'
+                    : 'text-white/90 hover:text-white'
                 }`}
               >
                 Sessions
@@ -219,11 +231,13 @@ export default function Navbar() {
                 href="/teams"
                 className={`text-sm font-medium transition-colors ${
                   pathname?.startsWith('/teams')
-                    ? 'text-primary-400'
-                    : 'text-white/80 hover:text-primary-400'
+                    ? 'text-primary-500'
+                    : scrolled
+                    ? 'text-secondary-600/80 hover:text-primary-500'
+                    : 'text-white/90 hover:text-white'
                 }`}
               >
-                Equipes
+                Équipes
               </Link>
             </div>
 
@@ -233,7 +247,9 @@ export default function Navbar() {
                   setAuthMode('login');
                   setAuthDrawerOpen(true);
                 }}
-                className="px-5 py-2 font-medium text-white hover:text-primary-400 transition-colors"
+                className={`px-5 py-2 font-medium transition-colors ${
+                  scrolled ? 'text-secondary-600 hover:text-primary-500' : 'text-white hover:text-primary-500'
+                }`}
               >
                 Connexion
               </button>
