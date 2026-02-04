@@ -97,7 +97,7 @@ export default function ProfilePage() {
   };
 
   return (
-    <div className="min-h-screen p-4 md:p-8">
+    <div className="min-h-screen pt-24 pb-8 px-4 md:px-8">
       <div className="max-w-6xl mx-auto">
         {/* Header */}
         <div className="mb-8">
