@@ -2,40 +2,77 @@
 
 /* Theme customization for Tailwind v4 */
 @theme {
-  /* Main brand colors - Green and Dark Gray */
-  --color-primary-50: #e8faf3;
-  --color-primary-100: #c6f3e0;
-  --color-primary-200: #93e8c8;
-  --color-primary-300: #5ddcab;
-  --color-primary-400: #3dd695;
-  --color-primary-500: #32d18a;
-  --color-primary-600: #2ab876;
-  --color-primary-700: #239962;
-  --color-primary-800: #1c7a4e;
-  --color-primary-900: #155b3a;
+  /* Dark - #0D1D25 - Headers, navbar, textes principaux */
+  --color-dark-50: #e8ebed;
+  --color-dark-100: #c5ccd0;
+  --color-dark-200: #9eaab1;
+  --color-dark-300: #778892;
+  --color-dark-400: #596f7a;
+  --color-dark-500: #3b5563;
+  --color-dark-600: #2a3f4a;
+  --color-dark-700: #1a2e37;
+  --color-dark-800: #0D1D25;
+  --color-dark-900: #071015;
 
-  /* Forest green (vert sapin) for accents */
-  --color-forest-50: #e8f5e8;
-  --color-forest-100: #c8e6c8;
-  --color-forest-200: #a4d4a4;
-  --color-forest-300: #7fc27f;
-  --color-forest-400: #5fb05f;
-  --color-forest-500: #3f9e3f;
-  --color-forest-600: #2d7a2d;
-  --color-forest-700: #1f5a1f;
-  --color-forest-800: #154015;
-  --color-forest-900: #0d2b0d;
+  /* Petrol - #104C64 - Liens, accents, hover */
+  --color-petrol-50: #e7f0f4;
+  --color-petrol-100: #c3dae3;
+  --color-petrol-200: #9bc2d0;
+  --color-petrol-300: #73aabd;
+  --color-petrol-400: #5598af;
+  --color-petrol-500: #3786a1;
+  --color-petrol-600: #256d85;
+  --color-petrol-700: #104C64;
+  --color-petrol-800: #0c3a4c;
+  --color-petrol-900: #082834;
 
-  --color-secondary-50: #f5f5f5;
-  --color-secondary-100: #e8e8e8;
-  --color-secondary-200: #d1d1d1;
-  --color-secondary-300: #ababab;
-  --color-secondary-400: #6b6b6b;
-  --color-secondary-500: #4a4a4a;
-  --color-secondary-600: #2c2c2c;
-  --color-secondary-700: #242424;
-  --color-secondary-800: #1c1c1c;
-  --color-secondary-900: #141414;
+  /* Silver - #C6C6D0 - Fonds, bordures, separateurs */
+  --color-silver-50: #fafafb;
+  --color-silver-100: #f2f2f4;
+  --color-silver-200: #e6e6ea;
+  --color-silver-300: #d6d6dc;
+  --color-silver-400: #C6C6D0;
+  --color-silver-500: #a8a8b4;
+  --color-silver-600: #8a8a98;
+  --color-silver-700: #6c6c7c;
+  --color-silver-800: #4e4e5c;
+  --color-silver-900: #30303c;
+
+  /* Sand - #D59D80 - Badges, accents doux */
+  --color-sand-50: #fdf6f3;
+  --color-sand-100: #f9e9e1;
+  --color-sand-200: #f2d4c5;
+  --color-sand-300: #e8bba3;
+  --color-sand-400: #D59D80;
+  --color-sand-500: #c4876a;
+  --color-sand-600: #a86d52;
+  --color-sand-700: #8c5541;
+  --color-sand-800: #704430;
+  --color-sand-900: #54321f;
+
+  /* Terracotta - #C0754D - Boutons secondaires */
+  --color-terra-50: #faf3ee;
+  --color-terra-100: #f2e0d3;
+  --color-terra-200: #e5c4a8;
+  --color-terra-300: #d8a77d;
+  --color-terra-400: #C0754D;
+  --color-terra-500: #a66240;
+  --color-terra-600: #8c5034;
+  --color-terra-700: #723f29;
+  --color-terra-800: #58301e;
+  --color-terra-900: #3e2114;
+
+  /* Rust - #B6410F - CTA, boutons principaux */
+  --color-rust-50: #fef2ec;
+  --color-rust-100: #fcdfd0;
+  --color-rust-200: #f8bea1;
+  --color-rust-300: #f49c72;
+  --color-rust-400: #d96a36;
+  --color-rust-500: #B6410F;
+  --color-rust-600: #9a370d;
+  --color-rust-700: #7e2d0b;
+  --color-rust-800: #622308;
+  --color-rust-900: #461906;
 }
 
 /* Base styles */
@@ -50,8 +87,8 @@
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Helvetica Neue', sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    background-color: #ffffff;
-    color: #2c2c2c;
+    background-color: #fafafb;
+    color: #0D1D25;
   }
 
   /* Smooth transitions */
@@ -65,7 +102,7 @@
   input:focus-visible,
   textarea:focus-visible,
   select:focus-visible {
-    outline: 2px solid #32d18a;
+    outline: 2px solid #104C64;
     outline-offset: 2px;
   }
 
@@ -76,15 +113,15 @@
   }
 
   ::-webkit-scrollbar-track {
-    background: #f1f5f9;
+    background: #f2f2f4;
   }
 
   ::-webkit-scrollbar-thumb {
-    background: #cbd5e1;
+    background: #C6C6D0;
     border-radius: 5px;
   }
 
   ::-webkit-scrollbar-thumb:hover {
-    background: #94a3b8;
+    background: #a8a8b4;
   }
 }

@@ -57,77 +57,77 @@ export default function SessionsPage() {
   }, [filterLevel, sessions]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary-50 via-white to-forest-50 pt-20 pb-8 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-silver-50 pt-20 pb-8 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6 bg-white/70 backdrop-blur-md rounded-2xl p-5 shadow-lg border border-primary-500/20">
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6 bg-white rounded-xl p-5 border border-silver-400">
           <div>
-            <h1 className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-primary-500 to-forest-700 bg-clip-text text-transparent mb-1">
+            <h1 className="text-2xl font-bold text-dark-800 mb-1">
               Sessions de running
             </h1>
-            <p className="text-sm text-secondary-600/80">
-              Trouve ta prochaine sortie et rejoins la communauté
+            <p className="text-sm text-dark-500">
+              Trouve ta prochaine sortie et rejoins la communaute
             </p>
           </div>
           <Link
             href="/sessions/create"
-            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-gradient-to-r from-primary-500 to-primary-600 text-white text-sm font-bold shadow-md hover:shadow-lg hover:scale-105 transition-all"
+            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg bg-rust-500 text-white text-sm font-semibold hover:bg-rust-600 transition-colors"
           >
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
             </svg>
-            Créer une sortie
+            Creer une sortie
           </Link>
         </div>
 
         {/* Filtres */}
-        <div className="bg-gradient-to-br from-white/90 to-primary-500/5 backdrop-blur-md rounded-2xl p-4 shadow-lg border border-primary-500/20 mb-6">
+        <div className="bg-white rounded-xl p-4 border border-silver-400 mb-6">
           <div className="flex items-center gap-2 mb-3">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-primary-500 to-primary-600 flex items-center justify-center shadow-md">
+            <div className="w-8 h-8 rounded-lg bg-petrol-700 flex items-center justify-center">
               <Filter className="w-4 h-4 text-white" />
             </div>
-            <h2 className="text-sm font-bold text-secondary-600">Filtrer par niveau</h2>
+            <h2 className="text-sm font-semibold text-dark-800">Filtrer par niveau</h2>
           </div>
           <div className="flex flex-wrap gap-2">
             <button
               onClick={() => setFilterLevel('all')}
-              className={`px-4 py-2 rounded-lg text-sm font-bold transition-all ${
+              className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
                 filterLevel === 'all'
-                  ? 'bg-gradient-to-r from-primary-500 to-primary-600 text-white shadow-md scale-105'
-                  : 'bg-white/80 text-secondary-600 hover:bg-white hover:shadow-sm'
+                  ? 'bg-dark-800 text-white'
+                  : 'bg-silver-200 text-dark-700 hover:bg-silver-300'
               }`}
             >
-              🌟 Tous
+              Tous
             </button>
             <button
               onClick={() => setFilterLevel('beginner')}
-              className={`px-4 py-2 rounded-lg text-sm font-bold transition-all ${
+              className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
                 filterLevel === 'beginner'
-                  ? 'bg-gradient-to-r from-primary-300 to-primary-500 text-white shadow-md scale-105'
-                  : 'bg-white/80 text-secondary-600 hover:bg-white hover:shadow-sm'
+                  ? 'bg-sand-400 text-white'
+                  : 'bg-silver-200 text-dark-700 hover:bg-silver-300'
               }`}
             >
-              🌱 Débutant
+              Debutant
             </button>
             <button
               onClick={() => setFilterLevel('intermediate')}
-              className={`px-4 py-2 rounded-lg text-sm font-bold transition-all ${
+              className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
                 filterLevel === 'intermediate'
-                  ? 'bg-gradient-to-r from-primary-600 to-forest-700 text-white shadow-md scale-105'
-                  : 'bg-white/80 text-secondary-600 hover:bg-white hover:shadow-sm'
+                  ? 'bg-terra-400 text-white'
+                  : 'bg-silver-200 text-dark-700 hover:bg-silver-300'
               }`}
             >
-              🔥 Intermédiaire
+              Intermediaire
             </button>
             <button
               onClick={() => setFilterLevel('advanced')}
-              className={`px-4 py-2 rounded-lg text-sm font-bold transition-all ${
+              className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
                 filterLevel === 'advanced'
-                  ? 'bg-gradient-to-r from-forest-800 to-secondary-600 text-white shadow-md scale-105'
-                  : 'bg-white/80 text-secondary-600 hover:bg-white hover:shadow-sm'
+                  ? 'bg-rust-500 text-white'
+                  : 'bg-silver-200 text-dark-700 hover:bg-silver-300'
               }`}
             >
-              🚀 Avancé
+              Avance
             </button>
           </div>
         </div>
@@ -141,9 +141,9 @@ export default function SessionsPage() {
 
         {/* Error */}
         {error && (
-          <div className="bg-white rounded-3xl p-8 border-2 border-red-500 text-center shadow-lg">
-            <p className="text-red-500 font-bold text-xl mb-2">❌ Erreur</p>
-            <p className="text-secondary-600/70">{error}</p>
+          <div className="bg-white rounded-xl p-6 border border-rust-300 text-center">
+            <p className="text-rust-600 font-semibold mb-1">Erreur</p>
+            <p className="text-dark-500">{error}</p>
           </div>
         )}
 
@@ -151,9 +151,9 @@ export default function SessionsPage() {
         {!loading && !error && (
           <>
             {filteredSessions.length === 0 ? (
-              <div className="bg-gradient-to-br from-primary-500/10 via-white to-forest-500/5 rounded-3xl p-12 text-center shadow-2xl border-2 border-primary-500/30">
-                <div className="w-24 h-24 rounded-full bg-gradient-to-br from-primary-500 to-forest-700 flex items-center justify-center mx-auto mb-6 shadow-xl">
-                  <svg className="w-12 h-12 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="bg-white rounded-xl p-10 text-center border border-silver-400">
+                <div className="w-16 h-16 rounded-full bg-petrol-700 flex items-center justify-center mx-auto mb-5">
+                  <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path
                       strokeLinecap="round"
                       strokeLinejoin="round"
@@ -162,40 +162,35 @@ export default function SessionsPage() {
                     />
                   </svg>
                 </div>
-                <h3 className="text-3xl font-bold text-secondary-600 mb-4">
+                <h3 className="text-xl font-bold text-dark-800 mb-2">
                   {filterLevel === 'all' ? 'Aucune session disponible' : 'Aucune session pour ce niveau'}
                 </h3>
-                <p className="text-lg text-secondary-600/80 mb-8">
+                <p className="text-dark-500 mb-6">
                   {filterLevel === 'all'
-                    ? 'Sois le premier à créer une sortie !'
-                    : 'Essaie de changer les filtres ou crée ta propre session'}
+                    ? 'Sois le premier a creer une sortie !'
+                    : 'Essaie de changer les filtres ou cree ta propre session'}
                 </p>
-                <div className="flex gap-4 justify-center">
+                <div className="flex gap-3 justify-center">
                   {filterLevel !== 'all' && (
                     <button
                       onClick={() => setFilterLevel('all')}
-                      className="px-8 py-4 rounded-xl bg-white border-2 border-primary-500 text-primary-600 font-bold hover:bg-primary-50 transition-all shadow-lg hover:scale-105"
+                      className="px-5 py-2.5 rounded-lg border border-silver-400 text-dark-700 font-medium hover:bg-silver-100 transition-colors"
                     >
                       Voir toutes les sessions
                     </button>
                   )}
                   <Link
                     href="/sessions/create"
-                    className="px-8 py-4 rounded-xl bg-gradient-to-r from-primary-500 to-primary-600 text-white font-bold shadow-xl hover:shadow-2xl hover:scale-105 transition-all"
+                    className="px-5 py-2.5 rounded-lg bg-rust-500 text-white font-medium hover:bg-rust-600 transition-colors"
                   >
-                    Créer une sortie
+                    Creer une sortie
                   </Link>
                 </div>
               </div>
             ) : (
               <>
-                <div className="mb-8 bg-white/80 backdrop-blur-sm rounded-2xl px-6 py-4 inline-flex items-center gap-3 shadow-lg border-2 border-primary-500/30">
-                  <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-primary-500 to-primary-600 flex items-center justify-center shadow-md">
-                    <span className="text-white font-bold text-lg">{filteredSessions.length}</span>
-                  </div>
-                  <span className="text-secondary-600 font-semibold">
-                    session{filteredSessions.length > 1 ? 's' : ''} trouvée{filteredSessions.length > 1 ? 's' : ''}
-                  </span>
+                <div className="mb-5 text-sm text-dark-500">
+                  <span className="font-semibold text-dark-800">{filteredSessions.length}</span> session{filteredSessions.length > 1 ? 's' : ''} trouvee{filteredSessions.length > 1 ? 's' : ''}
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
                   {filteredSessions.map((session) => (
