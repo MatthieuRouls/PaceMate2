@@ -2,7 +2,6 @@
 
 import { useEffect, useState, FormEvent } from 'react';
 import { Team } from '@/lib/types';
-import TeamCard from '@/components/ui/TeamCard';
 import {
   getUserTeam,
   getTeamsLeaderboard,
@@ -11,7 +10,7 @@ import {
 } from '@/lib/actions';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
 
-// Désactiver la pré-génération statique
+// Desactiver la pre-generation statique
 export const dynamic = 'force-dynamic';
 
 export default function TeamsPage() {
@@ -22,32 +21,35 @@ export default function TeamsPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Formulaire de création d'équipe
+  // Affichage du formulaire de creation
+  const [showCreateForm, setShowCreateForm] = useState(false);
+
+  // Formulaire de creation d'equipe
   const [teamName, setTeamName] = useState('');
   const [teamDescription, setTeamDescription] = useState('');
   const [creatingTeam, setCreatingTeam] = useState(false);
   const [createError, setCreateError] = useState<string | null>(null);
 
-  // État de quitter l'équipe
+  // Etat de quitter l'equipe
   const [leavingTeam, setLeavingTeam] = useState(false);
 
-  // Récupérer les données
+  // Recuperer les donnees
   useEffect(() => {
     async function fetchData() {
       try {
         setLoading(true);
         setError(null);
 
-        // Récupérer l'équipe de l'utilisateur
+        // Recuperer l'equipe de l'utilisateur
         const userTeamData = await getUserTeam();
         setUserTeam(userTeamData);
 
-        // Récupérer le classement des équipes
+        // Recuperer le classement des equipes
         const leaderboard = await getTeamsLeaderboard();
         setTeams(leaderboard);
       } catch (err) {
         console.error('Error fetching teams data:', err);
-        setError(err instanceof Error ? err.message : 'Erreur lors du chargement des données');
+        setError(err instanceof Error ? err.message : 'Erreur lors du chargement des donnees');
       } finally {
         setLoading(false);
       }
@@ -56,7 +58,7 @@ export default function TeamsPage() {
     fetchData();
   }, []);
 
-  // Créer une équipe
+  // Creer une equipe
   const handleCreateTeam = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
@@ -67,19 +69,20 @@ export default function TeamsPage() {
       const result = await createTeam(teamName, teamDescription);
 
       if (result.success && result.team_id) {
-        // Récupérer l'équipe créée
+        // Recuperer l'equipe creee
         const newTeam = await getUserTeam();
         setUserTeam(newTeam);
 
-        // Rafraîchir le classement
+        // Rafraichir le classement
         const leaderboard = await getTeamsLeaderboard();
         setTeams(leaderboard);
 
-        // Réinitialiser le formulaire
+        // Reinitialiser le formulaire
         setTeamName('');
         setTeamDescription('');
+        setShowCreateForm(false);
       } else {
-        setCreateError(result.error || 'Erreur lors de la création de l\'équipe');
+        setCreateError(result.error || 'Erreur lors de la creation de l\'equipe');
       }
     } catch (err) {
       console.error('Error creating team:', err);
@@ -89,12 +92,12 @@ export default function TeamsPage() {
     }
   };
 
-  // Quitter l'équipe
+  // Quitter l'equipe
   const handleLeaveTeam = async () => {
     if (!userTeam) return;
 
     const confirmLeave = window.confirm(
-      'Es-tu sûr de vouloir quitter ton équipe ? Cette action est irréversible.'
+      'Es-tu sur de vouloir quitter ton equipe ? Cette action est irreversible.'
     );
 
     if (!confirmLeave) return;
@@ -107,11 +110,11 @@ export default function TeamsPage() {
       if (result.success) {
         setUserTeam(null);
 
-        // Rafraîchir le classement
+        // Rafraichir le classement
         const leaderboard = await getTeamsLeaderboard();
         setTeams(leaderboard);
       } else {
-        alert(result.error || 'Erreur lors de la sortie de l\'équipe');
+        alert(result.error || 'Erreur lors de la sortie de l\'equipe');
       }
     } catch (err) {
       console.error('Error leaving team:', err);
@@ -121,11 +124,19 @@ export default function TeamsPage() {
     }
   };
 
-  // Calculer le rang de l'équipe de l'utilisateur
+  // Calculer le rang de l'equipe de l'utilisateur
   const getUserTeamRank = () => {
     if (!userTeam) return null;
     const rank = teams.findIndex((t) => t.id === userTeam.id) + 1;
     return rank > 0 ? rank : null;
+  };
+
+  // Badge de position pour le classement
+  const getPositionBadge = (pos: number) => {
+    if (pos === 1) return '🥇';
+    if (pos === 2) return '🥈';
+    if (pos === 3) return '🥉';
+    return `${pos}`;
   };
 
   return (
@@ -133,8 +144,8 @@ export default function TeamsPage() {
       {/* Header */}
       <div className="bg-white/80 backdrop-blur-xl border-b border-gray-200">
         <div className="max-w-6xl mx-auto px-6 py-5">
-          <h1 className="text-2xl md:text-3xl font-bold text-secondary-600 mb-1">Équipes</h1>
-          <p className="text-sm text-gray-600">Rejoins une équipe et grimpe dans le classement</p>
+          <h1 className="text-2xl md:text-3xl font-bold text-secondary-600 mb-1">Equipe</h1>
+          <p className="text-sm text-gray-600">Gere ton equipe et suis ta progression</p>
         </div>
       </div>
 
@@ -148,208 +159,254 @@ export default function TeamsPage() {
 
         {/* Error */}
         {error && (
-          <div className="bg-white rounded-3xl shadow-lg border-2 border-red-200 p-8 mb-8">
-            <div className="flex items-center gap-3 mb-3">
-              <div className="w-12 h-12 rounded-full bg-red-100 flex items-center justify-center">
-                <svg className="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div className="bg-white rounded-2xl shadow-lg border border-red-200 p-6 mb-6">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center">
+                <svg className="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                 </svg>
               </div>
-              <p className="text-red-900 font-bold text-xl">Erreur</p>
+              <div>
+                <p className="text-red-900 font-semibold">Erreur</p>
+                <p className="text-red-700 text-sm">{error}</p>
+              </div>
             </div>
-            <p className="text-red-700 ml-15">{error}</p>
           </div>
         )}
 
         {/* Contenu principal */}
         {!loading && !error && (
-          <div className="space-y-5">
-            {/* Section Mon équipe */}
-            {userTeam && (
-              <div className="bg-white rounded-2xl shadow-lg border border-primary-500 p-5">
-                <div className="flex items-center gap-2 mb-4 pb-3 border-b border-gray-100">
-                  <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-primary-500 to-primary-600 flex items-center justify-center">
-                    <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-                    </svg>
-                  </div>
-                  <h2 className="text-lg font-bold text-secondary-600">Mon équipe</h2>
-                </div>
-
-                <div className="space-y-4">
-                  <div>
-                    <h3 className="text-xl font-bold text-secondary-600 mb-1">{userTeam.name}</h3>
+          <div className="flex flex-col lg:flex-row gap-6">
+            {/* Colonne principale */}
+            <div className="flex-1">
+              {/* Si l'utilisateur a une equipe */}
+              {userTeam ? (
+                <div className="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
+                  {/* En-tete de l'equipe */}
+                  <div className="bg-gradient-to-r from-primary-500 to-primary-600 px-6 py-5">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-primary-100 text-sm font-medium mb-1">Mon equipe</p>
+                        <h2 className="text-2xl font-bold text-white">{userTeam.name}</h2>
+                      </div>
+                      {getUserTeamRank() && (
+                        <div className="bg-white/20 backdrop-blur-sm rounded-xl px-4 py-2 text-center">
+                          <p className="text-xs text-primary-100">Classement</p>
+                          <p className="text-2xl font-bold text-white">
+                            {getPositionBadge(getUserTeamRank()!)}
+                          </p>
+                        </div>
+                      )}
+                    </div>
                     {userTeam.description && (
-                      <p className="text-sm text-gray-600">{userTeam.description}</p>
+                      <p className="text-primary-100 mt-3 text-sm">{userTeam.description}</p>
                     )}
                   </div>
 
-                  {/* Stats */}
-                  <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-                    <div className="bg-gradient-to-br from-primary-50 to-primary-100 rounded-xl p-3 border border-primary-100">
-                      <p className="text-xs text-gray-600 mb-1 font-medium">👥 Membres</p>
-                      <p className="text-2xl font-bold text-primary-600">
-                        {userTeam.members_count || 0}
-                      </p>
-                    </div>
-                    <div className="bg-gradient-to-br from-primary-50 to-primary-100 rounded-xl p-3 border border-primary-100">
-                      <p className="text-xs text-gray-600 mb-1 font-medium">🏃 Distance totale</p>
-                      <p className="text-2xl font-bold text-primary-600">
-                        {(userTeam.total_distance || 0).toFixed(1)} <span className="text-sm">km</span>
-                      </p>
-                    </div>
-                    <div className="bg-gradient-to-br from-primary-50 to-primary-100 rounded-2xl p-5 border border-primary-100">
-                      <p className="text-sm text-gray-600 mb-2 font-medium">🏆 Classement</p>
-                      <p className="text-3xl font-bold text-primary-600">
-                        {getUserTeamRank() ? `${getUserTeamRank()}e` : '-'}
-                        {getUserTeamRank() && getUserTeamRank()! <= 3 && (
-                          <span className="ml-2 text-2xl">
-                            {getUserTeamRank() === 1 && '🥇'}
-                            {getUserTeamRank() === 2 && '🥈'}
-                            {getUserTeamRank() === 3 && '🥉'}
-                          </span>
-                        )}
-                      </p>
-                    </div>
-                  </div>
-
-                  {/* Bouton quitter */}
-                  <div className="pt-6 border-t border-gray-100">
-                    <button
-                      onClick={handleLeaveTeam}
-                      disabled={leavingTeam}
-                      className="px-6 py-3 bg-white text-red-600 font-bold rounded-xl border-2 border-red-200 hover:border-red-300 hover:bg-red-50 hover:shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-[1.02] active:scale-[0.98]"
-                    >
-                      {leavingTeam ? (
-                        <span className="flex items-center justify-center gap-2">
-                          <svg className="animate-spin h-5 w-5" fill="none" viewBox="0 0 24 24">
-                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                          </svg>
-                          Chargement...
-                        </span>
-                      ) : (
-                        '🚪 Quitter l\'équipe'
-                      )}
-                    </button>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* Section Créer une équipe */}
-            {!userTeam && (
-              <div className="bg-white rounded-3xl shadow-lg border border-gray-100 p-8">
-                <div className="flex items-center gap-3 mb-6 pb-4 border-b border-gray-100">
-                  <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-primary-500 to-primary-600 flex items-center justify-center">
-                    <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-                    </svg>
-                  </div>
-                  <h2 className="text-2xl font-bold text-secondary-600">Créer une équipe</h2>
-                </div>
-
-                <form onSubmit={handleCreateTeam} className="space-y-6">
-                  {/* Erreur de création */}
-                  {createError && (
-                    <div className="p-5 rounded-2xl bg-red-50 border-2 border-red-200 shadow-sm">
-                      <div className="flex items-center gap-3 mb-2">
-                        <div className="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center">
-                          <svg className="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  {/* Stats de l'equipe */}
+                  <div className="p-6">
+                    <div className="grid grid-cols-2 gap-4 mb-6">
+                      <div className="bg-gray-50 rounded-xl p-4 text-center">
+                        <div className="w-10 h-10 mx-auto mb-2 rounded-full bg-primary-100 flex items-center justify-center">
+                          <svg className="w-5 h-5 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
                           </svg>
                         </div>
-                        <p className="font-semibold text-red-900 text-lg">Erreur</p>
+                        <p className="text-2xl font-bold text-secondary-600">{userTeam.members_count || 0}</p>
+                        <p className="text-xs text-gray-500">Membre{(userTeam.members_count || 0) > 1 ? 's' : ''}</p>
                       </div>
-                      <p className="text-red-700 ml-13">{createError}</p>
+                      <div className="bg-gray-50 rounded-xl p-4 text-center">
+                        <div className="w-10 h-10 mx-auto mb-2 rounded-full bg-primary-100 flex items-center justify-center">
+                          <svg className="w-5 h-5 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+                          </svg>
+                        </div>
+                        <p className="text-2xl font-bold text-secondary-600">{(userTeam.total_distance || 0).toFixed(1)} <span className="text-sm font-normal">km</span></p>
+                        <p className="text-xs text-gray-500">Distance totale</p>
+                      </div>
                     </div>
-                  )}
 
-                  {/* Nom */}
-                  <div>
-                    <label htmlFor="teamName" className="block text-sm font-semibold text-secondary-600 mb-2">
-                      Nom de l'équipe <span className="text-red-500">*</span>
-                    </label>
-                    <input
-                      type="text"
-                      id="teamName"
-                      value={teamName}
-                      onChange={(e) => setTeamName(e.target.value)}
-                      required
-                      maxLength={50}
-                      placeholder="Ex: Les Runners du dimanche"
-                      className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-primary-500 focus:outline-none transition-colors text-secondary-600 placeholder:text-gray-400"
-                    />
-                    <p className="text-sm text-gray-500 mt-2">{teamName.length}/50 caractères</p>
+                    {/* Section informations supplementaires */}
+                    <div className="border-t border-gray-100 pt-6">
+                      <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-4">Activite recente</h3>
+                      <div className="bg-gray-50 rounded-xl p-4 text-center text-gray-500 text-sm">
+                        Les statistiques detaillees arrivent bientot...
+                      </div>
+                    </div>
+
+                    {/* Bouton quitter */}
+                    <div className="mt-6 pt-6 border-t border-gray-100">
+                      <button
+                        onClick={handleLeaveTeam}
+                        disabled={leavingTeam}
+                        className="text-sm px-4 py-2 text-red-600 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors disabled:opacity-50"
+                      >
+                        {leavingTeam ? 'Chargement...' : 'Quitter l\'equipe'}
+                      </button>
+                    </div>
                   </div>
-
-                  {/* Description */}
-                  <div>
-                    <label htmlFor="teamDescription" className="block text-sm font-semibold text-secondary-600 mb-2">
-                      Description (optionnel)
-                    </label>
-                    <textarea
-                      id="teamDescription"
-                      value={teamDescription}
-                      onChange={(e) => setTeamDescription(e.target.value)}
-                      maxLength={200}
-                      rows={3}
-                      placeholder="Décris ton équipe et son ambiance..."
-                      className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-primary-500 focus:outline-none transition-colors text-secondary-600 placeholder:text-gray-400 resize-none"
-                    />
-                    <p className="text-sm text-gray-500 mt-2">
-                      {teamDescription.length}/200 caractères
-                    </p>
-                  </div>
-
-                  {/* Bouton submit */}
-                  <button
-                    type="submit"
-                    disabled={creatingTeam || !teamName.trim()}
-                    className="w-full px-8 py-4 bg-gradient-to-r from-primary-500 to-primary-600 text-white font-bold rounded-2xl hover:from-primary-600 hover:to-primary-700 transition-all shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-[1.02] active:scale-[0.98]"
-                  >
-                    {creatingTeam ? (
-                      <span className="flex items-center justify-center gap-2">
-                        <svg className="animate-spin h-5 w-5" fill="none" viewBox="0 0 24 24">
-                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                        </svg>
-                        Création en cours...
-                      </span>
-                    ) : (
-                      '✨ Créer mon équipe'
-                    )}
-                  </button>
-                </form>
-              </div>
-            )}
-
-            {/* Section Classement */}
-            <div>
-              <div className="flex items-center gap-2 mb-4">
-                <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-primary-500 to-primary-600 flex items-center justify-center">
-                  <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
-                  </svg>
-                </div>
-                <h2 className="text-lg font-bold text-secondary-600">Classement des équipes</h2>
-              </div>
-
-              {teams.length === 0 ? (
-                <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-8 text-center">
-                  <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center">
-                    <span className="text-3xl">🏃‍♂️</span>
-                  </div>
-                  <h3 className="text-lg font-bold text-secondary-600 mb-1">Aucune équipe pour le moment</h3>
-                  <p className="text-sm text-gray-600">Sois le premier à créer une équipe !</p>
                 </div>
               ) : (
-                <div className="space-y-3">
-                  {teams.map((team, index) => (
-                    <TeamCard key={team.id} team={team} position={index + 1} />
-                  ))}
+                /* Si l'utilisateur n'a pas d'equipe */
+                <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-6">
+                  {!showCreateForm ? (
+                    /* Message d'invitation */
+                    <div className="text-center py-8">
+                      <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gradient-to-br from-primary-100 to-primary-200 flex items-center justify-center">
+                        <svg className="w-8 h-8 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                        </svg>
+                      </div>
+                      <h2 className="text-xl font-bold text-secondary-600 mb-2">Tu n'as pas encore d'equipe</h2>
+                      <p className="text-gray-600 mb-6 max-w-md mx-auto">
+                        Rejoins ou cree une equipe pour participer aux defis collectifs et grimper dans le classement !
+                      </p>
+                      <button
+                        onClick={() => setShowCreateForm(true)}
+                        className="px-6 py-3 bg-gradient-to-r from-primary-500 to-primary-600 text-white font-semibold rounded-xl hover:from-primary-600 hover:to-primary-700 transition-all shadow-lg hover:shadow-xl"
+                      >
+                        Creer une equipe
+                      </button>
+                    </div>
+                  ) : (
+                    /* Formulaire de creation */
+                    <div>
+                      <div className="flex items-center justify-between mb-6">
+                        <h2 className="text-xl font-bold text-secondary-600">Creer une equipe</h2>
+                        <button
+                          onClick={() => {
+                            setShowCreateForm(false);
+                            setCreateError(null);
+                          }}
+                          className="text-gray-400 hover:text-gray-600 transition-colors"
+                        >
+                          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                          </svg>
+                        </button>
+                      </div>
+
+                      <form onSubmit={handleCreateTeam} className="space-y-4">
+                        {/* Erreur de creation */}
+                        {createError && (
+                          <div className="p-4 rounded-xl bg-red-50 border border-red-200">
+                            <p className="text-red-700 text-sm">{createError}</p>
+                          </div>
+                        )}
+
+                        {/* Nom */}
+                        <div>
+                          <label htmlFor="teamName" className="block text-sm font-medium text-secondary-600 mb-1">
+                            Nom de l'equipe <span className="text-red-500">*</span>
+                          </label>
+                          <input
+                            type="text"
+                            id="teamName"
+                            value={teamName}
+                            onChange={(e) => setTeamName(e.target.value)}
+                            required
+                            maxLength={50}
+                            placeholder="Ex: Les Runners du dimanche"
+                            className="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/20 transition-all text-secondary-600 placeholder:text-gray-400"
+                          />
+                          <p className="text-xs text-gray-400 mt-1">{teamName.length}/50</p>
+                        </div>
+
+                        {/* Description */}
+                        <div>
+                          <label htmlFor="teamDescription" className="block text-sm font-medium text-secondary-600 mb-1">
+                            Description <span className="text-gray-400">(optionnel)</span>
+                          </label>
+                          <textarea
+                            id="teamDescription"
+                            value={teamDescription}
+                            onChange={(e) => setTeamDescription(e.target.value)}
+                            maxLength={200}
+                            rows={3}
+                            placeholder="Decris ton equipe..."
+                            className="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500/20 transition-all text-secondary-600 placeholder:text-gray-400 resize-none"
+                          />
+                          <p className="text-xs text-gray-400 mt-1">{teamDescription.length}/200</p>
+                        </div>
+
+                        {/* Boutons */}
+                        <div className="flex gap-3 pt-2">
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setShowCreateForm(false);
+                              setCreateError(null);
+                            }}
+                            className="flex-1 px-4 py-2.5 border border-gray-200 text-gray-600 font-medium rounded-xl hover:bg-gray-50 transition-colors"
+                          >
+                            Annuler
+                          </button>
+                          <button
+                            type="submit"
+                            disabled={creatingTeam || !teamName.trim()}
+                            className="flex-1 px-4 py-2.5 bg-gradient-to-r from-primary-500 to-primary-600 text-white font-medium rounded-xl hover:from-primary-600 hover:to-primary-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                          >
+                            {creatingTeam ? 'Creation...' : 'Creer'}
+                          </button>
+                        </div>
+                      </form>
+                    </div>
+                  )}
                 </div>
               )}
+            </div>
+
+            {/* Sidebar - Classement compact */}
+            <div className="lg:w-72">
+              <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-4 sticky top-24">
+                <div className="flex items-center gap-2 mb-4">
+                  <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-primary-500 to-primary-600 flex items-center justify-center">
+                    <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
+                    </svg>
+                  </div>
+                  <h3 className="text-sm font-bold text-secondary-600">Classement</h3>
+                </div>
+
+                {teams.length === 0 ? (
+                  <p className="text-sm text-gray-500 text-center py-4">Aucune equipe</p>
+                ) : (
+                  <div className="space-y-2">
+                    {teams.slice(0, 10).map((team, index) => {
+                      const isUserTeam = userTeam && team.id === userTeam.id;
+                      return (
+                        <div
+                          key={team.id}
+                          className={`flex items-center gap-3 p-2 rounded-lg transition-colors ${
+                            isUserTeam ? 'bg-primary-50 border border-primary-200' : 'hover:bg-gray-50'
+                          }`}
+                        >
+                          <span className={`w-6 text-center font-bold text-sm ${
+                            index < 3 ? 'text-lg' : 'text-gray-400'
+                          }`}>
+                            {getPositionBadge(index + 1)}
+                          </span>
+                          <div className="flex-1 min-w-0">
+                            <p className={`text-sm font-medium truncate ${
+                              isUserTeam ? 'text-primary-700' : 'text-secondary-600'
+                            }`}>
+                              {team.name}
+                            </p>
+                            <p className="text-xs text-gray-400">
+                              {(team.total_distance || 0).toFixed(1)} km
+                            </p>
+                          </div>
+                        </div>
+                      );
+                    })}
+                    {teams.length > 10 && (
+                      <p className="text-xs text-gray-400 text-center pt-2">
+                        +{teams.length - 10} autres equipes
+                      </p>
+                    )}
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         )}
