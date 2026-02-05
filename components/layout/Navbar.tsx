@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
-import { usePathname, useRouter } from 'next/navigation';
+import { usePathname } from 'next/navigation';
 import { useState, useEffect } from 'react';
 import { Bell } from 'lucide-react';
 import { useAuth } from '../providers/AuthProvider';
@@ -11,7 +11,6 @@ import DarkModeToggle from '../ui/DarkModeToggle';
 
 export default function Navbar() {
   const pathname = usePathname();
-  const router = useRouter();
   const { profile, signOut, loading } = useAuth();
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [authDrawerOpen, setAuthDrawerOpen] = useState(false);
@@ -23,7 +22,6 @@ export default function Navbar() {
   const handleSignOut = async () => {
     setDropdownOpen(false);
     await signOut();
-    // Forcer un rechargement complet de la page pour réinitialiser tout l'état
     window.location.href = '/';
   };
 
@@ -48,14 +46,37 @@ export default function Navbar() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, [isHomepage]);
 
+  // Check if a nav item is active
+  const isActive = (path: string) => {
+    if (path === '/sessions/create') {
+      return pathname === '/sessions/create';
+    }
+    if (path === '/sessions') {
+      return pathname?.startsWith('/sessions') && pathname !== '/sessions/create';
+    }
+    return pathname?.startsWith(path);
+  };
+
+  // Navigation items for connected users
+  const connectedNavItems = [
+    { href: '/sessions', label: 'Sessions' },
+    { href: '/mes-sorties', label: 'Mes sorties' },
+    { href: '/sessions/create', label: 'Creer une sortie' },
+    { href: '/teams', label: 'Equipes' },
+  ];
+
+  // Navigation items for guests
+  const guestNavItems = [
+    { href: '/sessions', label: 'Sessions' },
+    { href: '/teams', label: 'Equipes' },
+  ];
+
+  const navItems = profile ? connectedNavItems : guestNavItems;
+
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 px-4 sm:px-6 lg:px-8 py-4 transition-all duration-300">
-      <div className={`flex items-center justify-between mx-auto transition-all duration-300 ${
-        scrolled
-          ? 'glass-pill px-6 py-2 max-w-6xl shadow-lg'
-          : ''
-      }`}>
-        {/* Logo */}
+      <div className="flex items-center justify-between w-full">
+        {/* Logo - Far left */}
         <Link href={profile ? "/dashboard" : "/"} className="flex items-center gap-3 hover:opacity-80 transition-opacity">
           <Image
             src="/PaceMateLogo_vert.svg"
@@ -69,68 +90,43 @@ export default function Navbar() {
           </span>
         </Link>
 
-        {/* Navigation - User connected */}
-        {!loading && profile ? (
-          <>
-            <div className="hidden md:flex items-center gap-8">
+        {/* Center Navigation - Inside glass pill */}
+        {!loading && (
+          <div className={`hidden md:flex items-center transition-all duration-300 ${
+            scrolled
+              ? 'glass-pill px-2 py-1 shadow-lg'
+              : 'bg-white/10 backdrop-blur-sm rounded-full px-2 py-1'
+          }`}>
+            {navItems.map((item) => (
               <Link
-                href="/sessions"
-                className={`text-sm font-medium transition-colors ${
-                  pathname?.startsWith('/sessions')
-                    ? 'text-rust-500'
+                key={item.href}
+                href={item.href}
+                className={`px-4 py-2 text-sm font-medium rounded-full transition-all ${
+                  isActive(item.href)
+                    ? scrolled
+                      ? 'neu-tab-active'
+                      : 'bg-white/20 text-white'
                     : scrolled
-                    ? 'text-dark-800 hover:text-petrol-700'
-                    : 'text-white/90 hover:text-white'
+                    ? 'text-dark-600 hover:text-dark-800'
+                    : 'text-white/80 hover:text-white'
                 }`}
               >
-                Sessions
+                {item.label}
               </Link>
-              <Link
-                href="/mes-sorties"
-                className={`text-sm font-medium transition-colors ${
-                  pathname?.startsWith('/mes-sorties')
-                    ? 'text-rust-500'
-                    : scrolled
-                    ? 'text-dark-800 hover:text-petrol-700'
-                    : 'text-white/90 hover:text-white'
-                }`}
-              >
-                Mes sorties
-              </Link>
-              <Link
-                href="/sessions/create"
-                className={`text-sm font-medium transition-colors ${
-                  pathname?.startsWith('/sessions/create')
-                    ? 'text-rust-500'
-                    : scrolled
-                    ? 'text-dark-800 hover:text-petrol-700'
-                    : 'text-white/90 hover:text-white'
-                }`}
-              >
-                Creer une sortie
-              </Link>
-              <Link
-                href="/teams"
-                className={`text-sm font-medium transition-colors ${
-                  pathname?.startsWith('/teams')
-                    ? 'text-rust-500'
-                    : scrolled
-                    ? 'text-dark-800 hover:text-petrol-700'
-                    : 'text-white/90 hover:text-white'
-                }`}
-              >
-                Equipes
-              </Link>
-            </div>
+            ))}
+          </div>
+        )}
 
-            {/* User actions */}
-            <div className="flex items-center gap-3">
-              {/* Dark mode toggle */}
-              <DarkModeToggle />
+        {/* Right side actions */}
+        <div className="flex items-center gap-3">
+          {/* Dark mode toggle */}
+          <DarkModeToggle />
 
+          {!loading && profile ? (
+            <>
               {/* Notifications */}
-              <button className={`relative w-10 h-10 rounded-lg flex items-center justify-center transition-colors ${
-                scrolled ? 'hover:bg-silver-200' : 'hover:bg-white/20'
+              <button className={`relative w-10 h-10 rounded-full flex items-center justify-center transition-colors ${
+                scrolled ? 'hover:bg-silver-200 dark:hover:bg-dark-600' : 'hover:bg-white/20'
               }`}>
                 <Bell className={`w-5 h-5 transition-colors ${scrolled ? 'text-dark-800' : 'text-white'}`} />
                 <span className="absolute top-2 right-2 w-2 h-2 bg-rust-500 rounded-full"></span>
@@ -142,7 +138,7 @@ export default function Navbar() {
                   onClick={() => setDropdownOpen(!dropdownOpen)}
                   className="flex items-center gap-2 hover:opacity-80 transition-opacity"
                 >
-                  <div className="w-9 h-9 rounded-lg bg-terra-400 flex items-center justify-center text-white text-sm font-semibold">
+                  <div className="w-9 h-9 rounded-full bg-terra-400 flex items-center justify-center text-white text-sm font-semibold">
                     {profile.username.substring(0, 2).toUpperCase()}
                   </div>
                   <span className={`hidden md:block font-medium transition-colors ${scrolled ? 'text-dark-800' : 'text-white'}`}>
@@ -210,42 +206,9 @@ export default function Navbar() {
                   </>
                 )}
               </div>
-            </div>
-          </>
-        ) : !loading ? (
-          /* Navigation - Not connected */
-          <>
-            <div className="hidden md:flex items-center gap-10">
-              <Link
-                href="/sessions"
-                className={`text-sm font-medium transition-colors ${
-                  pathname?.startsWith('/sessions')
-                    ? 'text-rust-500'
-                    : scrolled
-                    ? 'text-dark-800 hover:text-petrol-700'
-                    : 'text-white/90 hover:text-white'
-                }`}
-              >
-                Sessions
-              </Link>
-              <Link
-                href="/teams"
-                className={`text-sm font-medium transition-colors ${
-                  pathname?.startsWith('/teams')
-                    ? 'text-rust-500'
-                    : scrolled
-                    ? 'text-dark-800 hover:text-petrol-700'
-                    : 'text-white/90 hover:text-white'
-                }`}
-              >
-                Equipes
-              </Link>
-            </div>
-
-            <div className="flex items-center gap-3">
-              {/* Dark mode toggle */}
-              <DarkModeToggle />
-
+            </>
+          ) : !loading ? (
+            <>
               <button
                 onClick={() => {
                   setAuthMode('login');
@@ -262,13 +225,13 @@ export default function Navbar() {
                   setAuthMode('signup');
                   setAuthDrawerOpen(true);
                 }}
-                className="px-5 py-2 rounded-lg bg-rust-500 text-white text-sm font-semibold hover:bg-rust-600 transition-colors"
+                className="neu-btn px-5 py-2 text-dark-800 text-sm font-semibold"
               >
                 Inscription
               </button>
-            </div>
-          </>
-        ) : null}
+            </>
+          ) : null}
+        </div>
       </div>
 
       {/* Auth Drawer */}

@@ -220,6 +220,19 @@
     border-radius: 50px;
   }
 
+  /* Neumorphic active tab */
+  .neu-tab-active {
+    background: rgba(255, 255, 255, 0.9);
+    box-shadow: inset 3px 3px 6px #d1d9e6, inset -3px -3px 6px #ffffff;
+    color: #0D1D25;
+  }
+
+  .dark .neu-tab-active {
+    background: rgba(22, 33, 62, 0.9);
+    box-shadow: inset 3px 3px 6px #0f0f1a, inset -3px -3px 6px #1d2a4d;
+    color: #e6e6ea;
+  }
+
   /* ============================================
      DARK MODE STYLES
      ============================================ */
