@@ -67,7 +67,7 @@ export default function DashboardPage() {
             </div>
             <Link
               href="/sessions/create"
-              className="neu-btn inline-flex items-center justify-center gap-2 px-8 py-4 text-dark-800 font-bold text-lg"
+              className="neu-btn-white inline-flex items-center justify-center gap-2 px-8 py-4 text-dark-800 font-bold text-lg"
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />

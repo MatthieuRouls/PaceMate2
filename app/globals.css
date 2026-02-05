@@ -145,20 +145,34 @@
     border: 1px solid rgba(0, 0, 0, 0.05);
   }
 
-  /* Neumorphic button - raised state (default) */
-  .neu-btn {
+  /* Neumorphic button on white background (for cards) */
+  .neu-btn-white {
     border-radius: 50px;
-    background: linear-gradient(145deg, #e5e5e5, #c1c1c1);
-    box-shadow: 20px 20px 60px #b6b6b6, -20px -20px 60px #f6f6f6;
+    background: #ffffff;
+    box-shadow: 20px 20px 60px #d9d9d9, -20px -20px 60px #ffffff;
     transition: all 0.15s ease;
     cursor: pointer;
   }
 
-  /* Neumorphic button - pressed state on click */
+  .neu-btn-white:active,
+  .neu-btn-white.pressed {
+    background: #ffffff;
+    box-shadow: inset 20px 20px 60px #d9d9d9, inset -20px -20px 60px #ffffff;
+  }
+
+  /* Neumorphic button on grey background (for page) */
+  .neu-btn {
+    border-radius: 50px;
+    background: #f0f2f5;
+    box-shadow: 20px 20px 60px #ccced0, -20px -20px 60px #ffffff;
+    transition: all 0.15s ease;
+    cursor: pointer;
+  }
+
   .neu-btn:active,
   .neu-btn.pressed {
-    background: #d6d6d6;
-    box-shadow: inset 20px 20px 60px #b6b6b6, inset -20px -20px 60px #f6f6f6;
+    background: #f0f2f5;
+    box-shadow: inset 20px 20px 60px #ccced0, inset -20px -20px 60px #ffffff;
   }
 
   /* Glassmorphism */
