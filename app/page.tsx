@@ -59,8 +59,8 @@ export default function Home() {
             className="object-cover brightness-[0.6]"
             quality={100}
           />
-          {/* Gradient overlay */}
-          <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-black/60" />
+          {/* Dark overlay */}
+          <div className="absolute inset-0 bg-dark-800/40" />
         </div>
 
         {/* Slogan */}
@@ -69,7 +69,7 @@ export default function Home() {
             <div className="text-6xl md:text-8xl lg:text-9xl font-bold text-white mb-6 leading-tight">
               Trouve ton
               <br />
-              <span className="text-primary-500">Mate</span>
+              <span className="text-rust-500">Mate</span>
             </div>
             <p className="text-xl md:text-2xl lg:text-3xl text-white/90 font-light">
               Au bon pace
@@ -80,7 +80,7 @@ export default function Home() {
         {/* Scroll Indicator */}
         <div className="absolute bottom-12 left-1/2 -translate-x-1/2 z-10 animate-bounce">
           <div className="flex flex-col items-center gap-2 text-white/80">
-            <span className="text-sm font-medium tracking-wider uppercase">Découvrir</span>
+            <span className="text-sm font-medium tracking-wider uppercase">Decouvrir</span>
             <svg
               className="w-6 h-6"
               fill="none"
@@ -99,19 +99,19 @@ export default function Home() {
       </section>
 
       {/* Sessions Feed Section */}
-      <section className="py-32 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-primary-50 via-white to-forest-50">
+      <section className="py-24 px-4 sm:px-6 lg:px-8 bg-silver-50">
         <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-20">
-            <div className="inline-flex items-center gap-3 mb-6 bg-white/80 backdrop-blur-sm rounded-2xl px-6 py-3 shadow-lg border-2 border-primary-500/30">
-              <div className="w-3 h-3 rounded-full bg-primary-500 animate-pulse"></div>
-              <span className="text-sm font-bold text-primary-600 uppercase tracking-wider">En direct</span>
+          <div className="text-center mb-16">
+            <div className="inline-flex items-center gap-3 mb-6 bg-white rounded-lg px-5 py-2.5 border border-silver-400">
+              <div className="w-2.5 h-2.5 rounded-full bg-rust-500 animate-pulse"></div>
+              <span className="text-sm font-bold text-petrol-700 uppercase tracking-wider">En direct</span>
             </div>
-            <h2 className="text-5xl md:text-6xl font-bold bg-gradient-to-r from-primary-500 to-forest-700 bg-clip-text text-transparent mb-6">
-              Sessions à venir
+            <h2 className="text-4xl md:text-5xl font-bold text-dark-800 mb-4">
+              Sessions a venir
             </h2>
-            <div className="w-32 h-2 bg-gradient-to-r from-primary-500 to-forest-700 mx-auto mb-8 rounded-full" />
-            <p className="text-xl text-secondary-600/80 max-w-2xl mx-auto font-medium">
-              Rejoins une session ou organise la tienne. La communauté t'attend.
+            <div className="w-24 h-1 bg-petrol-700 mx-auto mb-6 rounded-full" />
+            <p className="text-lg text-dark-500 max-w-2xl mx-auto">
+              Rejoins une session ou organise la tienne. La communaute t'attend.
             </p>
           </div>
 
@@ -120,7 +120,7 @@ export default function Home() {
               <LoadingSpinner size="lg" />
             </div>
           ) : upcomingSessions.length > 0 ? (
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
               {upcomingSessions.map((session) => (
                 <SessionCard
                   key={session.id}
@@ -133,10 +133,10 @@ export default function Home() {
               ))}
             </div>
           ) : (
-            <div className="text-center py-20 bg-white/60 backdrop-blur-sm rounded-3xl border-2 border-primary-500/20">
-              <div className="w-24 h-24 mx-auto mb-6 rounded-full bg-gradient-to-br from-primary-500 to-forest-700 flex items-center justify-center shadow-xl">
+            <div className="text-center py-16 bg-white rounded-xl border border-silver-400">
+              <div className="w-20 h-20 mx-auto mb-5 rounded-full bg-petrol-700 flex items-center justify-center">
                 <svg
-                  className="w-12 h-12 text-white"
+                  className="w-10 h-10 text-white"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -149,17 +149,17 @@ export default function Home() {
                   />
                 </svg>
               </div>
-              <p className="text-xl text-secondary-600 font-semibold">Aucune session disponible pour le moment</p>
+              <p className="text-lg text-dark-800 font-semibold">Aucune session disponible pour le moment</p>
             </div>
           )}
 
-          <div className="text-center mt-16">
+          <div className="text-center mt-12">
             <Link
               href="/sessions"
-              className="inline-flex items-center gap-3 px-10 py-5 bg-gradient-to-r from-primary-500 to-primary-600 text-white font-bold text-lg rounded-2xl transition-all shadow-xl hover:shadow-2xl transform hover:scale-105"
+              className="inline-flex items-center gap-3 px-8 py-4 bg-rust-500 text-white font-bold text-lg rounded-lg hover:bg-rust-600 transition-colors"
             >
-              ✨ Toutes les sessions
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              Toutes les sessions
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
               </svg>
             </Link>
@@ -168,19 +168,19 @@ export default function Home() {
       </section>
 
       {/* Top Teams Section */}
-      <section className="py-32 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-forest-50 via-white to-secondary-50">
+      <section className="py-24 px-4 sm:px-6 lg:px-8 bg-white">
         <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-20">
-            <div className="inline-flex items-center gap-3 mb-6 bg-white/80 backdrop-blur-sm rounded-2xl px-6 py-3 shadow-lg border-2 border-forest-500/30">
+          <div className="text-center mb-16">
+            <div className="inline-flex items-center gap-3 mb-6 bg-silver-100 rounded-lg px-5 py-2.5 border border-silver-400">
               <span className="text-2xl">🏆</span>
-              <span className="text-sm font-bold text-forest-700 uppercase tracking-wider">Champions</span>
+              <span className="text-sm font-bold text-petrol-700 uppercase tracking-wider">Champions</span>
             </div>
-            <h2 className="text-5xl md:text-6xl font-bold bg-gradient-to-r from-forest-700 to-secondary-600 bg-clip-text text-transparent mb-6">
-              Équipes leaders
+            <h2 className="text-4xl md:text-5xl font-bold text-dark-800 mb-4">
+              Equipes leaders
             </h2>
-            <div className="w-32 h-2 bg-gradient-to-r from-forest-700 to-secondary-600 mx-auto mb-8 rounded-full" />
-            <p className="text-xl text-secondary-600/80 max-w-2xl mx-auto font-medium">
-              Les équipes les plus actives qui font vibrer la communauté
+            <div className="w-24 h-1 bg-petrol-700 mx-auto mb-6 rounded-full" />
+            <p className="text-lg text-dark-500 max-w-2xl mx-auto">
+              Les equipes les plus actives qui font vibrer la communaute
             </p>
           </div>
 
@@ -189,57 +189,49 @@ export default function Home() {
               <LoadingSpinner size="lg" />
             </div>
           ) : topTeams.length > 0 ? (
-            <div className="grid md:grid-cols-3 gap-8">
+            <div className="grid md:grid-cols-3 gap-6">
               {topTeams.map((team, index) => {
                 const position = index + 1;
                 const medals = ['🥇', '🥈', '🥉'];
-                const gradients = [
-                  'from-primary-400 to-primary-600',
-                  'from-secondary-300 to-secondary-500',
-                  'from-forest-600 to-forest-800'
-                ];
-                const borderColors = [
-                  'border-primary-500/50',
-                  'border-secondary-400/50',
-                  'border-forest-600/50'
-                ];
+                const colors = ['text-rust-500', 'text-terra-400', 'text-petrol-700'];
+                const borderColors = ['border-rust-400', 'border-terra-300', 'border-petrol-500'];
 
                 return (
                   <div
                     key={team.id}
-                    className={`bg-white/90 backdrop-blur-sm rounded-3xl p-8 shadow-xl hover:shadow-2xl transition-all border-2 ${borderColors[index]} hover:scale-105`}
+                    className={`bg-white rounded-xl p-6 border-2 ${borderColors[index]} hover:shadow-lg transition-all`}
                   >
-                    <div className="flex items-start justify-between mb-6">
-                      <span className="text-6xl drop-shadow-lg">{medals[index]}</span>
+                    <div className="flex items-start justify-between mb-5">
+                      <span className="text-5xl">{medals[index]}</span>
                       <div className="text-right">
-                        <div className={`text-4xl font-bold bg-gradient-to-br ${gradients[index]} bg-clip-text text-transparent`}>
+                        <div className={`text-3xl font-bold ${colors[index]}`}>
                           #{position}
                         </div>
                       </div>
                     </div>
 
-                    <h3 className="text-2xl font-bold text-secondary-600 mb-3">
+                    <h3 className="text-xl font-bold text-dark-800 mb-2">
                       {team.name}
                     </h3>
 
                     {team.description && (
-                      <p className="text-secondary-600/70 mb-6 line-clamp-2">
+                      <p className="text-dark-500 mb-5 line-clamp-2 text-sm">
                         {team.description}
                       </p>
                     )}
 
-                    <div className="flex gap-8 pt-6 border-t-2 border-gradient-to-r">
+                    <div className="flex gap-6 pt-5 border-t border-silver-300">
                       <div className="flex-1">
-                        <div className={`text-3xl font-bold bg-gradient-to-br ${gradients[index]} bg-clip-text text-transparent`}>
+                        <div className={`text-2xl font-bold ${colors[index]}`}>
                           {team.members_count || 0}
                         </div>
-                        <div className="text-sm text-secondary-600/70 mt-1 font-medium">Membres</div>
+                        <div className="text-sm text-dark-500 mt-1">Membres</div>
                       </div>
                       <div className="flex-1">
-                        <div className="text-3xl font-bold text-primary-600">
+                        <div className="text-2xl font-bold text-rust-500">
                           {(team.total_distance || 0).toFixed(0)}
                         </div>
-                        <div className="text-sm text-secondary-600/70 mt-1 font-medium">Km parcourus</div>
+                        <div className="text-sm text-dark-500 mt-1">Km parcourus</div>
                       </div>
                     </div>
                   </div>
@@ -247,10 +239,10 @@ export default function Home() {
               })}
             </div>
           ) : (
-            <div className="text-center py-20 bg-white/60 backdrop-blur-sm rounded-3xl border-2 border-forest-500/20">
-              <div className="w-24 h-24 mx-auto mb-6 rounded-full bg-gradient-to-br from-forest-600 to-forest-800 flex items-center justify-center shadow-xl">
+            <div className="text-center py-16 bg-silver-50 rounded-xl border border-silver-400">
+              <div className="w-20 h-20 mx-auto mb-5 rounded-full bg-petrol-700 flex items-center justify-center">
                 <svg
-                  className="w-12 h-12 text-white"
+                  className="w-10 h-10 text-white"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -263,17 +255,17 @@ export default function Home() {
                   />
                 </svg>
               </div>
-              <p className="text-xl text-secondary-600 font-semibold">Aucune équipe pour le moment</p>
+              <p className="text-lg text-dark-800 font-semibold">Aucune equipe pour le moment</p>
             </div>
           )}
 
-          <div className="text-center mt-16">
+          <div className="text-center mt-12">
             <Link
               href="/teams"
-              className="inline-flex items-center gap-3 px-10 py-5 bg-gradient-to-r from-forest-700 to-secondary-600 text-white font-bold text-lg rounded-2xl transition-all shadow-xl hover:shadow-2xl transform hover:scale-105"
+              className="inline-flex items-center gap-3 px-8 py-4 bg-petrol-700 text-white font-bold text-lg rounded-lg hover:bg-petrol-600 transition-colors"
             >
-              🏆 Voir toutes les équipes
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              Voir toutes les equipes
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
               </svg>
             </Link>
@@ -282,30 +274,24 @@ export default function Home() {
       </section>
 
       {/* Footer CTA */}
-      <section className="py-32 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-forest-800 via-secondary-600 to-secondary-700 relative overflow-hidden">
-        {/* Decorative elements */}
-        <div className="absolute inset-0 opacity-10">
-          <div className="absolute top-20 left-20 w-64 h-64 bg-primary-500 rounded-full blur-3xl"></div>
-          <div className="absolute bottom-20 right-20 w-96 h-96 bg-primary-500 rounded-full blur-3xl"></div>
-        </div>
-
+      <section className="py-24 px-4 sm:px-6 lg:px-8 bg-dark-800 relative overflow-hidden">
         <div className="max-w-5xl mx-auto text-center relative z-10">
-          <div className="inline-flex items-center gap-2 mb-8 bg-white/20 backdrop-blur-sm rounded-full px-6 py-3">
-            <span className="text-3xl">🚀</span>
+          <div className="inline-flex items-center gap-2 mb-8 bg-white/10 rounded-lg px-5 py-2.5">
+            <span className="text-2xl">🚀</span>
             <span className="text-white font-bold uppercase tracking-wider">C'est parti !</span>
           </div>
-          <h2 className="text-5xl md:text-7xl font-bold text-white mb-8 drop-shadow-lg">
-            Prêt à courir ?
+          <h2 className="text-4xl md:text-6xl font-bold text-white mb-6">
+            Pret a courir ?
           </h2>
-          <p className="text-xl md:text-2xl text-white/90 mb-12 max-w-3xl mx-auto font-medium">
+          <p className="text-xl text-silver-300 mb-10 max-w-3xl mx-auto">
             Rejoins des milliers de runners qui partagent leur passion chaque jour
           </p>
           <Link
             href="/sessions"
-            className="inline-flex items-center gap-3 px-12 py-6 bg-gradient-to-r from-primary-500 to-primary-600 text-white font-bold text-xl rounded-2xl transition-all shadow-2xl hover:shadow-primary-500/50 transform hover:scale-105"
+            className="inline-flex items-center gap-3 px-10 py-5 bg-rust-500 text-white font-bold text-xl rounded-lg hover:bg-rust-600 transition-colors"
           >
-            ⚡ Commencer maintenant
-            <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            Commencer maintenant
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
             </svg>
           </Link>
@@ -313,7 +299,7 @@ export default function Home() {
       </section>
 
       {/* Footer */}
-      <footer className="py-12 px-4 sm:px-6 lg:px-8 bg-white border-t border-gray-200">
+      <footer className="py-10 px-4 sm:px-6 lg:px-8 bg-white border-t border-silver-400">
         <div className="max-w-7xl mx-auto">
           <div className="flex flex-col md:flex-row justify-between items-center gap-6">
             <div className="flex items-center gap-3">
@@ -323,28 +309,28 @@ export default function Home() {
                 width={32}
                 height={32}
               />
-              <span className="text-xl font-bold text-secondary-600">
+              <span className="text-xl font-bold text-dark-800">
                 PaceMate
               </span>
             </div>
 
-            <div className="flex gap-8 text-sm text-gray-600">
-              <Link href="#" className="hover:text-primary-500 transition-colors">
-                À propos
+            <div className="flex gap-8 text-sm text-dark-500">
+              <Link href="#" className="hover:text-petrol-700 transition-colors">
+                A propos
               </Link>
-              <Link href="#" className="hover:text-primary-500 transition-colors">
+              <Link href="#" className="hover:text-petrol-700 transition-colors">
                 Contact
               </Link>
-              <Link href="#" className="hover:text-primary-500 transition-colors">
-                Confidentialité
+              <Link href="#" className="hover:text-petrol-700 transition-colors">
+                Confidentialite
               </Link>
-              <Link href="#" className="hover:text-primary-500 transition-colors">
+              <Link href="#" className="hover:text-petrol-700 transition-colors">
                 CGU
               </Link>
             </div>
 
-            <div className="text-sm text-gray-500">
-              © 2026 PaceMate. Tous droits réservés.
+            <div className="text-sm text-dark-500">
+              © 2026 PaceMate. Tous droits reserves.
             </div>
           </div>
         </div>

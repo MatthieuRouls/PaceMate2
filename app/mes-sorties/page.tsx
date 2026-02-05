@@ -54,39 +54,39 @@ export default function MesSortiesPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary-500/5 via-white to-primary-500/10 pt-20 pb-8 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-silver-50 pt-20 pb-8 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
-        <div className="mb-4 bg-white/60 backdrop-blur-sm rounded-2xl p-5 border border-primary-500/20 shadow-lg">
-          <h1 className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-primary-500 to-primary-600 bg-clip-text text-transparent mb-1">
+        <div className="mb-5 bg-white rounded-xl p-5 border border-silver-400">
+          <h1 className="text-2xl md:text-3xl font-bold text-dark-800 mb-1">
             Mes sorties
           </h1>
-          <p className="text-sm text-secondary-600/80">
-            Gère tes sessions inscrites et consulte ton historique
+          <p className="text-sm text-dark-500">
+            Gere tes sessions inscrites et consulte ton historique
           </p>
         </div>
 
         {/* Tabs */}
-        <div className="flex items-center gap-2 mb-6 bg-white/80 backdrop-blur-sm rounded-xl p-1.5 shadow-lg border border-primary-500/20">
+        <div className="flex items-center gap-2 mb-6 bg-white rounded-lg p-1.5 border border-silver-400">
           <button
             onClick={() => setActiveTab('upcoming')}
             className={`flex-1 py-2 px-4 text-sm font-bold rounded-lg transition-all ${
               activeTab === 'upcoming'
-                ? 'bg-gradient-to-r from-primary-500 to-primary-600 text-white shadow-md'
-                : 'text-secondary-600/70 hover:bg-primary-500/5'
+                ? 'bg-dark-800 text-white'
+                : 'text-dark-500 hover:bg-silver-100'
             }`}
           >
-            ✨ À venir
+            A venir
           </button>
           <button
             onClick={() => setActiveTab('past')}
             className={`flex-1 py-2 px-4 text-sm font-bold rounded-lg transition-all ${
               activeTab === 'past'
-                ? 'bg-gradient-to-r from-primary-500 to-primary-600 text-white shadow-md'
-                : 'text-secondary-600/70 hover:bg-primary-500/5'
+                ? 'bg-dark-800 text-white'
+                : 'text-dark-500 hover:bg-silver-100'
             }`}
           >
-            📊 Historique
+            Historique
           </button>
         </div>
 
@@ -100,44 +100,44 @@ export default function MesSortiesPage() {
             {activeTab === 'upcoming' && (
               <>
                 {upcomingCreated.length === 0 && upcomingJoined.length === 0 ? (
-                  <div className="text-center py-20 bg-gradient-to-br from-primary-500/10 via-white to-primary-500/5 rounded-3xl shadow-xl border-2 border-primary-500/30">
-                    <div className="w-24 h-24 rounded-full bg-gradient-to-br from-primary-500 to-primary-600 flex items-center justify-center mx-auto mb-6 shadow-lg">
-                      <svg className="w-12 h-12 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <div className="text-center py-16 bg-white rounded-xl border border-silver-400">
+                    <div className="w-20 h-20 rounded-full bg-petrol-700 flex items-center justify-center mx-auto mb-5">
+                      <svg className="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                       </svg>
                     </div>
-                    <h3 className="text-2xl font-bold text-secondary-600 mb-3">
-                      Aucune sortie prévue
+                    <h3 className="text-xl font-bold text-dark-800 mb-2">
+                      Aucune sortie prevue
                     </h3>
-                    <p className="text-lg text-secondary-600/70 mb-8">
-                      Inscris-toi à une session ou crée la tienne
+                    <p className="text-dark-500 mb-6">
+                      Inscris-toi a une session ou cree la tienne
                     </p>
-                    <div className="flex gap-4 justify-center">
+                    <div className="flex gap-3 justify-center">
                       <a
                         href="/sessions"
-                        className="px-8 py-4 rounded-xl bg-gradient-to-r from-primary-500 to-primary-600 text-white font-bold hover:shadow-2xl transition-all shadow-lg hover:scale-105"
+                        className="px-6 py-3 rounded-lg bg-rust-500 text-white font-semibold hover:bg-rust-600 transition-colors"
                       >
-                        Découvrir les sessions
+                        Decouvrir les sessions
                       </a>
                       <a
                         href="/sessions/create"
-                        className="px-8 py-4 rounded-xl bg-white border-2 border-primary-500 text-primary-600 font-bold hover:bg-primary-50 transition-all shadow-lg hover:scale-105"
+                        className="px-6 py-3 rounded-lg bg-white border border-petrol-500 text-petrol-700 font-semibold hover:bg-petrol-50 transition-colors"
                       >
-                        Créer une sortie
+                        Creer une sortie
                       </a>
                     </div>
                   </div>
                 ) : (
                   <div className="space-y-6">
-                    {/* Mes créations */}
+                    {/* Mes creations */}
                     {upcomingCreated.length > 0 && (
                       <div>
                         <div className="flex items-center gap-2 mb-4">
-                          <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-gradient-to-r from-primary-500 to-primary-600 text-white shadow-sm">
-                            <span className="text-base">👑</span>
-                            <span className="font-bold text-sm">Mes créations</span>
+                          <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-rust-500 text-white">
+                            <span className="text-sm">👑</span>
+                            <span className="font-bold text-sm">Mes creations</span>
                           </div>
-                          <span className="text-xs text-secondary-600/70 font-medium">
+                          <span className="text-xs text-dark-500 font-medium">
                             {upcomingCreated.length} session{upcomingCreated.length > 1 ? 's' : ''}
                           </span>
                         </div>
@@ -152,12 +152,12 @@ export default function MesSortiesPage() {
                     {/* Mes participations */}
                     {upcomingJoined.length > 0 && (
                       <div>
-                        <div className="flex items-center gap-3 mb-6">
-                          <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white border border-primary-500 text-primary-600 shadow-sm">
-                            <span className="text-base">🏃</span>
+                        <div className="flex items-center gap-3 mb-4">
+                          <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white border border-petrol-500 text-petrol-700">
+                            <span className="text-sm">🏃</span>
                             <span className="font-bold text-sm">Mes participations</span>
                           </div>
-                          <span className="text-sm text-secondary-600/70 font-medium">
+                          <span className="text-sm text-dark-500 font-medium">
                             {upcomingJoined.length} session{upcomingJoined.length > 1 ? 's' : ''}
                           </span>
                         </div>
@@ -176,30 +176,30 @@ export default function MesSortiesPage() {
             {activeTab === 'past' && (
               <>
                 {pastCreated.length === 0 && pastJoined.length === 0 ? (
-                  <div className="text-center py-20 bg-gradient-to-br from-secondary-600/5 via-white to-primary-500/5 rounded-3xl shadow-xl border-2 border-gray-200">
-                    <div className="w-24 h-24 rounded-full bg-gradient-to-br from-secondary-600 to-gray-800 flex items-center justify-center mx-auto mb-6 shadow-lg">
-                      <svg className="w-12 h-12 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <div className="text-center py-16 bg-white rounded-xl border border-silver-400">
+                    <div className="w-20 h-20 rounded-full bg-dark-700 flex items-center justify-center mx-auto mb-5">
+                      <svg className="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                       </svg>
                     </div>
-                    <h3 className="text-2xl font-bold text-secondary-600 mb-3">
-                      Aucune sortie passée
+                    <h3 className="text-xl font-bold text-dark-800 mb-2">
+                      Aucune sortie passee
                     </h3>
-                    <p className="text-lg text-secondary-600/70 mb-6">
-                      Ton historique apparaîtra ici après tes premières sessions
+                    <p className="text-dark-500 mb-4">
+                      Ton historique apparaitra ici apres tes premieres sessions
                     </p>
                   </div>
                 ) : (
                   <div className="space-y-6">
-                    {/* Mes créations passées */}
+                    {/* Mes creations passees */}
                     {pastCreated.length > 0 && (
                       <div>
                         <div className="flex items-center gap-2 mb-4">
-                          <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-gradient-to-r from-primary-500 to-primary-600 text-white shadow-sm">
-                            <span className="text-base">👑</span>
-                            <span className="font-bold text-sm">Mes créations</span>
+                          <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-rust-500 text-white">
+                            <span className="text-sm">👑</span>
+                            <span className="font-bold text-sm">Mes creations</span>
                           </div>
-                          <span className="text-xs text-secondary-600/70 font-medium">
+                          <span className="text-xs text-dark-500 font-medium">
                             {pastCreated.length} session{pastCreated.length > 1 ? 's' : ''}
                           </span>
                         </div>
@@ -211,15 +211,15 @@ export default function MesSortiesPage() {
                       </div>
                     )}
 
-                    {/* Mes participations passées */}
+                    {/* Mes participations passees */}
                     {pastJoined.length > 0 && (
                       <div>
-                        <div className="flex items-center gap-3 mb-6">
-                          <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white border border-primary-500 text-primary-600 shadow-sm">
-                            <span className="text-base">🏃</span>
+                        <div className="flex items-center gap-3 mb-4">
+                          <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white border border-petrol-500 text-petrol-700">
+                            <span className="text-sm">🏃</span>
                             <span className="font-bold text-sm">Mes participations</span>
                           </div>
-                          <span className="text-sm text-secondary-600/70 font-medium">
+                          <span className="text-sm text-dark-500 font-medium">
                             {pastJoined.length} session{pastJoined.length > 1 ? 's' : ''}
                           </span>
                         </div>
@@ -240,31 +240,31 @@ export default function MesSortiesPage() {
         {/* Stats Summary (if has past sessions) */}
         {activeTab === 'past' && (pastCreated.length > 0 || pastJoined.length > 0) && (
           <div className="mt-6 grid grid-cols-2 md:grid-cols-4 gap-3">
-            <div className="bg-gradient-to-br from-primary-500 to-primary-600 rounded-2xl p-4 shadow-lg text-center transform hover:scale-105 transition-all">
-              <div className="text-3xl font-bold text-white mb-1">{pastCreated.length + pastJoined.length}</div>
-              <div className="text-xs text-white/90 font-medium">Sessions complétées</div>
+            <div className="bg-rust-500 rounded-lg p-4 text-center">
+              <div className="text-2xl font-bold text-white mb-1">{pastCreated.length + pastJoined.length}</div>
+              <div className="text-xs text-white/90 font-medium">Sessions completees</div>
             </div>
-            <div className="bg-gradient-to-br from-primary-600 to-primary-700 rounded-2xl p-4 shadow-lg text-center transform hover:scale-105 transition-all">
-              <div className="text-3xl font-bold text-white mb-1">
+            <div className="bg-terra-400 rounded-lg p-4 text-center">
+              <div className="text-2xl font-bold text-white mb-1">
                 {[...pastCreated, ...pastJoined].reduce((sum, s) => sum + s.distance_km, 0)} km
               </div>
               <div className="text-xs text-white/90 font-medium">Distance totale</div>
             </div>
-            <div className="bg-gradient-to-br from-forest-700 to-forest-800 rounded-2xl p-4 shadow-lg text-center transform hover:scale-105 transition-all">
-              <div className="text-3xl font-bold text-white mb-1">
+            <div className="bg-petrol-700 rounded-lg p-4 text-center">
+              <div className="text-2xl font-bold text-white mb-1">
                 {pastCreated.length > 0 ? (
                   <span>👑 {pastCreated.length}</span>
                 ) : (
                   <span>0</span>
                 )}
               </div>
-              <div className="text-xs text-white/90 font-medium">Sessions organisées</div>
+              <div className="text-xs text-white/90 font-medium">Sessions organisees</div>
             </div>
-            <div className="bg-gradient-to-br from-secondary-600 to-secondary-700 rounded-2xl p-4 shadow-lg text-center transform hover:scale-105 transition-all">
-              <div className="text-3xl font-bold text-white mb-1">
+            <div className="bg-dark-700 rounded-lg p-4 text-center">
+              <div className="text-2xl font-bold text-white mb-1">
                 {[...pastCreated, ...pastJoined].reduce((sum, s) => sum + (s.participants_count || 0), 0)}
               </div>
-              <div className="text-xs text-white/90 font-medium">Runners rencontrés</div>
+              <div className="text-xs text-white/90 font-medium">Runners rencontres</div>
             </div>
           </div>
         )}

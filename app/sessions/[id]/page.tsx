@@ -211,20 +211,20 @@ export default function SessionDetailsPage() {
   const isCreator = profile && session && session.creator_id === profile.id;
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-white to-gray-50 pt-24 pb-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-silver-50 pt-24 pb-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-5xl mx-auto">
         {/* Header avec bouton retour */}
         <div className="flex items-center gap-4 mb-8">
           <Link
             href="/sessions"
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-white border-2 border-gray-200 text-secondary-600 font-medium hover:border-primary-500 hover:bg-gray-50 transition-all"
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-white border border-silver-400 text-dark-800 font-medium hover:border-petrol-500 hover:bg-silver-100 transition-all"
           >
             <ArrowLeft className="w-4 h-4" />
             Retour
           </Link>
           {debugTestRating && (
-            <span className="px-4 py-2 rounded-xl bg-orange-500/10 text-orange-600 text-sm font-semibold border-2 border-orange-500/20">
-              🧪 Mode Test Notation
+            <span className="px-4 py-2 rounded-lg bg-rust-500/10 text-rust-500 text-sm font-semibold border border-rust-500/20">
+              Mode Test Notation
             </span>
           )}
         </div>
@@ -238,9 +238,9 @@ export default function SessionDetailsPage() {
 
         {/* Error */}
         {error && (
-          <div className="bg-white rounded-3xl p-8 border-2 border-red-500 text-center shadow-lg">
-            <p className="text-red-500 font-bold text-xl mb-2">❌ Erreur</p>
-            <p className="text-secondary-600/70">{error}</p>
+          <div className="bg-white rounded-xl p-8 border border-rust-500 text-center">
+            <p className="text-rust-500 font-bold text-xl mb-2">Erreur</p>
+            <p className="text-dark-500">{error}</p>
           </div>
         )}
 
@@ -248,24 +248,22 @@ export default function SessionDetailsPage() {
         {!loading && !error && session && (
           <div className="space-y-6">
             {/* Hero Card - Title & Creator */}
-            <div className="bg-white rounded-3xl p-8 shadow-lg border-2 border-gray-100">
-              <h1 className="text-4xl md:text-5xl font-bold text-secondary-600 mb-4">{session.title}</h1>
+            <div className="bg-white rounded-xl p-6 border border-silver-400">
+              <h1 className="text-3xl md:text-4xl font-bold text-dark-800 mb-4">{session.title}</h1>
 
               {session.description && (
-                <p className="text-lg text-secondary-600/70 leading-relaxed mb-6">{session.description}</p>
+                <p className="text-lg text-dark-500 leading-relaxed mb-6">{session.description}</p>
               )}
 
               {/* Creator Badge */}
               {session.creator && (
-                <div className="inline-flex items-center gap-3 px-5 py-3 rounded-2xl bg-primary-500/10">
-                  <div className="w-12 h-12 rounded-full bg-gradient-to-br from-primary-500 to-primary-400 p-0.5">
-                    <div className="w-full h-full rounded-full bg-secondary-600 flex items-center justify-center text-white font-bold">
-                      {getInitials(session.creator.username)}
-                    </div>
+                <div className="inline-flex items-center gap-3 px-4 py-2.5 rounded-lg bg-petrol-50">
+                  <div className="w-11 h-11 rounded-full bg-terra-400 flex items-center justify-center text-white font-bold">
+                    {getInitials(session.creator.username)}
                   </div>
                   <div>
-                    <p className="text-xs text-primary-600 font-medium uppercase tracking-wider">Organisé par</p>
-                    <p className="text-secondary-600 font-semibold">{session.creator.username}</p>
+                    <p className="text-xs text-petrol-700 font-medium uppercase tracking-wider">Organise par</p>
+                    <p className="text-dark-800 font-semibold">{session.creator.username}</p>
                   </div>
                 </div>
               )}
@@ -273,74 +271,74 @@ export default function SessionDetailsPage() {
 
             {/* Stats Grid - Big Numbers */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              <div className="bg-gradient-to-br from-primary-500 to-primary-600 rounded-3xl p-6 text-white shadow-lg">
-                <div className="text-4xl font-bold mb-1">{session.distance_km}</div>
-                <div className="text-sm opacity-90 uppercase tracking-wider font-medium">Kilomètres</div>
+              <div className="bg-rust-500 rounded-lg p-5 text-white">
+                <div className="text-3xl font-bold mb-1">{session.distance_km}</div>
+                <div className="text-sm opacity-90 uppercase tracking-wider font-medium">Kilometres</div>
               </div>
 
-              <div className="bg-white rounded-3xl p-6 border-2 border-primary-500 shadow-lg">
-                <div className="text-4xl font-bold text-secondary-600 mb-1">{getPaceDisplay()}</div>
-                <div className="text-sm text-secondary-600/60 uppercase tracking-wider font-medium">Allure/km</div>
+              <div className="bg-white rounded-lg p-5 border-2 border-petrol-500">
+                <div className="text-3xl font-bold text-dark-800 mb-1">{getPaceDisplay()}</div>
+                <div className="text-sm text-dark-500 uppercase tracking-wider font-medium">Allure/km</div>
               </div>
 
-              <div className="bg-white rounded-3xl p-6 border-2 border-gray-200 shadow-lg">
-                <div className="text-4xl font-bold text-secondary-600 mb-1">{estimatedDuration}</div>
-                <div className="text-sm text-secondary-600/60 uppercase tracking-wider font-medium">Minutes</div>
+              <div className="bg-white rounded-lg p-5 border border-silver-400">
+                <div className="text-3xl font-bold text-dark-800 mb-1">{estimatedDuration}</div>
+                <div className="text-sm text-dark-500 uppercase tracking-wider font-medium">Minutes</div>
               </div>
 
-              <div className="bg-white rounded-3xl p-6 border-2 border-gray-200 shadow-lg">
+              <div className="bg-white rounded-lg p-5 border border-silver-400">
                 <div className="flex gap-1 mb-2">
                   {Array.from({ length: 5 }).map((_, i) => (
                     <div
                       key={i}
                       className={`w-2.5 h-2.5 rounded-full ${
-                        i < session.level_required ? 'bg-primary-500' : 'bg-gray-300'
+                        i < session.level_required ? 'bg-rust-500' : 'bg-silver-300'
                       }`}
                     />
                   ))}
                 </div>
-                <div className="text-sm text-secondary-600/60 uppercase tracking-wider font-medium">
+                <div className="text-sm text-dark-500 uppercase tracking-wider font-medium">
                   {levelLabels[session.level_required - 1]}
                 </div>
               </div>
             </div>
 
             {/* Details Card */}
-            <div className="bg-white rounded-3xl p-8 shadow-lg border-2 border-gray-100">
-              <h2 className="text-2xl font-bold text-secondary-600 mb-6">Informations</h2>
+            <div className="bg-white rounded-xl p-6 border border-silver-400">
+              <h2 className="text-xl font-bold text-dark-800 mb-5">Informations</h2>
 
-              <div className="space-y-5">
+              <div className="space-y-4">
                 {/* Date */}
                 <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 rounded-xl bg-primary-500/10 flex items-center justify-center flex-shrink-0">
-                    <Calendar className="w-6 h-6 text-primary-500" />
+                  <div className="w-11 h-11 rounded-lg bg-petrol-100 flex items-center justify-center flex-shrink-0">
+                    <Calendar className="w-5 h-5 text-petrol-700" />
                   </div>
                   <div>
-                    <p className="text-sm text-secondary-600/60 font-medium">Date et heure</p>
-                    <p className="text-secondary-600 font-semibold">{formatLongDate(session.start_time)}</p>
+                    <p className="text-sm text-dark-500 font-medium">Date et heure</p>
+                    <p className="text-dark-800 font-semibold">{formatLongDate(session.start_time)}</p>
                   </div>
                 </div>
 
                 {/* Location */}
                 <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 rounded-xl bg-primary-500/10 flex items-center justify-center flex-shrink-0">
-                    <MapPin className="w-6 h-6 text-primary-500" />
+                  <div className="w-11 h-11 rounded-lg bg-petrol-100 flex items-center justify-center flex-shrink-0">
+                    <MapPin className="w-5 h-5 text-petrol-700" />
                   </div>
                   <div>
-                    <p className="text-sm text-secondary-600/60 font-medium">Point de rendez-vous</p>
-                    <p className="text-secondary-600 font-semibold">{session.location_name}</p>
+                    <p className="text-sm text-dark-500 font-medium">Point de rendez-vous</p>
+                    <p className="text-dark-800 font-semibold">{session.location_name}</p>
                   </div>
                 </div>
 
                 {/* Type */}
                 {session.session_type && (
                   <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 rounded-xl bg-primary-500/10 flex items-center justify-center flex-shrink-0">
-                      <Target className="w-6 h-6 text-primary-500" />
+                    <div className="w-11 h-11 rounded-lg bg-petrol-100 flex items-center justify-center flex-shrink-0">
+                      <Target className="w-5 h-5 text-petrol-700" />
                     </div>
                     <div>
-                      <p className="text-sm text-secondary-600/60 font-medium">Type de sortie</p>
-                      <p className="text-secondary-600 font-semibold">
+                      <p className="text-sm text-dark-500 font-medium">Type de sortie</p>
+                      <p className="text-dark-800 font-semibold">
                         {sessionTypeLabels[session.session_type] || session.session_type}
                       </p>
                     </div>
@@ -349,9 +347,9 @@ export default function SessionDetailsPage() {
 
                 {/* Walk breaks */}
                 {session.walk_breaks_ok && (
-                  <div className="pt-4 border-t border-gray-100">
-                    <span className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-primary-500/10 text-primary-600 font-semibold text-sm">
-                      ✓ Pauses marche autorisées
+                  <div className="pt-4 border-t border-silver-300">
+                    <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-petrol-100 text-petrol-700 font-semibold text-sm">
+                      Pauses marche autorisees
                     </span>
                   </div>
                 )}
@@ -359,25 +357,25 @@ export default function SessionDetailsPage() {
             </div>
 
             {/* Participants Card */}
-            <div className="bg-white rounded-3xl p-8 shadow-lg border-2 border-gray-100">
-              <h2 className="text-2xl font-bold text-secondary-600 mb-6">Participants</h2>
+            <div className="bg-white rounded-xl p-6 border border-silver-400">
+              <h2 className="text-xl font-bold text-dark-800 mb-5">Participants</h2>
 
               {/* Progress Bar */}
-              <div className="mb-6">
-                <div className="flex justify-between items-center mb-3">
-                  <span className="text-lg font-bold text-secondary-600">
+              <div className="mb-5">
+                <div className="flex justify-between items-center mb-2">
+                  <span className="text-lg font-bold text-dark-800">
                     {session.participants_count || 0} / {session.max_participants}
                   </span>
-                  <span className="text-sm text-secondary-600/60 font-medium">
+                  <span className="text-sm text-dark-500 font-medium">
                     {isSessionFull()
-                      ? 'Session complète'
+                      ? 'Session complete'
                       : `${session.max_participants - (session.participants_count || 0)} place${(session.max_participants - (session.participants_count || 0)) > 1 ? 's' : ''} restante${(session.max_participants - (session.participants_count || 0)) > 1 ? 's' : ''}`
                     }
                   </span>
                 </div>
-                <div className="w-full h-4 rounded-full bg-gray-100 overflow-hidden">
+                <div className="w-full h-3 rounded-full bg-silver-200 overflow-hidden">
                   <div
-                    className="h-full bg-gradient-to-r from-primary-500 to-primary-600 transition-all duration-500"
+                    className="h-full bg-petrol-700 transition-all duration-500"
                     style={{
                       width: `${((session.participants_count || 0) / session.max_participants) * 100}%`,
                     }}
@@ -387,43 +385,41 @@ export default function SessionDetailsPage() {
 
               {/* Participants List */}
               {session.participants && session.participants.length > 0 ? (
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
                   {session.participants.map((participant) => (
-                    <div key={participant.id} className="flex items-center gap-3 p-3 rounded-xl bg-gray-50">
-                      <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary-500 to-primary-400 p-0.5 flex-shrink-0">
-                        <div className="w-full h-full rounded-full bg-secondary-600 flex items-center justify-center text-white text-xs font-bold">
-                          {getInitials(participant.username)}
-                        </div>
+                    <div key={participant.id} className="flex items-center gap-3 p-3 rounded-lg bg-silver-100">
+                      <div className="w-9 h-9 rounded-full bg-terra-400 flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
+                        {getInitials(participant.username)}
                       </div>
-                      <span className="text-sm font-medium text-secondary-600 truncate">
+                      <span className="text-sm font-medium text-dark-800 truncate">
                         {participant.username}
                       </span>
                     </div>
                   ))}
                 </div>
               ) : (
-                <div className="text-center py-8 text-secondary-600/60">
-                  Sois le premier à rejoindre cette session !
+                <div className="text-center py-8 text-dark-500">
+                  Sois le premier a rejoindre cette session !
                 </div>
               )}
             </div>
 
             {/* Actions Card */}
-            <div className="bg-white rounded-3xl p-8 shadow-lg border-2 border-gray-100">
+            <div className="bg-white rounded-xl p-6 border border-silver-400">
               {/* Creator actions */}
               {isCreator && !isSessionPast() && (
                 <div className="space-y-4 mb-6">
-                  <div className="flex items-center justify-center gap-2 py-4 px-6 rounded-2xl bg-secondary-600/10 text-secondary-600">
-                    <span className="text-2xl">👑</span>
-                    <span className="font-bold text-lg">Vous êtes l'organisateur de cette session</span>
+                  <div className="flex items-center justify-center gap-2 py-3 px-5 rounded-lg bg-sand-100 text-dark-800">
+                    <span className="text-xl">👑</span>
+                    <span className="font-bold">Vous etes l'organisateur de cette session</span>
                   </div>
                   <button
                     onClick={handleDelete}
                     disabled={actionLoading}
-                    className="w-full py-4 rounded-2xl border-2 border-red-500 text-red-500 font-bold hover:bg-red-50 transition-all disabled:opacity-50 flex items-center justify-center gap-2"
+                    className="w-full py-3.5 rounded-lg border-2 border-rust-500 text-rust-500 font-bold hover:bg-rust-50 transition-all disabled:opacity-50 flex items-center justify-center gap-2"
                   >
                     <Trash2 className="w-5 h-5" />
-                    {actionLoading ? '⏳ Suppression...' : 'Supprimer la session'}
+                    {actionLoading ? 'Suppression...' : 'Supprimer la session'}
                   </button>
                 </div>
               )}
@@ -433,13 +429,13 @@ export default function SessionDetailsPage() {
                 <button
                   onClick={handleJoin}
                   disabled={actionLoading || isSessionFull()}
-                  className="w-full py-5 rounded-2xl bg-gradient-to-r from-primary-500 to-primary-600 text-white text-lg font-bold shadow-lg hover:shadow-xl hover:scale-105 transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+                  className="w-full py-4 rounded-lg bg-rust-500 text-white text-lg font-bold hover:bg-rust-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {actionLoading
-                    ? '⏳ Inscription en cours...'
+                    ? 'Inscription en cours...'
                     : isSessionFull()
-                    ? '❌ Session complète'
-                    : '✨ Rejoindre cette session'
+                    ? 'Session complete'
+                    : 'Rejoindre cette session'
                   }
                 </button>
               )}
@@ -447,16 +443,16 @@ export default function SessionDetailsPage() {
               {/* Already joined */}
               {userStatus && userStatus.status === 'confirmed' && !isSessionPast() && !isCreator && (
                 <div className="space-y-4">
-                  <div className="flex items-center justify-center gap-2 py-4 px-6 rounded-2xl bg-primary-500/10 text-primary-600">
-                    <span className="text-2xl">✓</span>
-                    <span className="font-bold text-lg">Vous participez à cette session</span>
+                  <div className="flex items-center justify-center gap-2 py-3 px-5 rounded-lg bg-petrol-100 text-petrol-700">
+                    <span className="text-xl">✓</span>
+                    <span className="font-bold">Vous participez a cette session</span>
                   </div>
                   <button
                     onClick={handleLeave}
                     disabled={actionLoading}
-                    className="w-full py-4 rounded-2xl border-2 border-red-500 text-red-500 font-bold hover:bg-red-50 transition-all disabled:opacity-50"
+                    className="w-full py-3.5 rounded-lg border-2 border-rust-500 text-rust-500 font-bold hover:bg-rust-50 transition-all disabled:opacity-50"
                   >
-                    {actionLoading ? '⏳ Chargement...' : '🚪 Se désister'}
+                    {actionLoading ? 'Chargement...' : 'Se desister'}
                   </button>
                 </div>
               )}
@@ -465,27 +461,27 @@ export default function SessionDetailsPage() {
               {userStatus && userStatus.status === 'confirmed' && isSessionPast() && !userStatus.rating && (
                 <button
                   onClick={() => setShowRatingModal(true)}
-                  className="w-full py-5 rounded-2xl bg-gradient-to-r from-primary-500 to-primary-600 text-white text-lg font-bold shadow-lg hover:shadow-xl hover:scale-105 transition-all"
+                  className="w-full py-4 rounded-lg bg-rust-500 text-white text-lg font-bold hover:bg-rust-600 transition-colors"
                 >
-                  ⭐ Noter cette sortie
+                  Noter cette sortie
                 </button>
               )}
 
               {/* Already rated */}
               {userStatus && userStatus.rating && (
                 <div className="text-center py-6">
-                  <div className="text-5xl mb-3">⭐</div>
-                  <p className="text-2xl font-bold text-secondary-600 mb-2">
-                    Vous avez donné {userStatus.rating}/5
+                  <div className="text-4xl mb-3">⭐</div>
+                  <p className="text-xl font-bold text-dark-800 mb-2">
+                    Vous avez donne {userStatus.rating}/5
                   </p>
-                  <p className="text-secondary-600/60">Merci pour votre retour !</p>
+                  <p className="text-dark-500">Merci pour votre retour !</p>
                 </div>
               )}
 
               {/* Past session but not participated */}
               {!userStatus && isSessionPast() && (
-                <div className="text-center py-6 text-secondary-600/60">
-                  <p className="text-lg">Cette session est terminée</p>
+                <div className="text-center py-6 text-dark-500">
+                  <p className="text-lg">Cette session est terminee</p>
                 </div>
               )}
             </div>

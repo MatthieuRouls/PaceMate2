@@ -59,7 +59,7 @@ export default function AuthDrawer({ isOpen, onClose, mode, onSwitchMode }: Auth
 
         if (result.success) {
           setError('');
-          alert('Compte créé ! Vérifiez votre email pour confirmer votre inscription.');
+          alert('Compte cree ! Verifiez votre email pour confirmer votre inscription.');
           onClose();
         } else {
           setError(result.error || 'Erreur lors de l\'inscription');
@@ -84,7 +84,7 @@ export default function AuthDrawer({ isOpen, onClose, mode, onSwitchMode }: Auth
 
       {/* Floating Card */}
       <div
-        className={`fixed top-6 right-6 w-[420px] max-h-[calc(100vh-48px)] bg-white rounded-3xl shadow-2xl z-50 transform transition-all duration-300 ease-out ${
+        className={`fixed top-6 right-6 w-[420px] max-h-[calc(100vh-48px)] bg-white rounded-xl shadow-2xl z-50 transform transition-all duration-300 ease-out ${
           isOpen ? 'translate-y-0 opacity-100 scale-100' : '-translate-y-4 opacity-0 scale-95'
         }`}
         style={{
@@ -93,22 +93,22 @@ export default function AuthDrawer({ isOpen, onClose, mode, onSwitchMode }: Auth
       >
         <div className="flex flex-col max-h-[calc(100vh-48px)]">
           {/* Header */}
-          <div className="flex items-center justify-between p-6 border-b border-gray-100">
+          <div className="flex items-center justify-between p-6 border-b border-silver-300">
             <div>
-              <h2 className="text-2xl font-bold text-secondary-600">
+              <h2 className="text-2xl font-bold text-dark-800">
                 {mode === 'login' ? 'Connexion' : 'Inscription'}
               </h2>
-              <p className="text-sm text-secondary-600/60 mt-1">
+              <p className="text-sm text-dark-500 mt-1">
                 {mode === 'login'
                   ? 'Bon retour parmi nous !'
-                  : 'Rejoins la communauté PaceMate'}
+                  : 'Rejoins la communaute PaceMate'}
               </p>
             </div>
             <button
               onClick={onClose}
-              className="w-8 h-8 rounded-full hover:bg-gray-100 flex items-center justify-center transition-colors"
+              className="w-8 h-8 rounded-lg hover:bg-silver-200 flex items-center justify-center transition-colors"
             >
-              <X className="w-5 h-5 text-secondary-600" />
+              <X className="w-5 h-5 text-dark-800" />
             </button>
           </div>
 
@@ -117,15 +117,15 @@ export default function AuthDrawer({ isOpen, onClose, mode, onSwitchMode }: Auth
             <form onSubmit={handleSubmit} className="space-y-5">
               {/* Error message */}
               {error && (
-                <div className="p-3 rounded-2xl bg-red-50 border border-red-100">
-                  <p className="text-sm text-red-600">{error}</p>
+                <div className="p-3 rounded-lg bg-rust-50 border border-rust-300">
+                  <p className="text-sm text-rust-600">{error}</p>
                 </div>
               )}
 
               {/* Username field (signup only) */}
               {mode === 'signup' && (
                 <div className="space-y-2">
-                  <label className="text-sm font-medium text-secondary-600">
+                  <label className="text-sm font-medium text-dark-800">
                     Nom d'utilisateur
                   </label>
                   <input
@@ -133,7 +133,7 @@ export default function AuthDrawer({ isOpen, onClose, mode, onSwitchMode }: Auth
                     value={username}
                     onChange={(e) => setUsername(e.target.value)}
                     required
-                    className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 outline-none transition-all text-secondary-600 bg-white"
+                    className="w-full px-4 py-3 rounded-lg border border-silver-400 focus:border-petrol-700 focus:ring-2 focus:ring-petrol-700/20 outline-none transition-all text-dark-800 bg-white"
                     placeholder="ton_pseudo"
                   />
                 </div>
@@ -141,7 +141,7 @@ export default function AuthDrawer({ isOpen, onClose, mode, onSwitchMode }: Auth
 
               {/* Email field */}
               <div className="space-y-2">
-                <label className="text-sm font-medium text-secondary-600">
+                <label className="text-sm font-medium text-dark-800">
                   Email
                 </label>
                 <input
@@ -149,14 +149,14 @@ export default function AuthDrawer({ isOpen, onClose, mode, onSwitchMode }: Auth
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
-                  className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 outline-none transition-all text-secondary-600 bg-white"
+                  className="w-full px-4 py-3 rounded-lg border border-silver-400 focus:border-petrol-700 focus:ring-2 focus:ring-petrol-700/20 outline-none transition-all text-dark-800 bg-white"
                   placeholder="ton@email.com"
                 />
               </div>
 
               {/* Password field */}
               <div className="space-y-2">
-                <label className="text-sm font-medium text-secondary-600">
+                <label className="text-sm font-medium text-dark-800">
                   Mot de passe
                 </label>
                 <input
@@ -165,12 +165,12 @@ export default function AuthDrawer({ isOpen, onClose, mode, onSwitchMode }: Auth
                   onChange={(e) => setPassword(e.target.value)}
                   required
                   minLength={6}
-                  className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 outline-none transition-all text-secondary-600 bg-white"
+                  className="w-full px-4 py-3 rounded-lg border border-silver-400 focus:border-petrol-700 focus:ring-2 focus:ring-petrol-700/20 outline-none transition-all text-dark-800 bg-white"
                   placeholder="••••••••"
                 />
                 {mode === 'signup' && (
-                  <p className="text-xs text-secondary-600/60">
-                    Minimum 6 caractères
+                  <p className="text-xs text-dark-500">
+                    Minimum 6 caracteres
                   </p>
                 )}
               </div>
@@ -179,7 +179,7 @@ export default function AuthDrawer({ isOpen, onClose, mode, onSwitchMode }: Auth
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full px-6 py-3.5 rounded-xl bg-primary-500 text-white font-semibold hover:bg-primary-600 transition-all shadow-lg hover:shadow-xl hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full px-6 py-3.5 rounded-lg bg-rust-500 text-white font-semibold hover:bg-rust-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {loading ? (
                   <span className="flex items-center justify-center gap-2">
@@ -190,31 +190,31 @@ export default function AuthDrawer({ isOpen, onClose, mode, onSwitchMode }: Auth
                     Chargement...
                   </span>
                 ) : (
-                  mode === 'login' ? 'Se connecter' : 'Créer mon compte'
+                  mode === 'login' ? 'Se connecter' : 'Creer mon compte'
                 )}
               </button>
 
               {/* Switch mode */}
               <div className="text-center pt-2">
-                <p className="text-sm text-secondary-600/60">
+                <p className="text-sm text-dark-500">
                   {mode === 'login' ? (
                     <>
                       Pas encore de compte ?{' '}
                       <button
                         type="button"
                         onClick={() => onSwitchMode('signup')}
-                        className="text-primary-500 font-semibold hover:text-primary-600 transition-colors"
+                        className="text-petrol-700 font-semibold hover:text-petrol-600 transition-colors"
                       >
                         Inscris-toi
                       </button>
                     </>
                   ) : (
                     <>
-                      Déjà un compte ?{' '}
+                      Deja un compte ?{' '}
                       <button
                         type="button"
                         onClick={() => onSwitchMode('login')}
-                        className="text-primary-500 font-semibold hover:text-primary-600 transition-colors"
+                        className="text-petrol-700 font-semibold hover:text-petrol-600 transition-colors"
                       >
                         Connecte-toi
                       </button>
@@ -226,20 +226,20 @@ export default function AuthDrawer({ isOpen, onClose, mode, onSwitchMode }: Auth
 
             {/* Features (signup only) */}
             {mode === 'signup' && (
-              <div className="mt-8 pt-6 border-t border-gray-100 space-y-3">
-                <h3 className="text-xs font-semibold text-secondary-600 uppercase tracking-wide">
+              <div className="mt-8 pt-6 border-t border-silver-300 space-y-3">
+                <h3 className="text-xs font-semibold text-dark-800 uppercase tracking-wide">
                   Pourquoi PaceMate ?
                 </h3>
                 <div className="space-y-2.5">
                   {[
                     { icon: '🏃', text: 'Trouve des partenaires de course' },
                     { icon: '📅', text: 'Organise tes sessions facilement' },
-                    { icon: '👥', text: 'Rejoins une communauté active' },
+                    { icon: '👥', text: 'Rejoins une communaute active' },
                     { icon: '📊', text: 'Suis ta progression' },
                   ].map((feature, i) => (
                     <div key={i} className="flex items-center gap-3">
                       <span className="text-xl">{feature.icon}</span>
-                      <span className="text-sm text-secondary-600/70">{feature.text}</span>
+                      <span className="text-sm text-dark-500">{feature.text}</span>
                     </div>
                   ))}
                 </div>

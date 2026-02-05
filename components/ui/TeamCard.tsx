@@ -21,18 +21,18 @@ export default function TeamCard({ team, position }: TeamCardProps) {
   return (
     <div
       className={`
-        bg-white rounded-3xl shadow-lg border-2 p-6 transition-all hover:shadow-xl transform hover:scale-[1.01]
-        ${isTopThree ? 'border-primary-500 bg-gradient-to-br from-primary-50/50 to-primary-100/50' : 'border-gray-100 hover:border-gray-200'}
+        bg-white rounded-xl border p-5 transition-all hover:shadow-md
+        ${isTopThree ? 'border-petrol-500' : 'border-silver-400 hover:border-petrol-300'}
       `}
     >
-      <div className="flex items-center gap-5">
+      <div className="flex items-center gap-4">
         {/* Position */}
         <div
           className={`
-            flex-shrink-0 w-16 h-16 rounded-2xl flex items-center justify-center font-bold text-xl shadow-md
+            flex-shrink-0 w-14 h-14 rounded-lg flex items-center justify-center font-bold text-lg
             ${isTopThree
-              ? 'bg-gradient-to-br from-primary-500 to-primary-600 text-white'
-              : 'bg-gray-100 text-gray-700'
+              ? 'bg-petrol-700 text-white'
+              : 'bg-silver-200 text-dark-700'
             }
           `}
         >
@@ -41,39 +41,39 @@ export default function TeamCard({ team, position }: TeamCardProps) {
 
         {/* Contenu */}
         <div className="flex-1 min-w-0">
-          {/* Nom de l'équipe */}
-          <h3 className="text-xl font-bold text-secondary-600 mb-1 truncate">{team.name}</h3>
+          {/* Nom de l'equipe */}
+          <h3 className="text-lg font-bold text-dark-800 mb-1 truncate">{team.name}</h3>
 
           {/* Description */}
           {team.description && (
-            <p className="text-sm text-gray-600 mb-3 line-clamp-2">{team.description}</p>
+            <p className="text-sm text-dark-500 mb-2 line-clamp-2">{team.description}</p>
           )}
 
           {/* Stats */}
-          <div className="flex items-center gap-6">
+          <div className="flex items-center gap-5">
             <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-lg bg-gray-100 flex items-center justify-center">
-                <span className="text-lg">👥</span>
+              <div className="w-7 h-7 rounded-lg bg-silver-200 flex items-center justify-center">
+                <span className="text-sm">👥</span>
               </div>
-              <span className="font-bold text-secondary-600">
+              <span className="font-bold text-dark-800">
                 {team.members_count || 0}
               </span>
-              <span className="text-sm text-gray-500">
+              <span className="text-sm text-dark-500">
                 membre{(team.members_count || 0) > 1 ? 's' : ''}
               </span>
             </div>
             <div className="flex items-center gap-2">
-              <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${
-                isTopThree ? 'bg-primary-100' : 'bg-gray-100'
+              <div className={`w-7 h-7 rounded-lg flex items-center justify-center ${
+                isTopThree ? 'bg-petrol-100' : 'bg-silver-200'
               }`}>
-                <span className="text-lg">🏃</span>
+                <span className="text-sm">🏃</span>
               </div>
-              <span className={`font-bold text-xl ${
-                isTopThree ? 'text-primary-600' : 'text-secondary-600'
+              <span className={`font-bold text-lg ${
+                isTopThree ? 'text-rust-500' : 'text-dark-800'
               }`}>
                 {(team.total_distance || 0).toFixed(1)}
               </span>
-              <span className="text-sm text-gray-500">km</span>
+              <span className="text-sm text-dark-500">km</span>
             </div>
           </div>
         </div>
