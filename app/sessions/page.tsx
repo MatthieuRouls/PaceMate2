@@ -83,8 +83,8 @@ export default function SessionsPage() {
         {/* Filtres */}
         <div className="card p-4 mb-6">
           <div className="flex items-center gap-2 mb-3">
-            <div className="w-8 h-8 rounded-lg bg-petrol-100 flex items-center justify-center">
-              <Filter className="w-4 h-4 text-petrol-700" />
+            <div className="w-8 h-8 rounded-lg bg-neon-100 flex items-center justify-center">
+              <Filter className="w-4 h-4 text-neon-700" />
             </div>
             <h2 className="text-sm font-semibold text-dark-800">Filtrer par niveau</h2>
           </div>
@@ -103,7 +103,7 @@ export default function SessionsPage() {
               onClick={() => setFilterLevel('beginner')}
               className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
                 filterLevel === 'beginner'
-                  ? 'bg-sand-400 text-white'
+                  ? 'bg-silver-400 text-white'
                   : 'bg-silver-200 text-dark-700 hover:bg-silver-300'
               }`}
             >
@@ -113,7 +113,7 @@ export default function SessionsPage() {
               onClick={() => setFilterLevel('intermediate')}
               className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
                 filterLevel === 'intermediate'
-                  ? 'bg-terra-400 text-white'
+                  ? 'bg-neon-400 text-white'
                   : 'bg-silver-200 text-dark-700 hover:bg-silver-300'
               }`}
             >
@@ -123,7 +123,7 @@ export default function SessionsPage() {
               onClick={() => setFilterLevel('advanced')}
               className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
                 filterLevel === 'advanced'
-                  ? 'bg-rust-500 text-white'
+                  ? 'bg-pink-500 text-white'
                   : 'bg-silver-200 text-dark-700 hover:bg-silver-300'
               }`}
             >
@@ -142,7 +142,7 @@ export default function SessionsPage() {
         {/* Error */}
         {error && (
           <div className="card p-6 text-center">
-            <p className="text-rust-600 font-semibold mb-1">Erreur</p>
+            <p className="text-pink-600 font-semibold mb-1">Erreur</p>
             <p className="text-dark-500">{error}</p>
           </div>
         )}
@@ -152,8 +152,8 @@ export default function SessionsPage() {
           <>
             {filteredSessions.length === 0 ? (
               <div className="card p-10 text-center">
-                <div className="w-16 h-16 rounded-full bg-petrol-100 flex items-center justify-center mx-auto mb-5">
-                  <svg className="w-8 h-8 text-petrol-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div className="w-16 h-16 rounded-full bg-neon-100 flex items-center justify-center mx-auto mb-5">
+                  <svg className="w-8 h-8 text-neon-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path
                       strokeLinecap="round"
                       strokeLinejoin="round"

@@ -14,15 +14,15 @@ export default function Badge({
   className = '',
 }: BadgeProps) {
   const variantStyles = {
-    'level-1': 'bg-sand-100 text-sand-600 border border-sand-200',
-    'level-2': 'bg-sand-200 text-sand-700 border border-sand-300',
-    'level-3': 'bg-terra-100 text-terra-600 border border-terra-200',
-    'level-4': 'bg-rust-100 text-rust-600 border border-rust-200',
-    'level-5': 'bg-rust-200 text-rust-700 border border-rust-300',
-    primary: 'bg-petrol-100 text-petrol-700 border border-petrol-200',
-    success: 'bg-petrol-100 text-petrol-700 border border-petrol-200',
-    warning: 'bg-sand-100 text-sand-600 border border-sand-200',
-    danger: 'bg-rust-100 text-rust-600 border border-rust-200',
+    'level-1': 'bg-silver-100 text-silver-600 border border-silver-200',
+    'level-2': 'bg-silver-200 text-silver-700 border border-silver-300',
+    'level-3': 'bg-neon-100 text-neon-600 border border-neon-200',
+    'level-4': 'bg-pink-100 text-pink-600 border border-pink-200',
+    'level-5': 'bg-pink-200 text-pink-700 border border-pink-300',
+    primary: 'bg-neon-100 text-neon-700 border border-neon-200',
+    success: 'bg-neon-100 text-neon-700 border border-neon-200',
+    warning: 'bg-silver-100 text-silver-600 border border-silver-200',
+    danger: 'bg-pink-100 text-pink-600 border border-pink-200',
     info: 'bg-silver-200 text-dark-700 border border-silver-300',
   };
 

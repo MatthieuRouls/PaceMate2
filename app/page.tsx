@@ -69,7 +69,7 @@ export default function Home() {
             <div className="text-6xl md:text-8xl lg:text-9xl font-bold text-white mb-6 leading-tight">
               Trouve ton
               <br />
-              <span className="text-rust-500">Mate</span>
+              <span className="text-pink-500">Mate</span>
             </div>
             <p className="text-xl md:text-2xl lg:text-3xl text-white/90 font-light">
               Au bon pace
@@ -103,13 +103,13 @@ export default function Home() {
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
             <div className="inline-flex items-center gap-3 mb-6 bg-white rounded-lg px-5 py-2.5 border border-silver-400">
-              <div className="w-2.5 h-2.5 rounded-full bg-rust-500 animate-pulse"></div>
-              <span className="text-sm font-bold text-petrol-700 uppercase tracking-wider">En direct</span>
+              <div className="w-2.5 h-2.5 rounded-full bg-pink-500 animate-pulse"></div>
+              <span className="text-sm font-bold text-neon-700 uppercase tracking-wider">En direct</span>
             </div>
             <h2 className="text-4xl md:text-5xl font-bold text-dark-800 mb-4">
               Sessions a venir
             </h2>
-            <div className="w-24 h-1 bg-petrol-700 mx-auto mb-6 rounded-full" />
+            <div className="w-24 h-1 bg-neon-700 mx-auto mb-6 rounded-full" />
             <p className="text-lg text-dark-500 max-w-2xl mx-auto">
               Rejoins une session ou organise la tienne. La communaute t'attend.
             </p>
@@ -134,7 +134,7 @@ export default function Home() {
             </div>
           ) : (
             <div className="text-center py-16 bg-white rounded-xl border border-silver-400">
-              <div className="w-20 h-20 mx-auto mb-5 rounded-full bg-petrol-700 flex items-center justify-center">
+              <div className="w-20 h-20 mx-auto mb-5 rounded-full bg-neon-700 flex items-center justify-center">
                 <svg
                   className="w-10 h-10 text-white"
                   fill="none"
@@ -156,7 +156,7 @@ export default function Home() {
           <div className="text-center mt-12">
             <Link
               href="/sessions"
-              className="inline-flex items-center gap-3 px-8 py-4 bg-rust-500 text-white font-bold text-lg rounded-lg hover:bg-rust-600 transition-colors"
+              className="inline-flex items-center gap-3 px-8 py-4 bg-pink-500 text-white font-bold text-lg rounded-lg hover:bg-pink-600 transition-colors"
             >
               Toutes les sessions
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -173,12 +173,12 @@ export default function Home() {
           <div className="text-center mb-16">
             <div className="inline-flex items-center gap-3 mb-6 bg-silver-100 rounded-lg px-5 py-2.5 border border-silver-400">
               <span className="text-2xl">🏆</span>
-              <span className="text-sm font-bold text-petrol-700 uppercase tracking-wider">Champions</span>
+              <span className="text-sm font-bold text-neon-700 uppercase tracking-wider">Champions</span>
             </div>
             <h2 className="text-4xl md:text-5xl font-bold text-dark-800 mb-4">
               Equipes leaders
             </h2>
-            <div className="w-24 h-1 bg-petrol-700 mx-auto mb-6 rounded-full" />
+            <div className="w-24 h-1 bg-neon-700 mx-auto mb-6 rounded-full" />
             <p className="text-lg text-dark-500 max-w-2xl mx-auto">
               Les equipes les plus actives qui font vibrer la communaute
             </p>
@@ -193,8 +193,8 @@ export default function Home() {
               {topTeams.map((team, index) => {
                 const position = index + 1;
                 const medals = ['🥇', '🥈', '🥉'];
-                const colors = ['text-rust-500', 'text-terra-400', 'text-petrol-700'];
-                const borderColors = ['border-rust-400', 'border-terra-300', 'border-petrol-500'];
+                const colors = ['text-pink-500', 'text-neon-400', 'text-neon-700'];
+                const borderColors = ['border-pink-400', 'border-neon-300', 'border-neon-500'];
 
                 return (
                   <div
@@ -228,7 +228,7 @@ export default function Home() {
                         <div className="text-sm text-dark-500 mt-1">Membres</div>
                       </div>
                       <div className="flex-1">
-                        <div className="text-2xl font-bold text-rust-500">
+                        <div className="text-2xl font-bold text-pink-500">
                           {(team.total_distance || 0).toFixed(0)}
                         </div>
                         <div className="text-sm text-dark-500 mt-1">Km parcourus</div>
@@ -240,7 +240,7 @@ export default function Home() {
             </div>
           ) : (
             <div className="text-center py-16 bg-silver-50 rounded-xl border border-silver-400">
-              <div className="w-20 h-20 mx-auto mb-5 rounded-full bg-petrol-700 flex items-center justify-center">
+              <div className="w-20 h-20 mx-auto mb-5 rounded-full bg-neon-700 flex items-center justify-center">
                 <svg
                   className="w-10 h-10 text-white"
                   fill="none"
@@ -262,7 +262,7 @@ export default function Home() {
           <div className="text-center mt-12">
             <Link
               href="/teams"
-              className="inline-flex items-center gap-3 px-8 py-4 bg-petrol-700 text-white font-bold text-lg rounded-lg hover:bg-petrol-600 transition-colors"
+              className="inline-flex items-center gap-3 px-8 py-4 bg-neon-700 text-white font-bold text-lg rounded-lg hover:bg-neon-600 transition-colors"
             >
               Voir toutes les equipes
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -288,7 +288,7 @@ export default function Home() {
           </p>
           <Link
             href="/sessions"
-            className="inline-flex items-center gap-3 px-10 py-5 bg-rust-500 text-white font-bold text-xl rounded-lg hover:bg-rust-600 transition-colors"
+            className="inline-flex items-center gap-3 px-10 py-5 bg-pink-500 text-white font-bold text-xl rounded-lg hover:bg-pink-600 transition-colors"
           >
             Commencer maintenant
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -315,16 +315,16 @@ export default function Home() {
             </div>
 
             <div className="flex gap-8 text-sm text-dark-500">
-              <Link href="#" className="hover:text-petrol-700 transition-colors">
+              <Link href="#" className="hover:text-neon-700 transition-colors">
                 A propos
               </Link>
-              <Link href="#" className="hover:text-petrol-700 transition-colors">
+              <Link href="#" className="hover:text-neon-700 transition-colors">
                 Contact
               </Link>
-              <Link href="#" className="hover:text-petrol-700 transition-colors">
+              <Link href="#" className="hover:text-neon-700 transition-colors">
                 Confidentialite
               </Link>
-              <Link href="#" className="hover:text-petrol-700 transition-colors">
+              <Link href="#" className="hover:text-neon-700 transition-colors">
                 CGU
               </Link>
             </div>

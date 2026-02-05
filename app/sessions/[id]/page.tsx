@@ -217,13 +217,13 @@ export default function SessionDetailsPage() {
         <div className="flex items-center gap-4 mb-8">
           <Link
             href="/sessions"
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-white border border-silver-400 text-dark-800 font-medium hover:border-petrol-500 hover:bg-silver-100 transition-all"
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-white border border-silver-400 text-dark-800 font-medium hover:border-neon-500 hover:bg-silver-100 transition-all"
           >
             <ArrowLeft className="w-4 h-4" />
             Retour
           </Link>
           {debugTestRating && (
-            <span className="px-4 py-2 rounded-lg bg-rust-500/10 text-rust-500 text-sm font-semibold border border-rust-500/20">
+            <span className="px-4 py-2 rounded-lg bg-pink-500/10 text-pink-500 text-sm font-semibold border border-pink-500/20">
               Mode Test Notation
             </span>
           )}
@@ -238,8 +238,8 @@ export default function SessionDetailsPage() {
 
         {/* Error */}
         {error && (
-          <div className="bg-white rounded-xl p-8 border border-rust-500 text-center">
-            <p className="text-rust-500 font-bold text-xl mb-2">Erreur</p>
+          <div className="bg-white rounded-xl p-8 border border-pink-500 text-center">
+            <p className="text-pink-500 font-bold text-xl mb-2">Erreur</p>
             <p className="text-dark-500">{error}</p>
           </div>
         )}
@@ -257,12 +257,12 @@ export default function SessionDetailsPage() {
 
               {/* Creator Badge */}
               {session.creator && (
-                <div className="inline-flex items-center gap-3 px-4 py-2.5 rounded-lg bg-petrol-50">
-                  <div className="w-11 h-11 rounded-full bg-terra-400 flex items-center justify-center text-white font-bold">
+                <div className="inline-flex items-center gap-3 px-4 py-2.5 rounded-lg bg-neon-50">
+                  <div className="w-11 h-11 rounded-full bg-neon-400 flex items-center justify-center text-white font-bold">
                     {getInitials(session.creator.username)}
                   </div>
                   <div>
-                    <p className="text-xs text-petrol-700 font-medium uppercase tracking-wider">Organise par</p>
+                    <p className="text-xs text-neon-700 font-medium uppercase tracking-wider">Organise par</p>
                     <p className="text-dark-800 font-semibold">{session.creator.username}</p>
                   </div>
                 </div>
@@ -271,12 +271,12 @@ export default function SessionDetailsPage() {
 
             {/* Stats Grid - Big Numbers */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              <div className="bg-rust-500 rounded-lg p-5 text-white">
+              <div className="bg-pink-500 rounded-lg p-5 text-white">
                 <div className="text-3xl font-bold mb-1">{session.distance_km}</div>
                 <div className="text-sm opacity-90 uppercase tracking-wider font-medium">Kilometres</div>
               </div>
 
-              <div className="bg-white rounded-lg p-5 border-2 border-petrol-500">
+              <div className="bg-white rounded-lg p-5 border-2 border-neon-500">
                 <div className="text-3xl font-bold text-dark-800 mb-1">{getPaceDisplay()}</div>
                 <div className="text-sm text-dark-500 uppercase tracking-wider font-medium">Allure/km</div>
               </div>
@@ -292,7 +292,7 @@ export default function SessionDetailsPage() {
                     <div
                       key={i}
                       className={`w-2.5 h-2.5 rounded-full ${
-                        i < session.level_required ? 'bg-rust-500' : 'bg-silver-300'
+                        i < session.level_required ? 'bg-pink-500' : 'bg-silver-300'
                       }`}
                     />
                   ))}
@@ -310,8 +310,8 @@ export default function SessionDetailsPage() {
               <div className="space-y-4">
                 {/* Date */}
                 <div className="flex items-center gap-4">
-                  <div className="w-11 h-11 rounded-lg bg-petrol-100 flex items-center justify-center flex-shrink-0">
-                    <Calendar className="w-5 h-5 text-petrol-700" />
+                  <div className="w-11 h-11 rounded-lg bg-neon-100 flex items-center justify-center flex-shrink-0">
+                    <Calendar className="w-5 h-5 text-neon-700" />
                   </div>
                   <div>
                     <p className="text-sm text-dark-500 font-medium">Date et heure</p>
@@ -321,8 +321,8 @@ export default function SessionDetailsPage() {
 
                 {/* Location */}
                 <div className="flex items-center gap-4">
-                  <div className="w-11 h-11 rounded-lg bg-petrol-100 flex items-center justify-center flex-shrink-0">
-                    <MapPin className="w-5 h-5 text-petrol-700" />
+                  <div className="w-11 h-11 rounded-lg bg-neon-100 flex items-center justify-center flex-shrink-0">
+                    <MapPin className="w-5 h-5 text-neon-700" />
                   </div>
                   <div>
                     <p className="text-sm text-dark-500 font-medium">Point de rendez-vous</p>
@@ -333,8 +333,8 @@ export default function SessionDetailsPage() {
                 {/* Type */}
                 {session.session_type && (
                   <div className="flex items-center gap-4">
-                    <div className="w-11 h-11 rounded-lg bg-petrol-100 flex items-center justify-center flex-shrink-0">
-                      <Target className="w-5 h-5 text-petrol-700" />
+                    <div className="w-11 h-11 rounded-lg bg-neon-100 flex items-center justify-center flex-shrink-0">
+                      <Target className="w-5 h-5 text-neon-700" />
                     </div>
                     <div>
                       <p className="text-sm text-dark-500 font-medium">Type de sortie</p>
@@ -348,7 +348,7 @@ export default function SessionDetailsPage() {
                 {/* Walk breaks */}
                 {session.walk_breaks_ok && (
                   <div className="pt-4 border-t border-silver-300">
-                    <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-petrol-100 text-petrol-700 font-semibold text-sm">
+                    <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-neon-100 text-neon-700 font-semibold text-sm">
                       Pauses marche autorisees
                     </span>
                   </div>
@@ -375,7 +375,7 @@ export default function SessionDetailsPage() {
                 </div>
                 <div className="w-full h-3 rounded-full bg-silver-200 overflow-hidden">
                   <div
-                    className="h-full bg-petrol-700 transition-all duration-500"
+                    className="h-full bg-neon-700 transition-all duration-500"
                     style={{
                       width: `${((session.participants_count || 0) / session.max_participants) * 100}%`,
                     }}
@@ -388,7 +388,7 @@ export default function SessionDetailsPage() {
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
                   {session.participants.map((participant) => (
                     <div key={participant.id} className="flex items-center gap-3 p-3 rounded-lg bg-silver-100">
-                      <div className="w-9 h-9 rounded-full bg-terra-400 flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
+                      <div className="w-9 h-9 rounded-full bg-neon-400 flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
                         {getInitials(participant.username)}
                       </div>
                       <span className="text-sm font-medium text-dark-800 truncate">
@@ -409,14 +409,14 @@ export default function SessionDetailsPage() {
               {/* Creator actions */}
               {isCreator && !isSessionPast() && (
                 <div className="space-y-4 mb-6">
-                  <div className="flex items-center justify-center gap-2 py-3 px-5 rounded-lg bg-sand-100 text-dark-800">
+                  <div className="flex items-center justify-center gap-2 py-3 px-5 rounded-lg bg-silver-100 text-dark-800">
                     <span className="text-xl">👑</span>
                     <span className="font-bold">Vous etes l'organisateur de cette session</span>
                   </div>
                   <button
                     onClick={handleDelete}
                     disabled={actionLoading}
-                    className="w-full py-3.5 rounded-lg border-2 border-rust-500 text-rust-500 font-bold hover:bg-rust-50 transition-all disabled:opacity-50 flex items-center justify-center gap-2"
+                    className="w-full py-3.5 rounded-lg border-2 border-pink-500 text-pink-500 font-bold hover:bg-pink-50 transition-all disabled:opacity-50 flex items-center justify-center gap-2"
                   >
                     <Trash2 className="w-5 h-5" />
                     {actionLoading ? 'Suppression...' : 'Supprimer la session'}
@@ -429,7 +429,7 @@ export default function SessionDetailsPage() {
                 <button
                   onClick={handleJoin}
                   disabled={actionLoading || isSessionFull()}
-                  className="w-full py-4 rounded-lg bg-rust-500 text-white text-lg font-bold hover:bg-rust-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="w-full py-4 rounded-lg bg-pink-500 text-white text-lg font-bold hover:bg-pink-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {actionLoading
                     ? 'Inscription en cours...'
@@ -443,14 +443,14 @@ export default function SessionDetailsPage() {
               {/* Already joined */}
               {userStatus && userStatus.status === 'confirmed' && !isSessionPast() && !isCreator && (
                 <div className="space-y-4">
-                  <div className="flex items-center justify-center gap-2 py-3 px-5 rounded-lg bg-petrol-100 text-petrol-700">
+                  <div className="flex items-center justify-center gap-2 py-3 px-5 rounded-lg bg-neon-100 text-neon-700">
                     <span className="text-xl">✓</span>
                     <span className="font-bold">Vous participez a cette session</span>
                   </div>
                   <button
                     onClick={handleLeave}
                     disabled={actionLoading}
-                    className="w-full py-3.5 rounded-lg border-2 border-rust-500 text-rust-500 font-bold hover:bg-rust-50 transition-all disabled:opacity-50"
+                    className="w-full py-3.5 rounded-lg border-2 border-pink-500 text-pink-500 font-bold hover:bg-pink-50 transition-all disabled:opacity-50"
                   >
                     {actionLoading ? 'Chargement...' : 'Se desister'}
                   </button>
@@ -461,7 +461,7 @@ export default function SessionDetailsPage() {
               {userStatus && userStatus.status === 'confirmed' && isSessionPast() && !userStatus.rating && (
                 <button
                   onClick={() => setShowRatingModal(true)}
-                  className="w-full py-4 rounded-lg bg-rust-500 text-white text-lg font-bold hover:bg-rust-600 transition-colors"
+                  className="w-full py-4 rounded-lg bg-pink-500 text-white text-lg font-bold hover:bg-pink-600 transition-colors"
                 >
                   Noter cette sortie
                 </button>

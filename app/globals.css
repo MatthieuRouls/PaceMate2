@@ -2,31 +2,43 @@
 
 /* Theme customization for Tailwind v4 */
 @theme {
-  /* Dark - #0D1D25 - Headers, navbar, textes principaux */
-  --color-dark-50: #e8ebed;
-  --color-dark-100: #c5ccd0;
-  --color-dark-200: #9eaab1;
-  --color-dark-300: #778892;
-  --color-dark-400: #596f7a;
-  --color-dark-500: #3b5563;
-  --color-dark-600: #2a3f4a;
-  --color-dark-700: #1a2e37;
-  --color-dark-800: #0D1D25;
-  --color-dark-900: #071015;
+  /* Dark Green - #0B2E26 - Backgrounds, dark mode */
+  --color-dark-50: #e8edeb;
+  --color-dark-100: #c5d4cf;
+  --color-dark-200: #9eb8b0;
+  --color-dark-300: #779c91;
+  --color-dark-400: #598779;
+  --color-dark-500: #3b7261;
+  --color-dark-600: #2d5a4c;
+  --color-dark-700: #1f4437;
+  --color-dark-800: #0B2E26;
+  --color-dark-900: #051a15;
 
-  /* Petrol - #104C64 - Liens, accents, hover */
-  --color-petrol-50: #e7f0f4;
-  --color-petrol-100: #c3dae3;
-  --color-petrol-200: #9bc2d0;
-  --color-petrol-300: #73aabd;
-  --color-petrol-400: #5598af;
-  --color-petrol-500: #3786a1;
-  --color-petrol-600: #256d85;
-  --color-petrol-700: #104C64;
-  --color-petrol-800: #0c3a4c;
-  --color-petrol-900: #082834;
+  /* Neon Green - #00F57A - Secondary, accents */
+  --color-neon-50: #e6fff2;
+  --color-neon-100: #b3ffda;
+  --color-neon-200: #80ffc2;
+  --color-neon-300: #4dffaa;
+  --color-neon-400: #26ff96;
+  --color-neon-500: #00F57A;
+  --color-neon-600: #00c462;
+  --color-neon-700: #00934a;
+  --color-neon-800: #006231;
+  --color-neon-900: #003119;
 
-  /* Silver - #C6C6D0 - Fonds, bordures, separateurs */
+  /* Pink - #FF2D95 - Tertiary, highlights */
+  --color-pink-50: #fff0f7;
+  --color-pink-100: #ffd6ea;
+  --color-pink-200: #ffadd5;
+  --color-pink-300: #ff85c0;
+  --color-pink-400: #ff5cab;
+  --color-pink-500: #FF2D95;
+  --color-pink-600: #cc2477;
+  --color-pink-700: #991b59;
+  --color-pink-800: #66123c;
+  --color-pink-900: #33091e;
+
+  /* Silver - Neutral tones */
   --color-silver-50: #fafafb;
   --color-silver-100: #f2f2f4;
   --color-silver-200: #e6e6ea;
@@ -38,51 +50,10 @@
   --color-silver-800: #4e4e5c;
   --color-silver-900: #30303c;
 
-  /* Sand - #D59D80 - Badges, accents doux */
-  --color-sand-50: #fdf6f3;
-  --color-sand-100: #f9e9e1;
-  --color-sand-200: #f2d4c5;
-  --color-sand-300: #e8bba3;
-  --color-sand-400: #D59D80;
-  --color-sand-500: #c4876a;
-  --color-sand-600: #a86d52;
-  --color-sand-700: #8c5541;
-  --color-sand-800: #704430;
-  --color-sand-900: #54321f;
-
-  /* Terracotta - #C0754D - Boutons secondaires */
-  --color-terra-50: #faf3ee;
-  --color-terra-100: #f2e0d3;
-  --color-terra-200: #e5c4a8;
-  --color-terra-300: #d8a77d;
-  --color-terra-400: #C0754D;
-  --color-terra-500: #a66240;
-  --color-terra-600: #8c5034;
-  --color-terra-700: #723f29;
-  --color-terra-800: #58301e;
-  --color-terra-900: #3e2114;
-
-  /* Rust - #B6410F - CTA, boutons principaux */
-  --color-rust-50: #fef2ec;
-  --color-rust-100: #fcdfd0;
-  --color-rust-200: #f8bea1;
-  --color-rust-300: #f49c72;
-  --color-rust-400: #d96a36;
-  --color-rust-500: #B6410F;
-  --color-rust-600: #9a370d;
-  --color-rust-700: #7e2d0b;
-  --color-rust-800: #622308;
-  --color-rust-900: #461906;
-
   /* Neumorphism background */
   --color-neu-base: #F0F2F5;
   --color-neu-light: #ffffff;
   --color-neu-dark: #d1d9e6;
-
-  /* Orange PaceMate for buttons */
-  --color-orange-500: #FF5722;
-  --color-orange-600: #E64A19;
-  --color-orange-700: #D84315;
 }
 
 /* Base styles */
@@ -98,14 +69,14 @@
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     background-color: #F0F2F5;
-    color: #0D1D25;
+    color: #0B2E26;
     transition: background-color 0.3s ease, color 0.3s ease;
   }
 
   /* Dark mode body */
   .dark body,
   body.dark {
-    background-color: #1a1a2e;
+    background-color: #0B2E26;
     color: #e6e6ea;
   }
 
@@ -120,7 +91,7 @@
   input:focus-visible,
   textarea:focus-visible,
   select:focus-visible {
-    outline: 2px solid #104C64;
+    outline: 2px solid #00F57A;
     outline-offset: 2px;
   }
 
@@ -145,15 +116,15 @@
 
   /* Dark mode scrollbar */
   .dark ::-webkit-scrollbar-track {
-    background: #1a1a2e;
+    background: #0B2E26;
   }
 
   .dark ::-webkit-scrollbar-thumb {
-    background: #3a3a5c;
+    background: #1f4437;
   }
 
   .dark ::-webkit-scrollbar-thumb:hover {
-    background: #4a4a6c;
+    background: #2d5a4c;
   }
 }
 
@@ -205,7 +176,7 @@
   }
 
   .glass-dark {
-    background: rgba(13, 29, 37, 0.6);
+    background: rgba(11, 46, 38, 0.6);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
     border: 1px solid rgba(255, 255, 255, 0.1);
@@ -224,55 +195,55 @@
   .neu-tab-active {
     background: rgba(255, 255, 255, 0.9);
     box-shadow: inset 3px 3px 6px #d1d9e6, inset -3px -3px 6px #ffffff;
-    color: #0D1D25;
+    color: #0B2E26;
   }
 
   .dark .neu-tab-active {
-    background: rgba(22, 33, 62, 0.9);
-    box-shadow: inset 3px 3px 6px #0f0f1a, inset -3px -3px 6px #1d2a4d;
+    background: rgba(31, 68, 55, 0.9);
+    box-shadow: inset 3px 3px 6px #051a15, inset -3px -3px 6px #2d5a4c;
     color: #e6e6ea;
   }
 
   /* ============================================
-     DARK MODE STYLES
+     DARK MODE STYLES - #0B2E26 based
      ============================================ */
 
   /* Dark mode background */
   .dark .bg-neu-base {
-    background-color: #1a1a2e !important;
+    background-color: #0B2E26 !important;
   }
 
   .dark .bg-white {
-    background-color: #16213e !important;
+    background-color: #0f3d32 !important;
   }
 
   /* Dark mode cards */
   .dark .card {
-    background: #16213e;
-    border-color: rgba(255, 255, 255, 0.08);
+    background: #0f3d32;
+    border-color: rgba(0, 245, 122, 0.1);
   }
 
   /* Dark mode neumorphic buttons */
   .dark .neu-btn {
-    background: #1a1a2e;
-    box-shadow: 5px 5px 10px #0f0f1a, -5px -5px 10px #252542;
+    background: #0B2E26;
+    box-shadow: 5px 5px 10px #051a15, -5px -5px 10px #114237;
   }
 
   .dark .neu-btn:active,
   .dark .neu-btn.pressed {
-    background: #1a1a2e;
-    box-shadow: inset 5px 5px 10px #0f0f1a, inset -5px -5px 10px #252542;
+    background: #0B2E26;
+    box-shadow: inset 5px 5px 10px #051a15, inset -5px -5px 10px #114237;
   }
 
   .dark .neu-btn-white {
-    background: #16213e;
-    box-shadow: 5px 5px 10px #0f0f1a, -5px -5px 10px #1d2a4d;
+    background: #0f3d32;
+    box-shadow: 5px 5px 10px #051a15, -5px -5px 10px #1a5244;
   }
 
   .dark .neu-btn-white:active,
   .dark .neu-btn-white.pressed {
-    background: #16213e;
-    box-shadow: inset 5px 5px 10px #0f0f1a, inset -5px -5px 10px #1d2a4d;
+    background: #0f3d32;
+    box-shadow: inset 5px 5px 10px #051a15, inset -5px -5px 10px #1a5244;
   }
 
   /* Dark mode text colors */
@@ -294,16 +265,16 @@
 
   /* Dark mode glass pill */
   .dark .glass-pill {
-    background: rgba(22, 33, 62, 0.7);
-    border-color: rgba(255, 255, 255, 0.1);
+    background: rgba(15, 61, 50, 0.7);
+    border-color: rgba(0, 245, 122, 0.2);
   }
 
   /* Dark mode inputs */
   .dark input,
   .dark textarea,
   .dark select {
-    background-color: #1a1a2e;
-    border-color: rgba(255, 255, 255, 0.15);
+    background-color: #0B2E26;
+    border-color: rgba(0, 245, 122, 0.2);
     color: #e6e6ea;
   }
 
@@ -348,15 +319,15 @@
 
   /* Dark mode toggle */
   .dark .neu-toggle {
-    box-shadow: -8px -4px 8px 0px #252542,
-      8px 4px 12px 0px #0f0f1a,
-      4px 4px 4px 0px #0f0f1a inset,
-      -4px -4px 4px 0px #252542 inset;
+    box-shadow: -8px -4px 8px 0px #114237,
+      8px 4px 12px 0px #051a15,
+      4px 4px 4px 0px #051a15 inset,
+      -4px -4px 4px 0px #114237 inset;
   }
 
   .dark .neu-toggle-indicator {
-    background: #1a1a2e;
-    box-shadow: -8px -4px 8px 0px #252542,
-      8px 4px 12px 0px #0f0f1a;
+    background: #0B2E26;
+    box-shadow: -8px -4px 8px 0px #114237,
+      8px 4px 12px 0px #051a15;
   }
 }

@@ -22,7 +22,7 @@ export default function TeamCard({ team, position }: TeamCardProps) {
     <div
       className={`
         card p-5 transition-all hover:shadow-md
-        ${isTopThree ? 'ring-2 ring-petrol-500' : ''}
+        ${isTopThree ? 'ring-2 ring-neon-500' : ''}
       `}
     >
       <div className="flex items-center gap-4">
@@ -31,7 +31,7 @@ export default function TeamCard({ team, position }: TeamCardProps) {
           className={`
             flex-shrink-0 w-14 h-14 rounded-lg flex items-center justify-center font-bold text-lg
             ${isTopThree
-              ? 'bg-petrol-700 text-white'
+              ? 'bg-neon-700 text-white'
               : 'bg-silver-200 text-dark-700'
             }
           `}
@@ -64,12 +64,12 @@ export default function TeamCard({ team, position }: TeamCardProps) {
             </div>
             <div className="flex items-center gap-2">
               <div className={`w-7 h-7 rounded-lg flex items-center justify-center ${
-                isTopThree ? 'bg-petrol-100' : 'bg-silver-200'
+                isTopThree ? 'bg-neon-100' : 'bg-silver-200'
               }`}>
                 <span className="text-sm">🏃</span>
               </div>
               <span className={`font-bold text-lg ${
-                isTopThree ? 'text-rust-500' : 'text-dark-800'
+                isTopThree ? 'text-pink-500' : 'text-dark-800'
               }`}>
                 {(team.total_distance || 0).toFixed(1)}
               </span>

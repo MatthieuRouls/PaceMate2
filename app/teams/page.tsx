@@ -160,7 +160,7 @@ export default function TeamsPage() {
         {/* Error */}
         {error && (
           <div className="card p-5 mb-6">
-            <p className="text-rust-600 font-semibold mb-1">Erreur</p>
+            <p className="text-pink-600 font-semibold mb-1">Erreur</p>
             <p className="text-dark-500 text-sm">{error}</p>
           </div>
         )}
@@ -181,7 +181,7 @@ export default function TeamsPage() {
                         <h2 className="text-xl font-bold text-white">{userTeam.name}</h2>
                       </div>
                       {getUserTeamRank() && (
-                        <div className="bg-petrol-700 rounded-lg px-4 py-2 text-center">
+                        <div className="bg-neon-700 rounded-lg px-4 py-2 text-center">
                           <p className="text-xs text-silver-300">Classement</p>
                           <p className="text-xl font-bold text-white">
                             {getPositionBadge(getUserTeamRank()!)}
@@ -198,7 +198,7 @@ export default function TeamsPage() {
                   <div className="p-5">
                     <div className="grid grid-cols-2 gap-4 mb-5">
                       <div className="bg-silver-100 rounded-lg p-4 text-center">
-                        <div className="w-9 h-9 mx-auto mb-2 rounded-lg bg-petrol-700 flex items-center justify-center">
+                        <div className="w-9 h-9 mx-auto mb-2 rounded-lg bg-neon-700 flex items-center justify-center">
                           <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
                           </svg>
@@ -207,7 +207,7 @@ export default function TeamsPage() {
                         <p className="text-xs text-dark-500">Membre{(userTeam.members_count || 0) > 1 ? 's' : ''}</p>
                       </div>
                       <div className="bg-silver-100 rounded-lg p-4 text-center">
-                        <div className="w-9 h-9 mx-auto mb-2 rounded-lg bg-terra-400 flex items-center justify-center">
+                        <div className="w-9 h-9 mx-auto mb-2 rounded-lg bg-neon-400 flex items-center justify-center">
                           <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
                           </svg>
@@ -230,7 +230,7 @@ export default function TeamsPage() {
                       <button
                         onClick={handleLeaveTeam}
                         disabled={leavingTeam}
-                        className="text-sm px-4 py-2 text-rust-600 hover:text-rust-700 hover:bg-rust-50 rounded-lg transition-colors disabled:opacity-50"
+                        className="text-sm px-4 py-2 text-pink-600 hover:text-pink-700 hover:bg-pink-50 rounded-lg transition-colors disabled:opacity-50"
                       >
                         {leavingTeam ? 'Chargement...' : 'Quitter l\'equipe'}
                       </button>
@@ -243,7 +243,7 @@ export default function TeamsPage() {
                   {!showCreateForm ? (
                     /* Message d'invitation */
                     <div className="text-center py-6">
-                      <div className="w-14 h-14 mx-auto mb-4 rounded-full bg-petrol-700 flex items-center justify-center">
+                      <div className="w-14 h-14 mx-auto mb-4 rounded-full bg-neon-700 flex items-center justify-center">
                         <svg className="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
                         </svg>
@@ -280,15 +280,15 @@ export default function TeamsPage() {
                       <form onSubmit={handleCreateTeam} className="space-y-4">
                         {/* Erreur de creation */}
                         {createError && (
-                          <div className="p-3 rounded-lg bg-rust-50 border border-rust-200">
-                            <p className="text-rust-600 text-sm">{createError}</p>
+                          <div className="p-3 rounded-lg bg-pink-50 border border-pink-200">
+                            <p className="text-pink-600 text-sm">{createError}</p>
                           </div>
                         )}
 
                         {/* Nom */}
                         <div>
                           <label htmlFor="teamName" className="block text-sm font-medium text-dark-800 mb-1">
-                            Nom de l'equipe <span className="text-rust-500">*</span>
+                            Nom de l'equipe <span className="text-pink-500">*</span>
                           </label>
                           <input
                             type="text"
@@ -298,7 +298,7 @@ export default function TeamsPage() {
                             required
                             maxLength={50}
                             placeholder="Ex: Les Runners du dimanche"
-                            className="w-full px-3 py-2 rounded-lg border border-silver-400 focus:border-petrol-500 focus:outline-none focus:ring-2 focus:ring-petrol-500/20 transition-all text-dark-800 placeholder:text-silver-500"
+                            className="w-full px-3 py-2 rounded-lg border border-silver-400 focus:border-neon-500 focus:outline-none focus:ring-2 focus:ring-neon-500/20 transition-all text-dark-800 placeholder:text-silver-500"
                           />
                           <p className="text-xs text-silver-500 mt-1">{teamName.length}/50</p>
                         </div>
@@ -315,7 +315,7 @@ export default function TeamsPage() {
                             maxLength={200}
                             rows={3}
                             placeholder="Decris ton equipe..."
-                            className="w-full px-3 py-2 rounded-lg border border-silver-400 focus:border-petrol-500 focus:outline-none focus:ring-2 focus:ring-petrol-500/20 transition-all text-dark-800 placeholder:text-silver-500 resize-none"
+                            className="w-full px-3 py-2 rounded-lg border border-silver-400 focus:border-neon-500 focus:outline-none focus:ring-2 focus:ring-neon-500/20 transition-all text-dark-800 placeholder:text-silver-500 resize-none"
                           />
                           <p className="text-xs text-silver-500 mt-1">{teamDescription.length}/200</p>
                         </div>
@@ -351,7 +351,7 @@ export default function TeamsPage() {
             <div className="lg:w-64">
               <div className="bg-dark-800 rounded-xl p-4 sticky top-24">
                 <div className="flex items-center gap-2 mb-4">
-                  <div className="w-7 h-7 rounded-lg bg-petrol-700 flex items-center justify-center">
+                  <div className="w-7 h-7 rounded-lg bg-neon-700 flex items-center justify-center">
                     <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
                     </svg>
@@ -369,17 +369,17 @@ export default function TeamsPage() {
                         <div
                           key={team.id}
                           className={`flex items-center gap-2 p-2 rounded-lg transition-colors ${
-                            isUserTeam ? 'bg-petrol-700' : 'hover:bg-dark-700'
+                            isUserTeam ? 'bg-neon-700' : 'hover:bg-dark-700'
                           }`}
                         >
                           <span className={`w-5 text-center font-bold text-sm ${
-                            index < 3 ? 'text-sand-400' : 'text-silver-500'
+                            index < 3 ? 'text-silver-400' : 'text-silver-500'
                           }`}>
                             {getPositionBadge(index + 1)}
                           </span>
                           <div className="flex-1 min-w-0">
                             <p className={`text-sm font-medium truncate ${
-                              isUserTeam ? 'text-sand-300' : 'text-white'
+                              isUserTeam ? 'text-silver-300' : 'text-white'
                             }`}>
                               {team.name}
                             </p>

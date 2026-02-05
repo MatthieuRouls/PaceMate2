@@ -27,7 +27,7 @@ export default function DarkModeToggle({ showLabel = false }: DarkModeToggleProp
           </div>
           {/* Moon icon on dark side */}
           <div className="absolute right-2 top-1/2 -translate-y-1/2">
-            <svg className="w-4 h-4 text-petrol-700" fill="currentColor" viewBox="0 0 20 20">
+            <svg className="w-4 h-4 text-neon-700" fill="currentColor" viewBox="0 0 20 20">
               <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z" />
             </svg>
           </div>

@@ -117,8 +117,8 @@ export default function AuthDrawer({ isOpen, onClose, mode, onSwitchMode }: Auth
             <form onSubmit={handleSubmit} className="space-y-5">
               {/* Error message */}
               {error && (
-                <div className="p-3 rounded-lg bg-rust-50 border border-rust-300">
-                  <p className="text-sm text-rust-600">{error}</p>
+                <div className="p-3 rounded-lg bg-pink-50 border border-pink-300">
+                  <p className="text-sm text-pink-600">{error}</p>
                 </div>
               )}
 
@@ -133,7 +133,7 @@ export default function AuthDrawer({ isOpen, onClose, mode, onSwitchMode }: Auth
                     value={username}
                     onChange={(e) => setUsername(e.target.value)}
                     required
-                    className="w-full px-4 py-3 rounded-lg border border-silver-400 focus:border-petrol-700 focus:ring-2 focus:ring-petrol-700/20 outline-none transition-all text-dark-800 bg-white"
+                    className="w-full px-4 py-3 rounded-lg border border-silver-400 focus:border-neon-700 focus:ring-2 focus:ring-neon-700/20 outline-none transition-all text-dark-800 bg-white"
                     placeholder="ton_pseudo"
                   />
                 </div>
@@ -149,7 +149,7 @@ export default function AuthDrawer({ isOpen, onClose, mode, onSwitchMode }: Auth
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
-                  className="w-full px-4 py-3 rounded-lg border border-silver-400 focus:border-petrol-700 focus:ring-2 focus:ring-petrol-700/20 outline-none transition-all text-dark-800 bg-white"
+                  className="w-full px-4 py-3 rounded-lg border border-silver-400 focus:border-neon-700 focus:ring-2 focus:ring-neon-700/20 outline-none transition-all text-dark-800 bg-white"
                   placeholder="ton@email.com"
                 />
               </div>
@@ -165,7 +165,7 @@ export default function AuthDrawer({ isOpen, onClose, mode, onSwitchMode }: Auth
                   onChange={(e) => setPassword(e.target.value)}
                   required
                   minLength={6}
-                  className="w-full px-4 py-3 rounded-lg border border-silver-400 focus:border-petrol-700 focus:ring-2 focus:ring-petrol-700/20 outline-none transition-all text-dark-800 bg-white"
+                  className="w-full px-4 py-3 rounded-lg border border-silver-400 focus:border-neon-700 focus:ring-2 focus:ring-neon-700/20 outline-none transition-all text-dark-800 bg-white"
                   placeholder="••••••••"
                 />
                 {mode === 'signup' && (
@@ -179,7 +179,7 @@ export default function AuthDrawer({ isOpen, onClose, mode, onSwitchMode }: Auth
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full px-6 py-3.5 rounded-lg bg-rust-500 text-white font-semibold hover:bg-rust-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full px-6 py-3.5 rounded-lg bg-pink-500 text-white font-semibold hover:bg-pink-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {loading ? (
                   <span className="flex items-center justify-center gap-2">
@@ -203,7 +203,7 @@ export default function AuthDrawer({ isOpen, onClose, mode, onSwitchMode }: Auth
                       <button
                         type="button"
                         onClick={() => onSwitchMode('signup')}
-                        className="text-petrol-700 font-semibold hover:text-petrol-600 transition-colors"
+                        className="text-neon-700 font-semibold hover:text-neon-600 transition-colors"
                       >
                         Inscris-toi
                       </button>
@@ -214,7 +214,7 @@ export default function AuthDrawer({ isOpen, onClose, mode, onSwitchMode }: Auth
                       <button
                         type="button"
                         onClick={() => onSwitchMode('login')}
-                        className="text-petrol-700 font-semibold hover:text-petrol-600 transition-colors"
+                        className="text-neon-700 font-semibold hover:text-neon-600 transition-colors"
                       >
                         Connecte-toi
                       </button>

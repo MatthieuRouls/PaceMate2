@@ -81,8 +81,8 @@ export default function DashboardPage() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
           <div className="card p-6">
             <div className="flex items-center justify-between mb-4">
-              <div className="w-12 h-12 rounded-xl bg-petrol-100 flex items-center justify-center">
-                <svg className="w-6 h-6 text-petrol-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="w-12 h-12 rounded-xl bg-neon-100 flex items-center justify-center">
+                <svg className="w-6 h-6 text-neon-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                 </svg>
               </div>
@@ -95,7 +95,7 @@ export default function DashboardPage() {
               {[40, 65, 45, 80, 55, 70, 90].map((h, i) => (
                 <div
                   key={i}
-                  className="flex-1 bg-petrol-200 rounded-t"
+                  className="flex-1 bg-neon-200 rounded-t"
                   style={{ height: `${h}%` }}
                 />
               ))}
@@ -104,21 +104,21 @@ export default function DashboardPage() {
 
           <div className="card p-6">
             <div className="flex items-center justify-between mb-4">
-              <div className="w-12 h-12 rounded-xl bg-orange-100 flex items-center justify-center">
-                <svg className="w-6 h-6 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="w-12 h-12 rounded-xl bg-pink-100 flex items-center justify-center">
+                <svg className="w-6 h-6 text-pink-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
                 </svg>
               </div>
               <span className="text-xs font-semibold text-dark-500 uppercase tracking-wider">Total</span>
             </div>
-            <div className="text-4xl font-bold text-orange-500 mb-1">42 km</div>
+            <div className="text-4xl font-bold text-pink-500 mb-1">42 km</div>
             <div className="text-sm text-dark-500">Ce mois-ci</div>
             {/* Mini sparkline */}
             <div className="mt-4 flex items-end gap-1 h-8">
               {[30, 50, 70, 45, 85, 60, 95].map((h, i) => (
                 <div
                   key={i}
-                  className="flex-1 bg-orange-200 rounded-t"
+                  className="flex-1 bg-pink-200 rounded-t"
                   style={{ height: `${h}%` }}
                 />
               ))}
@@ -127,8 +127,8 @@ export default function DashboardPage() {
 
           <div className="card p-6">
             <div className="flex items-center justify-between mb-4">
-              <div className="w-12 h-12 rounded-xl bg-sand-100 flex items-center justify-center">
-                <svg className="w-6 h-6 text-sand-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="w-12 h-12 rounded-xl bg-neon-100 flex items-center justify-center">
+                <svg className="w-6 h-6 text-neon-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
               </div>
@@ -141,7 +141,7 @@ export default function DashboardPage() {
               {[55, 40, 75, 50, 65, 80, 60].map((h, i) => (
                 <div
                   key={i}
-                  className="flex-1 bg-sand-200 rounded-t"
+                  className="flex-1 bg-neon-200 rounded-t"
                   style={{ height: `${h}%` }}
                 />
               ))}
@@ -156,7 +156,7 @@ export default function DashboardPage() {
             className="neu-btn group p-6"
           >
             <div className="flex items-center gap-5">
-              <div className="w-14 h-14 rounded-2xl bg-orange-500 flex items-center justify-center">
+              <div className="w-14 h-14 rounded-2xl bg-pink-500 flex items-center justify-center">
                 <svg className="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
                 </svg>
@@ -165,7 +165,7 @@ export default function DashboardPage() {
                 <h3 className="text-xl font-bold text-dark-800 mb-1">Creer une sortie</h3>
                 <p className="text-sm text-dark-500">Organise ta prochaine session</p>
               </div>
-              <svg className="w-6 h-6 text-dark-400 group-hover:translate-x-1 group-hover:text-orange-500 transition-all" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-6 h-6 text-dark-400 group-hover:translate-x-1 group-hover:text-pink-500 transition-all" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
               </svg>
             </div>
@@ -176,8 +176,8 @@ export default function DashboardPage() {
             className="neu-btn group p-6"
           >
             <div className="flex items-center gap-5">
-              <div className="w-14 h-14 rounded-xl bg-petrol-100 flex items-center justify-center">
-                <svg className="w-7 h-7 text-petrol-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="w-14 h-14 rounded-xl bg-neon-100 flex items-center justify-center">
+                <svg className="w-7 h-7 text-neon-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                 </svg>
               </div>
@@ -185,7 +185,7 @@ export default function DashboardPage() {
                 <h3 className="text-xl font-bold text-dark-800 mb-1">Decouvrir</h3>
                 <p className="text-sm text-dark-500">Trouve des sessions pres de toi</p>
               </div>
-              <svg className="w-6 h-6 text-dark-400 group-hover:translate-x-1 group-hover:text-petrol-700 transition-all" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-6 h-6 text-dark-400 group-hover:translate-x-1 group-hover:text-neon-700 transition-all" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
               </svg>
             </div>
@@ -200,7 +200,7 @@ export default function DashboardPage() {
             </h2>
             <Link
               href="/sessions"
-              className="text-sm font-semibold text-petrol-700 hover:text-petrol-600 transition-colors"
+              className="text-sm font-semibold text-neon-700 hover:text-neon-600 transition-colors"
             >
               Voir tout
             </Link>
@@ -237,12 +237,12 @@ export default function DashboardPage() {
         {/* CTA Section - Glassmorphism on dark background */}
         <div className="relative overflow-hidden rounded-3xl bg-dark-800 p-10">
           {/* Background decoration */}
-          <div className="absolute top-0 right-0 w-64 h-64 bg-orange-500/20 rounded-full blur-3xl" />
-          <div className="absolute bottom-0 left-0 w-48 h-48 bg-petrol-500/20 rounded-full blur-3xl" />
+          <div className="absolute top-0 right-0 w-64 h-64 bg-pink-500/20 rounded-full blur-3xl" />
+          <div className="absolute bottom-0 left-0 w-48 h-48 bg-neon-500/20 rounded-full blur-3xl" />
 
           <div className="relative z-10 text-center">
             <h3 className="text-3xl font-bold text-white mb-4">
-              Rejoins une <span className="text-orange-500">equipe</span>
+              Rejoins une <span className="text-pink-500">equipe</span>
             </h3>
             <p className="text-silver-400 mb-8 max-w-xl mx-auto">
               Cours en equipe, progresse ensemble et grimpe dans le classement !

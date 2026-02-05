@@ -89,11 +89,11 @@ export default function SessionDetailsDrawer({ session, isOpen, onClose }: Sessi
 
           {/* Key Stats */}
           <div className="grid grid-cols-3 gap-4">
-            <div className="bg-rust-500 rounded-lg p-4 text-white">
+            <div className="bg-pink-500 rounded-lg p-4 text-white">
               <div className="text-2xl font-bold mb-1">{session.distance_km}</div>
               <div className="text-sm opacity-90">Kilometres</div>
             </div>
-            <div className="bg-white border-2 border-petrol-500 rounded-lg p-4">
+            <div className="bg-white border-2 border-neon-500 rounded-lg p-4">
               <div className="text-2xl font-bold text-dark-800 mb-1">{session.target_pace || '5\'30"'}</div>
               <div className="text-sm text-dark-500">Allure/km</div>
             </div>
@@ -106,8 +106,8 @@ export default function SessionDetailsDrawer({ session, isOpen, onClose }: Sessi
           {/* Location */}
           <div className="bg-silver-100 rounded-lg p-5">
             <div className="flex items-start gap-3">
-              <div className="w-10 h-10 rounded-lg bg-petrol-100 flex items-center justify-center flex-shrink-0">
-                <svg className="w-5 h-5 text-petrol-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="w-10 h-10 rounded-lg bg-neon-100 flex items-center justify-center flex-shrink-0">
+                <svg className="w-5 h-5 text-neon-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                 </svg>
@@ -128,7 +128,7 @@ export default function SessionDetailsDrawer({ session, isOpen, onClose }: Sessi
                   <div
                     key={i}
                     className={`w-3 h-3 rounded-full ${
-                      i < session.level_required ? 'bg-rust-500' : 'bg-silver-300'
+                      i < session.level_required ? 'bg-pink-500' : 'bg-silver-300'
                     }`}
                   />
                 ))}
@@ -150,7 +150,7 @@ export default function SessionDetailsDrawer({ session, isOpen, onClose }: Sessi
             <div>
               <div className="font-semibold text-dark-800 mb-3">Organisateur</div>
               <div className="flex items-center gap-3">
-                <div className="w-12 h-12 rounded-full bg-terra-400 flex items-center justify-center text-white font-bold">
+                <div className="w-12 h-12 rounded-full bg-neon-400 flex items-center justify-center text-white font-bold">
                   {session.creator.username.substring(0, 2).toUpperCase()}
                 </div>
                 <div>
@@ -168,7 +168,7 @@ export default function SessionDetailsDrawer({ session, isOpen, onClose }: Sessi
               <div className="flex items-center gap-4">
                 <div className="flex -space-x-3">
                   {session.creator && (
-                    <div className="w-10 h-10 rounded-full bg-terra-400 flex items-center justify-center border-2 border-white">
+                    <div className="w-10 h-10 rounded-full bg-neon-400 flex items-center justify-center border-2 border-white">
                       <span className="text-white text-xs font-bold">
                         {session.creator.username.substring(0, 2).toUpperCase()}
                       </span>
@@ -177,7 +177,7 @@ export default function SessionDetailsDrawer({ session, isOpen, onClose }: Sessi
                   {Array.from({ length: Math.min(3, (session.participants_count || 1) - 1) }).map((_, i) => (
                     <div
                       key={i}
-                      className="w-10 h-10 rounded-full bg-sand-400 border-2 border-white"
+                      className="w-10 h-10 rounded-full bg-silver-400 border-2 border-white"
                     />
                   ))}
                 </div>
@@ -198,14 +198,14 @@ export default function SessionDetailsDrawer({ session, isOpen, onClose }: Sessi
             <div className="flex gap-3">
               <Link
                 href={`/sessions/${session.id}`}
-                className="flex-1 py-3.5 rounded-lg bg-white border border-silver-400 text-dark-800 font-semibold text-center hover:border-petrol-500 hover:bg-silver-50 transition-all"
+                className="flex-1 py-3.5 rounded-lg bg-white border border-silver-400 text-dark-800 font-semibold text-center hover:border-neon-500 hover:bg-silver-50 transition-all"
               >
                 Voir tous les details
               </Link>
               {!isFull ? (
                 <Link
                   href={`/sessions/${session.id}`}
-                  className="flex-1 py-3.5 rounded-lg bg-rust-500 text-white font-semibold text-center hover:bg-rust-600 transition-colors"
+                  className="flex-1 py-3.5 rounded-lg bg-pink-500 text-white font-semibold text-center hover:bg-pink-600 transition-colors"
                 >
                   Rejoindre la session
                 </Link>

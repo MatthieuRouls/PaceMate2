@@ -129,9 +129,9 @@ export default function CreateSessionPage() {
                   <div
                     className={`w-10 h-10 rounded-full flex items-center justify-center font-bold transition-all ${
                       step < currentStep
-                        ? 'bg-petrol-700 text-white'
+                        ? 'bg-neon-700 text-white'
                         : step === currentStep
-                        ? 'bg-rust-500 text-white ring-4 ring-rust-500/30'
+                        ? 'bg-pink-500 text-white ring-4 ring-pink-500/30'
                         : 'bg-silver-300 text-dark-500'
                     }`}
                   >
@@ -148,7 +148,7 @@ export default function CreateSessionPage() {
                 {step < 5 && (
                   <div
                     className={`h-1 flex-1 transition-all ${
-                      step < currentStep ? 'bg-petrol-700' : 'bg-silver-300'
+                      step < currentStep ? 'bg-neon-700' : 'bg-silver-300'
                     }`}
                   />
                 )}
@@ -175,7 +175,7 @@ export default function CreateSessionPage() {
                     value={formData.title}
                     onChange={handleChange}
                     placeholder="Ex: Sortie matinale au parc"
-                    className="w-full px-4 py-3 rounded-lg border border-silver-400 focus:border-petrol-700 focus:ring-2 focus:ring-petrol-700/20 outline-none transition-all"
+                    className="w-full px-4 py-3 rounded-lg border border-silver-400 focus:border-neon-700 focus:ring-2 focus:ring-neon-700/20 outline-none transition-all"
                     required
                   />
                 </div>
@@ -190,7 +190,7 @@ export default function CreateSessionPage() {
                     onChange={handleChange}
                     placeholder="Decris ta sortie, l'ambiance, les points de passage..."
                     rows={4}
-                    className="w-full px-4 py-3 rounded-lg border border-silver-400 focus:border-petrol-700 focus:ring-2 focus:ring-petrol-700/20 outline-none transition-all resize-none"
+                    className="w-full px-4 py-3 rounded-lg border border-silver-400 focus:border-neon-700 focus:ring-2 focus:ring-neon-700/20 outline-none transition-all resize-none"
                   />
                 </div>
               </div>
@@ -210,7 +210,7 @@ export default function CreateSessionPage() {
                     name="start_time"
                     value={formData.start_time}
                     onChange={handleChange}
-                    className="w-full px-4 py-3 rounded-lg border border-silver-400 focus:border-petrol-700 focus:ring-2 focus:ring-petrol-700/20 outline-none transition-all"
+                    className="w-full px-4 py-3 rounded-lg border border-silver-400 focus:border-neon-700 focus:ring-2 focus:ring-neon-700/20 outline-none transition-all"
                     required
                   />
                 </div>
@@ -227,7 +227,7 @@ export default function CreateSessionPage() {
                     step="0.5"
                     value={formData.distance_km}
                     onChange={handleChange}
-                    className="w-full h-2 bg-silver-300 rounded-lg appearance-none cursor-pointer accent-rust-500"
+                    className="w-full h-2 bg-silver-300 rounded-lg appearance-none cursor-pointer accent-pink-500"
                   />
                   <div className="flex justify-between text-xs text-dark-500 mt-1">
                     <span>1 km</span>
@@ -245,7 +245,7 @@ export default function CreateSessionPage() {
                     value={formData.target_pace}
                     onChange={handleChange}
                     placeholder="Ex: 5'30/km"
-                    className="w-full px-4 py-3 rounded-lg border border-silver-400 focus:border-petrol-700 focus:ring-2 focus:ring-petrol-700/20 outline-none transition-all"
+                    className="w-full px-4 py-3 rounded-lg border border-silver-400 focus:border-neon-700 focus:ring-2 focus:ring-neon-700/20 outline-none transition-all"
                   />
                 </div>
               </div>
@@ -268,8 +268,8 @@ export default function CreateSessionPage() {
                         onClick={() => setFormData({ ...formData, session_type: type.value })}
                         className={`p-3 rounded-lg border-2 transition-all text-left ${
                           formData.session_type === type.value
-                            ? 'border-petrol-700 bg-petrol-50'
-                            : 'border-silver-400 hover:border-petrol-300'
+                            ? 'border-neon-700 bg-neon-50'
+                            : 'border-silver-400 hover:border-neon-300'
                         }`}
                       >
                         <div className="text-2xl mb-1">{type.icon}</div>
@@ -292,15 +292,15 @@ export default function CreateSessionPage() {
                         onClick={() => setFormData({ ...formData, level_required: level })}
                         className={`w-full p-3 rounded-lg border-2 transition-all text-left ${
                           formData.level_required === level
-                            ? 'border-petrol-700 bg-petrol-50'
-                            : 'border-silver-400 hover:border-petrol-300'
+                            ? 'border-neon-700 bg-neon-50'
+                            : 'border-silver-400 hover:border-neon-300'
                         }`}
                       >
                         <div className="flex items-center justify-between">
                           <span className="text-sm font-bold text-dark-800">{levelLabels[level - 1]}</span>
                           <div className="flex gap-0.5">
                             {Array.from({ length: level }).map((_, i) => (
-                              <div key={i} className="w-2 h-2 rounded-full bg-rust-500" />
+                              <div key={i} className="w-2 h-2 rounded-full bg-pink-500" />
                             ))}
                           </div>
                         </div>
@@ -315,7 +315,7 @@ export default function CreateSessionPage() {
                     name="walk_breaks_ok"
                     checked={formData.walk_breaks_ok}
                     onChange={handleChange}
-                    className="w-4 h-4 accent-rust-500"
+                    className="w-4 h-4 accent-pink-500"
                   />
                   <label className="text-sm text-dark-800">
                     Pauses marche autorisees
@@ -339,7 +339,7 @@ export default function CreateSessionPage() {
                     value={formData.location_name}
                     onChange={handleChange}
                     placeholder="Ex: Entree du parc Monceau"
-                    className="w-full px-4 py-3 rounded-lg border border-silver-400 focus:border-petrol-700 focus:ring-2 focus:ring-petrol-700/20 outline-none transition-all"
+                    className="w-full px-4 py-3 rounded-lg border border-silver-400 focus:border-neon-700 focus:ring-2 focus:ring-neon-700/20 outline-none transition-all"
                     required
                   />
                 </div>
@@ -355,7 +355,7 @@ export default function CreateSessionPage() {
                     max="20"
                     value={formData.max_participants}
                     onChange={handleChange}
-                    className="w-full h-2 bg-silver-300 rounded-lg appearance-none cursor-pointer accent-rust-500"
+                    className="w-full h-2 bg-silver-300 rounded-lg appearance-none cursor-pointer accent-pink-500"
                   />
                   <div className="flex justify-between text-xs text-dark-500 mt-1">
                     <span>2 personnes</span>
@@ -371,7 +371,7 @@ export default function CreateSessionPage() {
                 <h2 className="text-xl font-bold text-dark-800 mb-4">Recapitulatif</h2>
 
                 <div className="space-y-3">
-                  <div className="p-4 bg-petrol-50 rounded-lg">
+                  <div className="p-4 bg-neon-50 rounded-lg">
                     <div className="font-bold text-dark-800 mb-1">{formData.title}</div>
                     {formData.description && (
                       <div className="text-sm text-dark-500">{formData.description}</div>
@@ -423,8 +423,8 @@ export default function CreateSessionPage() {
                 </div>
 
                 {error && (
-                  <div className="p-4 bg-rust-50 border border-rust-300 rounded-lg">
-                    <p className="text-sm text-rust-600">{error}</p>
+                  <div className="p-4 bg-pink-50 border border-pink-300 rounded-lg">
+                    <p className="text-sm text-pink-600">{error}</p>
                   </div>
                 )}
               </div>
@@ -453,7 +453,7 @@ export default function CreateSessionPage() {
                   disabled={!canProceed()}
                   className={`inline-flex items-center gap-2 px-6 py-2.5 rounded-lg font-bold transition-all ${
                     canProceed()
-                      ? 'bg-rust-500 text-white hover:bg-rust-600'
+                      ? 'bg-pink-500 text-white hover:bg-pink-600'
                       : 'bg-silver-300 text-dark-500 cursor-not-allowed'
                   }`}
                 >
@@ -464,7 +464,7 @@ export default function CreateSessionPage() {
                 <button
                   type="submit"
                   disabled={loading}
-                  className="inline-flex items-center gap-2 px-8 py-2.5 rounded-lg bg-rust-500 text-white font-bold hover:bg-rust-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="inline-flex items-center gap-2 px-8 py-2.5 rounded-lg bg-pink-500 text-white font-bold hover:bg-pink-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {loading ? 'Creation...' : 'Creer la sortie'}
                   <Check className="w-5 h-5" />
@@ -478,7 +478,7 @@ export default function CreateSessionPage() {
         <div className="text-center mt-4">
           <Link
             href="/sessions"
-            className="text-sm text-dark-500 hover:text-petrol-700 transition-colors"
+            className="text-sm text-dark-500 hover:text-neon-700 transition-colors"
           >
             Annuler
           </Link>

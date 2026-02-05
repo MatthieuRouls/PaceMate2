@@ -101,7 +101,7 @@ export default function MesSortiesPage() {
               <>
                 {upcomingCreated.length === 0 && upcomingJoined.length === 0 ? (
                   <div className="text-center py-16 bg-white rounded-xl border border-silver-400">
-                    <div className="w-20 h-20 rounded-full bg-petrol-700 flex items-center justify-center mx-auto mb-5">
+                    <div className="w-20 h-20 rounded-full bg-neon-700 flex items-center justify-center mx-auto mb-5">
                       <svg className="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                       </svg>
@@ -115,13 +115,13 @@ export default function MesSortiesPage() {
                     <div className="flex gap-3 justify-center">
                       <a
                         href="/sessions"
-                        className="px-6 py-3 rounded-lg bg-rust-500 text-white font-semibold hover:bg-rust-600 transition-colors"
+                        className="px-6 py-3 rounded-lg bg-pink-500 text-white font-semibold hover:bg-pink-600 transition-colors"
                       >
                         Decouvrir les sessions
                       </a>
                       <a
                         href="/sessions/create"
-                        className="px-6 py-3 rounded-lg bg-white border border-petrol-500 text-petrol-700 font-semibold hover:bg-petrol-50 transition-colors"
+                        className="px-6 py-3 rounded-lg bg-white border border-neon-500 text-neon-700 font-semibold hover:bg-neon-50 transition-colors"
                       >
                         Creer une sortie
                       </a>
@@ -133,7 +133,7 @@ export default function MesSortiesPage() {
                     {upcomingCreated.length > 0 && (
                       <div>
                         <div className="flex items-center gap-2 mb-4">
-                          <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-rust-500 text-white">
+                          <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-pink-500 text-white">
                             <span className="text-sm">👑</span>
                             <span className="font-bold text-sm">Mes creations</span>
                           </div>
@@ -153,7 +153,7 @@ export default function MesSortiesPage() {
                     {upcomingJoined.length > 0 && (
                       <div>
                         <div className="flex items-center gap-3 mb-4">
-                          <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white border border-petrol-500 text-petrol-700">
+                          <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white border border-neon-500 text-neon-700">
                             <span className="text-sm">🏃</span>
                             <span className="font-bold text-sm">Mes participations</span>
                           </div>
@@ -195,7 +195,7 @@ export default function MesSortiesPage() {
                     {pastCreated.length > 0 && (
                       <div>
                         <div className="flex items-center gap-2 mb-4">
-                          <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-rust-500 text-white">
+                          <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-pink-500 text-white">
                             <span className="text-sm">👑</span>
                             <span className="font-bold text-sm">Mes creations</span>
                           </div>
@@ -215,7 +215,7 @@ export default function MesSortiesPage() {
                     {pastJoined.length > 0 && (
                       <div>
                         <div className="flex items-center gap-3 mb-4">
-                          <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white border border-petrol-500 text-petrol-700">
+                          <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white border border-neon-500 text-neon-700">
                             <span className="text-sm">🏃</span>
                             <span className="font-bold text-sm">Mes participations</span>
                           </div>
@@ -240,17 +240,17 @@ export default function MesSortiesPage() {
         {/* Stats Summary (if has past sessions) */}
         {activeTab === 'past' && (pastCreated.length > 0 || pastJoined.length > 0) && (
           <div className="mt-6 grid grid-cols-2 md:grid-cols-4 gap-3">
-            <div className="bg-rust-500 rounded-lg p-4 text-center">
+            <div className="bg-pink-500 rounded-lg p-4 text-center">
               <div className="text-2xl font-bold text-white mb-1">{pastCreated.length + pastJoined.length}</div>
               <div className="text-xs text-white/90 font-medium">Sessions completees</div>
             </div>
-            <div className="bg-terra-400 rounded-lg p-4 text-center">
+            <div className="bg-neon-400 rounded-lg p-4 text-center">
               <div className="text-2xl font-bold text-white mb-1">
                 {[...pastCreated, ...pastJoined].reduce((sum, s) => sum + s.distance_km, 0)} km
               </div>
               <div className="text-xs text-white/90 font-medium">Distance totale</div>
             </div>
-            <div className="bg-petrol-700 rounded-lg p-4 text-center">
+            <div className="bg-neon-700 rounded-lg p-4 text-center">
               <div className="text-2xl font-bold text-white mb-1">
                 {pastCreated.length > 0 ? (
                   <span>👑 {pastCreated.length}</span>
