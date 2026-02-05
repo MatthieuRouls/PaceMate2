@@ -54,8 +54,8 @@ export default function DashboardPage() {
   return (
     <div className="min-h-screen bg-neu-base pt-28 pb-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
-        {/* Welcome Header - Neumorphic */}
-        <div className="neu-card p-8 mb-10">
+        {/* Welcome Header */}
+        <div className="card p-8 mb-10">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
             <div>
               <h1 className="text-3xl font-bold text-dark-800 mb-2">
@@ -67,7 +67,7 @@ export default function DashboardPage() {
             </div>
             <Link
               href="/sessions/create"
-              className="neu-btn inline-flex items-center justify-center gap-2 px-8 py-4 text-white font-bold text-lg"
+              className="neu-btn inline-flex items-center justify-center gap-2 px-8 py-4 text-dark-800 font-bold text-lg"
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
@@ -77,11 +77,11 @@ export default function DashboardPage() {
           </div>
         </div>
 
-        {/* Quick Stats - Neumorphic Cards */}
+        {/* Quick Stats */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
-          <div className="neu-card-subtle p-6">
+          <div className="card p-6">
             <div className="flex items-center justify-between mb-4">
-              <div className="neu-icon w-12 h-12 flex items-center justify-center">
+              <div className="w-12 h-12 rounded-xl bg-petrol-100 flex items-center justify-center">
                 <svg className="w-6 h-6 text-petrol-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                 </svg>
@@ -102,9 +102,9 @@ export default function DashboardPage() {
             </div>
           </div>
 
-          <div className="neu-card-subtle p-6">
+          <div className="card p-6">
             <div className="flex items-center justify-between mb-4">
-              <div className="neu-icon w-12 h-12 flex items-center justify-center">
+              <div className="w-12 h-12 rounded-xl bg-orange-100 flex items-center justify-center">
                 <svg className="w-6 h-6 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
                 </svg>
@@ -125,9 +125,9 @@ export default function DashboardPage() {
             </div>
           </div>
 
-          <div className="neu-card-subtle p-6">
+          <div className="card p-6">
             <div className="flex items-center justify-between mb-4">
-              <div className="neu-icon w-12 h-12 flex items-center justify-center">
+              <div className="w-12 h-12 rounded-xl bg-sand-100 flex items-center justify-center">
                 <svg className="w-6 h-6 text-sand-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
@@ -149,11 +149,11 @@ export default function DashboardPage() {
           </div>
         </div>
 
-        {/* Quick Actions - Neumorphic */}
+        {/* Quick Actions */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
           <Link
             href="/sessions/create"
-            className="group neu-card p-6 hover:shadow-[10px_10px_20px_#d1d9e6,-10px_-10px_20px_#ffffff] transition-shadow"
+            className="neu-btn group p-6"
           >
             <div className="flex items-center gap-5">
               <div className="w-14 h-14 rounded-2xl bg-orange-500 flex items-center justify-center">
@@ -173,10 +173,10 @@ export default function DashboardPage() {
 
           <Link
             href="/sessions"
-            className="group neu-card p-6 hover:shadow-[10px_10px_20px_#d1d9e6,-10px_-10px_20px_#ffffff] transition-shadow"
+            className="neu-btn group p-6"
           >
             <div className="flex items-center gap-5">
-              <div className="neu-icon w-14 h-14 flex items-center justify-center">
+              <div className="w-14 h-14 rounded-xl bg-petrol-100 flex items-center justify-center">
                 <svg className="w-7 h-7 text-petrol-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                 </svg>
@@ -217,8 +217,8 @@ export default function DashboardPage() {
               ))}
             </div>
           ) : (
-            <div className="neu-card text-center py-16 px-8">
-              <div className="neu-icon w-16 h-16 mx-auto mb-6 flex items-center justify-center">
+            <div className="card text-center py-16 px-8">
+              <div className="w-16 h-16 mx-auto mb-6 rounded-xl bg-silver-100 flex items-center justify-center">
                 <svg className="w-8 h-8 text-dark-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                 </svg>
@@ -226,7 +226,7 @@ export default function DashboardPage() {
               <p className="text-dark-500 mb-6">Aucune session disponible</p>
               <Link
                 href="/sessions/create"
-                className="neu-btn inline-block px-8 py-3 text-white font-semibold"
+                className="neu-btn inline-block px-8 py-3 text-dark-800 font-semibold"
               >
                 Creer la premiere session
               </Link>
@@ -249,7 +249,7 @@ export default function DashboardPage() {
             </p>
             <Link
               href="/teams"
-              className="neu-btn inline-block px-10 py-4 text-white font-bold text-lg"
+              className="neu-btn inline-block px-10 py-4 text-dark-800 font-bold text-lg"
             >
               Decouvrir les equipes
             </Link>

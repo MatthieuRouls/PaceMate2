@@ -136,35 +136,29 @@
   }
 }
 
-/* Neumorphism utilities */
+/* Utilities */
 @layer utilities {
-  /* Neumorphic card - raised effect */
-  .neu-card {
-    background: #F0F2F5;
-    border-radius: 20px;
-    box-shadow: 8px 8px 16px #d1d9e6, -8px -8px 16px #ffffff;
-  }
-
-  /* Neumorphic card - subtle */
-  .neu-card-subtle {
-    background: #F0F2F5;
+  /* Simple card - flat design */
+  .card {
+    background: #ffffff;
     border-radius: 16px;
-    box-shadow: 5px 5px 10px #d1d9e6, -5px -5px 10px #ffffff;
+    border: 1px solid rgba(0, 0, 0, 0.05);
   }
 
-  /* Neumorphic inset - pressed effect */
-  .neu-inset {
-    background: #F0F2F5;
-    border-radius: 12px;
-    box-shadow: inset 4px 4px 8px #d1d9e6, inset -4px -4px 8px #ffffff;
-  }
-
-  /* Neumorphic button - pressed/inset effect by default */
+  /* Neumorphic button - raised state (default) */
   .neu-btn {
-    background: #FF5722;
     border-radius: 50px;
-    box-shadow: inset 4px 4px 10px rgba(0, 0, 0, 0.25), inset -3px -3px 8px rgba(255, 140, 100, 0.4);
+    background: linear-gradient(145deg, #e5e5e5, #c1c1c1);
+    box-shadow: 20px 20px 60px #b6b6b6, -20px -20px 60px #f6f6f6;
     transition: all 0.15s ease;
+    cursor: pointer;
+  }
+
+  /* Neumorphic button - pressed state on click */
+  .neu-btn:active,
+  .neu-btn.pressed {
+    background: #d6d6d6;
+    box-shadow: inset 20px 20px 60px #b6b6b6, inset -20px -20px 60px #f6f6f6;
   }
 
   /* Glassmorphism */
@@ -189,12 +183,5 @@
     -webkit-backdrop-filter: blur(12px);
     border: 1px solid rgba(255, 255, 255, 0.4);
     border-radius: 50px;
-  }
-
-  /* Neumorphic icon container */
-  .neu-icon {
-    background: #F0F2F5;
-    border-radius: 12px;
-    box-shadow: 3px 3px 6px #d1d9e6, -3px -3px 6px #ffffff;
   }
 }
