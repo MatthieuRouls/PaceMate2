@@ -99,6 +99,14 @@
     -moz-osx-font-smoothing: grayscale;
     background-color: #F0F2F5;
     color: #0D1D25;
+    transition: background-color 0.3s ease, color 0.3s ease;
+  }
+
+  /* Dark mode body */
+  .dark body,
+  body.dark {
+    background-color: #1a1a2e;
+    color: #e6e6ea;
   }
 
   /* Smooth transitions */
@@ -133,6 +141,19 @@
 
   ::-webkit-scrollbar-thumb:hover {
     background: #b8c4d4;
+  }
+
+  /* Dark mode scrollbar */
+  .dark ::-webkit-scrollbar-track {
+    background: #1a1a2e;
+  }
+
+  .dark ::-webkit-scrollbar-thumb {
+    background: #3a3a5c;
+  }
+
+  .dark ::-webkit-scrollbar-thumb:hover {
+    background: #4a4a6c;
   }
 }
 
@@ -197,5 +218,132 @@
     -webkit-backdrop-filter: blur(12px);
     border: 1px solid rgba(255, 255, 255, 0.4);
     border-radius: 50px;
+  }
+
+  /* ============================================
+     DARK MODE STYLES
+     ============================================ */
+
+  /* Dark mode background */
+  .dark .bg-neu-base {
+    background-color: #1a1a2e !important;
+  }
+
+  .dark .bg-white {
+    background-color: #16213e !important;
+  }
+
+  /* Dark mode cards */
+  .dark .card {
+    background: #16213e;
+    border-color: rgba(255, 255, 255, 0.08);
+  }
+
+  /* Dark mode neumorphic buttons */
+  .dark .neu-btn {
+    background: #1a1a2e;
+    box-shadow: 5px 5px 10px #0f0f1a, -5px -5px 10px #252542;
+  }
+
+  .dark .neu-btn:active,
+  .dark .neu-btn.pressed {
+    background: #1a1a2e;
+    box-shadow: inset 5px 5px 10px #0f0f1a, inset -5px -5px 10px #252542;
+  }
+
+  .dark .neu-btn-white {
+    background: #16213e;
+    box-shadow: 5px 5px 10px #0f0f1a, -5px -5px 10px #1d2a4d;
+  }
+
+  .dark .neu-btn-white:active,
+  .dark .neu-btn-white.pressed {
+    background: #16213e;
+    box-shadow: inset 5px 5px 10px #0f0f1a, inset -5px -5px 10px #1d2a4d;
+  }
+
+  /* Dark mode text colors */
+  .dark .text-dark-800 {
+    color: #e6e6ea !important;
+  }
+
+  .dark .text-dark-700 {
+    color: #d6d6dc !important;
+  }
+
+  .dark .text-dark-600 {
+    color: #c6c6d0 !important;
+  }
+
+  .dark .text-dark-500 {
+    color: #a8a8b4 !important;
+  }
+
+  /* Dark mode glass pill */
+  .dark .glass-pill {
+    background: rgba(22, 33, 62, 0.7);
+    border-color: rgba(255, 255, 255, 0.1);
+  }
+
+  /* Dark mode inputs */
+  .dark input,
+  .dark textarea,
+  .dark select {
+    background-color: #1a1a2e;
+    border-color: rgba(255, 255, 255, 0.15);
+    color: #e6e6ea;
+  }
+
+  .dark input::placeholder,
+  .dark textarea::placeholder {
+    color: #6c6c7c;
+  }
+
+  /* Neumorphic toggle switch */
+  .neu-toggle {
+    isolation: isolate;
+    position: relative;
+    height: 30px;
+    width: 60px;
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: -8px -4px 8px 0px #ffffff,
+      8px 4px 12px 0px #d1d9e6,
+      4px 4px 4px 0px #d1d9e6 inset,
+      -4px -4px 4px 0px #ffffff inset;
+    cursor: pointer;
+  }
+
+  .neu-toggle-input {
+    display: none;
+  }
+
+  .neu-toggle-indicator {
+    height: 100%;
+    width: 200%;
+    background: #ecf0f3;
+    border-radius: 15px;
+    transform: translate3d(-75%, 0, 0);
+    transition: transform 0.4s cubic-bezier(0.85, 0.05, 0.18, 1.35);
+    box-shadow: -8px -4px 8px 0px #ffffff,
+      8px 4px 12px 0px #d1d9e6;
+  }
+
+  .neu-toggle-input:checked ~ .neu-toggle-indicator {
+    transform: translate3d(25%, 0, 0);
+  }
+
+  /* Dark mode toggle */
+  .dark .neu-toggle {
+    box-shadow: -8px -4px 8px 0px #252542,
+      8px 4px 12px 0px #0f0f1a,
+      4px 4px 4px 0px #0f0f1a inset,
+      -4px -4px 4px 0px #252542 inset;
+  }
+
+  .dark .neu-toggle-indicator {
+    background: #1a1a2e;
+    box-shadow: -8px -4px 8px 0px #252542,
+      8px 4px 12px 0px #0f0f1a;
   }
 }
