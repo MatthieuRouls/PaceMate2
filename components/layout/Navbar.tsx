@@ -48,12 +48,12 @@ export default function Navbar() {
   }, [isHomepage]);
 
   return (
-    <nav className={`fixed top-0 left-0 right-0 z-50 px-4 sm:px-6 lg:px-8 py-4 transition-all duration-300 ${
-      scrolled
-        ? 'bg-white/95 backdrop-blur-md border-b border-silver-400 shadow-sm'
-        : 'bg-transparent'
-    }`}>
-      <div className="flex items-center justify-between">
+    <nav className="fixed top-0 left-0 right-0 z-50 px-4 sm:px-6 lg:px-8 py-4 transition-all duration-300">
+      <div className={`flex items-center justify-between mx-auto transition-all duration-300 ${
+        scrolled
+          ? 'glass-pill px-6 py-2 max-w-6xl shadow-lg'
+          : ''
+      }`}>
         {/* Logo */}
         <Link href={profile ? "/dashboard" : "/"} className="flex items-center gap-3 hover:opacity-80 transition-opacity">
           <Image
