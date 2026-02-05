@@ -21,8 +21,8 @@ export default function TeamCard({ team, position }: TeamCardProps) {
   return (
     <div
       className={`
-        bg-white rounded-xl border p-5 transition-all hover:shadow-md
-        ${isTopThree ? 'border-petrol-500' : 'border-silver-400 hover:border-petrol-300'}
+        card p-5 transition-all hover:shadow-md
+        ${isTopThree ? 'ring-2 ring-petrol-500' : ''}
       `}
     >
       <div className="flex items-center gap-4">

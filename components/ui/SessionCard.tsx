@@ -47,7 +47,7 @@ export default function SessionCard({ session, onClick, showJoinButton = true }:
 
   const cardContent = (
     <div
-      className="group bg-white rounded-xl p-6 hover:shadow-lg transition-all duration-300 cursor-pointer border border-silver-400 hover:border-petrol-500"
+      className="group card p-6 hover:shadow-md transition-all duration-300 cursor-pointer"
       onClick={onClick}
     >
       <div className="space-y-5">
@@ -158,19 +158,19 @@ export default function SessionCard({ session, onClick, showJoinButton = true }:
           </div>
 
           {isFull ? (
-            <span className="px-4 py-2 rounded-lg bg-silver-200 text-dark-600 text-sm font-semibold">
+            <span className="px-5 py-2.5 rounded-full bg-silver-200 text-dark-600 text-sm font-semibold">
               Complet
             </span>
           ) : showJoinButton && onClick ? (
             <Link
               href={`/sessions/${session.id}`}
               onClick={handleJoinClick}
-              className="px-4 py-2 rounded-lg bg-rust-500 text-white text-sm font-semibold hover:bg-rust-600 transition-colors"
+              className="neu-btn-white px-5 py-2.5 text-dark-800 text-sm font-semibold"
             >
               Rejoindre
             </Link>
           ) : showJoinButton && !onClick ? (
-            <span className="px-4 py-2 rounded-lg bg-rust-500 text-white text-sm font-semibold">
+            <span className="neu-btn-white px-5 py-2.5 text-dark-800 text-sm font-semibold">
               Voir details
             </span>
           ) : null}

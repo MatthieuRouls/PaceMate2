@@ -140,7 +140,7 @@ export default function TeamsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-silver-50 pt-20">
+    <div className="min-h-screen bg-neu-base pt-20">
       {/* Header */}
       <div className="bg-white border-b border-silver-400">
         <div className="max-w-6xl mx-auto px-6 py-5">
@@ -159,7 +159,7 @@ export default function TeamsPage() {
 
         {/* Error */}
         {error && (
-          <div className="bg-white rounded-xl border border-rust-300 p-5 mb-6">
+          <div className="card p-5 mb-6">
             <p className="text-rust-600 font-semibold mb-1">Erreur</p>
             <p className="text-dark-500 text-sm">{error}</p>
           </div>
@@ -172,7 +172,7 @@ export default function TeamsPage() {
             <div className="flex-1">
               {/* Si l'utilisateur a une equipe */}
               {userTeam ? (
-                <div className="bg-white rounded-xl border border-silver-400 overflow-hidden">
+                <div className="card overflow-hidden">
                   {/* En-tete de l'equipe */}
                   <div className="bg-dark-800 px-6 py-5">
                     <div className="flex items-center justify-between">
@@ -239,7 +239,7 @@ export default function TeamsPage() {
                 </div>
               ) : (
                 /* Si l'utilisateur n'a pas d'equipe */
-                <div className="bg-white rounded-xl border border-silver-400 p-6">
+                <div className="card p-6">
                   {!showCreateForm ? (
                     /* Message d'invitation */
                     <div className="text-center py-6">
@@ -254,7 +254,7 @@ export default function TeamsPage() {
                       </p>
                       <button
                         onClick={() => setShowCreateForm(true)}
-                        className="px-5 py-2.5 bg-rust-500 text-white font-medium rounded-lg hover:bg-rust-600 transition-colors"
+                        className="neu-btn-white px-5 py-2.5 text-dark-800 font-medium"
                       >
                         Creer une equipe
                       </button>
@@ -328,14 +328,14 @@ export default function TeamsPage() {
                               setShowCreateForm(false);
                               setCreateError(null);
                             }}
-                            className="flex-1 px-4 py-2 border border-silver-400 text-dark-600 font-medium rounded-lg hover:bg-silver-100 transition-colors"
+                            className="flex-1 px-4 py-2 border border-silver-400 text-dark-600 font-medium rounded-full hover:bg-silver-100 transition-colors"
                           >
                             Annuler
                           </button>
                           <button
                             type="submit"
                             disabled={creatingTeam || !teamName.trim()}
-                            className="flex-1 px-4 py-2 bg-rust-500 text-white font-medium rounded-lg hover:bg-rust-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                            className="neu-btn-white flex-1 px-4 py-2 text-dark-800 font-medium disabled:opacity-50 disabled:cursor-not-allowed"
                           >
                             {creatingTeam ? 'Creation...' : 'Creer'}
                           </button>

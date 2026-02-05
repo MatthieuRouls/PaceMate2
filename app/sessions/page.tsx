@@ -57,10 +57,10 @@ export default function SessionsPage() {
   }, [filterLevel, sessions]);
 
   return (
-    <div className="min-h-screen bg-silver-50 pt-20 pb-8 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-neu-base pt-20 pb-8 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6 bg-white rounded-xl p-5 border border-silver-400">
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6 card p-5">
           <div>
             <h1 className="text-2xl font-bold text-dark-800 mb-1">
               Sessions de running
@@ -71,7 +71,7 @@ export default function SessionsPage() {
           </div>
           <Link
             href="/sessions/create"
-            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg bg-rust-500 text-white text-sm font-semibold hover:bg-rust-600 transition-colors"
+            className="neu-btn-white inline-flex items-center gap-2 px-5 py-2.5 text-dark-800 text-sm font-semibold"
           >
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
@@ -81,17 +81,17 @@ export default function SessionsPage() {
         </div>
 
         {/* Filtres */}
-        <div className="bg-white rounded-xl p-4 border border-silver-400 mb-6">
+        <div className="card p-4 mb-6">
           <div className="flex items-center gap-2 mb-3">
-            <div className="w-8 h-8 rounded-lg bg-petrol-700 flex items-center justify-center">
-              <Filter className="w-4 h-4 text-white" />
+            <div className="w-8 h-8 rounded-lg bg-petrol-100 flex items-center justify-center">
+              <Filter className="w-4 h-4 text-petrol-700" />
             </div>
             <h2 className="text-sm font-semibold text-dark-800">Filtrer par niveau</h2>
           </div>
           <div className="flex flex-wrap gap-2">
             <button
               onClick={() => setFilterLevel('all')}
-              className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+              className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
                 filterLevel === 'all'
                   ? 'bg-dark-800 text-white'
                   : 'bg-silver-200 text-dark-700 hover:bg-silver-300'
@@ -101,7 +101,7 @@ export default function SessionsPage() {
             </button>
             <button
               onClick={() => setFilterLevel('beginner')}
-              className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+              className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
                 filterLevel === 'beginner'
                   ? 'bg-sand-400 text-white'
                   : 'bg-silver-200 text-dark-700 hover:bg-silver-300'
@@ -111,7 +111,7 @@ export default function SessionsPage() {
             </button>
             <button
               onClick={() => setFilterLevel('intermediate')}
-              className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+              className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
                 filterLevel === 'intermediate'
                   ? 'bg-terra-400 text-white'
                   : 'bg-silver-200 text-dark-700 hover:bg-silver-300'
@@ -121,7 +121,7 @@ export default function SessionsPage() {
             </button>
             <button
               onClick={() => setFilterLevel('advanced')}
-              className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+              className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
                 filterLevel === 'advanced'
                   ? 'bg-rust-500 text-white'
                   : 'bg-silver-200 text-dark-700 hover:bg-silver-300'
@@ -141,7 +141,7 @@ export default function SessionsPage() {
 
         {/* Error */}
         {error && (
-          <div className="bg-white rounded-xl p-6 border border-rust-300 text-center">
+          <div className="card p-6 text-center">
             <p className="text-rust-600 font-semibold mb-1">Erreur</p>
             <p className="text-dark-500">{error}</p>
           </div>
@@ -151,9 +151,9 @@ export default function SessionsPage() {
         {!loading && !error && (
           <>
             {filteredSessions.length === 0 ? (
-              <div className="bg-white rounded-xl p-10 text-center border border-silver-400">
-                <div className="w-16 h-16 rounded-full bg-petrol-700 flex items-center justify-center mx-auto mb-5">
-                  <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="card p-10 text-center">
+                <div className="w-16 h-16 rounded-full bg-petrol-100 flex items-center justify-center mx-auto mb-5">
+                  <svg className="w-8 h-8 text-petrol-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path
                       strokeLinecap="round"
                       strokeLinejoin="round"
@@ -174,14 +174,14 @@ export default function SessionsPage() {
                   {filterLevel !== 'all' && (
                     <button
                       onClick={() => setFilterLevel('all')}
-                      className="px-5 py-2.5 rounded-lg border border-silver-400 text-dark-700 font-medium hover:bg-silver-100 transition-colors"
+                      className="px-5 py-2.5 rounded-full border border-silver-400 text-dark-700 font-medium hover:bg-silver-100 transition-colors"
                     >
                       Voir toutes les sessions
                     </button>
                   )}
                   <Link
                     href="/sessions/create"
-                    className="px-5 py-2.5 rounded-lg bg-rust-500 text-white font-medium hover:bg-rust-600 transition-colors"
+                    className="neu-btn px-5 py-2.5 text-dark-800 font-medium"
                   >
                     Creer une sortie
                   </Link>
