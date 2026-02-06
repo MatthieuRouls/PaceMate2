@@ -330,4 +330,145 @@
     box-shadow: -8px -4px 8px 0px #114237,
       8px 4px 12px 0px #051a15;
   }
+
+  /* ============================================
+     DARK MODE - Silver backgrounds
+     ============================================ */
+  .dark .bg-silver-50 {
+    background-color: #0B2E26 !important;
+  }
+
+  .dark .bg-silver-100 {
+    background-color: #0f3d32 !important;
+  }
+
+  .dark .bg-silver-200 {
+    background-color: #1a4a3e !important;
+  }
+
+  .dark .bg-silver-300 {
+    background-color: #1f5547 !important;
+  }
+
+  /* ============================================
+     DARK MODE - Neon backgrounds
+     ============================================ */
+  .dark .bg-neon-50 {
+    background-color: rgba(0, 245, 122, 0.1) !important;
+  }
+
+  .dark .bg-neon-100 {
+    background-color: rgba(0, 245, 122, 0.15) !important;
+  }
+
+  /* ============================================
+     DARK MODE - Pink backgrounds
+     ============================================ */
+  .dark .bg-pink-50 {
+    background-color: rgba(255, 45, 149, 0.1) !important;
+  }
+
+  /* ============================================
+     DARK MODE - Borders
+     ============================================ */
+  .dark .border-silver-300 {
+    border-color: rgba(0, 245, 122, 0.15) !important;
+  }
+
+  .dark .border-silver-400 {
+    border-color: rgba(0, 245, 122, 0.2) !important;
+  }
+
+  .dark .border-neon-300 {
+    border-color: rgba(0, 245, 122, 0.4) !important;
+  }
+
+  .dark .border-neon-700 {
+    border-color: #00F57A !important;
+  }
+
+  .dark .border-pink-300 {
+    border-color: rgba(255, 45, 149, 0.4) !important;
+  }
+
+  /* ============================================
+     DARK MODE - Form elements
+     ============================================ */
+  .dark .bg-white.rounded-xl,
+  .dark .bg-white.rounded-lg {
+    background-color: #0f3d32 !important;
+  }
+
+  .dark .focus\:border-neon-700:focus {
+    border-color: #00F57A !important;
+  }
+
+  .dark .focus\:ring-neon-700\/20:focus {
+    --tw-ring-color: rgba(0, 245, 122, 0.2) !important;
+  }
+
+  /* ============================================
+     DARK MODE - Filter buttons (sessions page)
+     ============================================ */
+  .dark .bg-dark-800 {
+    background-color: #00F57A !important;
+    color: #0B2E26 !important;
+  }
+
+  .dark .hover\:bg-silver-300:hover {
+    background-color: #1f5547 !important;
+  }
+
+  .dark .hover\:bg-silver-200:hover {
+    background-color: #1a4a3e !important;
+  }
+
+  .dark .hover\:bg-silver-100:hover {
+    background-color: #0f3d32 !important;
+  }
+
+  .dark .hover\:bg-silver-50:hover {
+    background-color: #0f3d32 !important;
+  }
+
+  /* ============================================
+     DARK MODE - Text colors
+     ============================================ */
+  .dark .text-dark-600 {
+    color: #c6c6d0 !important;
+  }
+
+  /* ============================================
+     DARK MODE - Border colors for avatars
+     ============================================ */
+  .dark .border-white {
+    border-color: #0f3d32 !important;
+  }
+
+  /* ============================================
+     DARK MODE - Drawer and panels
+     ============================================ */
+  .dark .bg-white.shadow-2xl,
+  .dark .shadow-2xl.bg-white {
+    background-color: #0B2E26 !important;
+  }
+
+  /* Generic white background panels */
+  .dark .fixed.bg-white {
+    background-color: #0B2E26 !important;
+  }
+
+  .dark .sticky.bg-white {
+    background-color: #0B2E26 !important;
+  }
+
+  /* Border for neon */
+  .dark .border-neon-500 {
+    border-color: #00F57A !important;
+  }
+
+  /* Hover border */
+  .dark .hover\:border-neon-500:hover {
+    border-color: #00F57A !important;
+  }
 }

@@ -108,7 +108,7 @@ export default function CreateSessionPage() {
   const levelLabels = ['Debutant', 'Debutant confirme', 'Intermediaire', 'Confirme', 'Expert'];
 
   return (
-    <div className="min-h-screen bg-silver-50 pt-20 pb-8 px-4">
+    <div className="min-h-screen bg-neu-base pt-20 pb-8 px-4">
       <div className="max-w-3xl mx-auto">
         {/* Header */}
         <div className="mb-6 text-center">
@@ -158,7 +158,7 @@ export default function CreateSessionPage() {
         </div>
 
         {/* Form Card */}
-        <div className="bg-white rounded-xl border border-silver-400 p-6 md:p-8 min-h-[400px]">
+        <div className="bg-white dark:bg-dark-700 rounded-xl border border-silver-400 p-6 md:p-8 min-h-[400px]">
           <form onSubmit={handleSubmit}>
             {/* Step 1: Basic Info */}
             {currentStep === 1 && (
@@ -268,8 +268,8 @@ export default function CreateSessionPage() {
                         onClick={() => setFormData({ ...formData, session_type: type.value })}
                         className={`p-3 rounded-lg border-2 transition-all text-left ${
                           formData.session_type === type.value
-                            ? 'border-neon-700 bg-neon-50'
-                            : 'border-silver-400 hover:border-neon-300'
+                            ? 'border-neon-700 bg-neon-50 dark:bg-neon-900/30'
+                            : 'border-silver-400 hover:border-neon-300 dark:border-dark-500 dark:hover:border-neon-600'
                         }`}
                       >
                         <div className="text-2xl mb-1">{type.icon}</div>
@@ -292,8 +292,8 @@ export default function CreateSessionPage() {
                         onClick={() => setFormData({ ...formData, level_required: level })}
                         className={`w-full p-3 rounded-lg border-2 transition-all text-left ${
                           formData.level_required === level
-                            ? 'border-neon-700 bg-neon-50'
-                            : 'border-silver-400 hover:border-neon-300'
+                            ? 'border-neon-700 bg-neon-50 dark:bg-neon-900/30'
+                            : 'border-silver-400 hover:border-neon-300 dark:border-dark-500 dark:hover:border-neon-600'
                         }`}
                       >
                         <div className="flex items-center justify-between">
