@@ -30,7 +30,7 @@ export interface UnreadCountResult extends ActionResult {
 }
 
 /**
- * Récupérer toutes les conversations de l'utilisateur
+ * Récupérer toutes les conversations de l'utilisateur (optimisé)
  */
 export async function getUserConversations(): Promise<ConversationsResult> {
   try {
@@ -41,10 +41,19 @@ export async function getUserConversations(): Promise<ConversationsResult> {
 
     const supabase = await getServerSupabaseClient();
 
-    // Récupérer les conversations où l'utilisateur est participant
+    // Récupérer les conversations avec tous les participants en une seule requête
     const { data: participations, error: partError } = await supabase
       .from('conversation_participants')
-      .select('conversation_id, last_read_at, is_muted')
+      .select(`
+        conversation_id,
+        last_read_at,
+        is_muted,
+        conversation:conversations(
+          *,
+          team:teams(*),
+          session:sessions(*)
+        )
+      `)
       .eq('user_id', user.id);
 
     if (partError || !participations?.length) {
@@ -53,73 +62,78 @@ export async function getUserConversations(): Promise<ConversationsResult> {
 
     const conversationIds = participations.map(p => p.conversation_id);
 
-    // Récupérer les détails des conversations
-    const { data: conversations, error } = await supabase
-      .from('conversations')
-      .select(`
-        *,
-        team:teams(*),
-        session:sessions(*)
-      `)
-      .in('id', conversationIds)
-      .order('updated_at', { ascending: false });
+    // Récupérer les derniers messages pour toutes les conversations en une requête
+    const { data: allMessages } = await supabase
+      .from('messages')
+      .select(`*, sender:profiles(*)`)
+      .in('conversation_id', conversationIds)
+      .eq('is_deleted', false)
+      .order('created_at', { ascending: false });
 
-    if (error) {
-      console.error('Error fetching conversations:', error);
-      return { success: false, error: 'Erreur lors de la récupération' };
+    // Grouper les messages par conversation et prendre le premier (le plus récent)
+    const lastMessageByConv: Record<string, Message> = {};
+    if (allMessages) {
+      for (const msg of allMessages) {
+        if (!lastMessageByConv[msg.conversation_id]) {
+          lastMessageByConv[msg.conversation_id] = msg as unknown as Message;
+        }
+      }
     }
 
-    // Pour chaque conversation, récupérer le dernier message et le nombre de non-lus
-    const enrichedConversations = await Promise.all(
-      conversations.map(async (conv) => {
-        const participation = participations.find(p => p.conversation_id === conv.id);
+    // Récupérer tous les participants pour les conversations directes en une requête
+    const directConvIds = participations
+      .filter(p => {
+        const conv = p.conversation as unknown as { type?: string } | null;
+        return conv?.type === 'direct';
+      })
+      .map(p => p.conversation_id);
 
-        // Dernier message
-        const { data: lastMessages } = await supabase
-          .from('messages')
-          .select(`*, sender:profiles(*)`)
-          .eq('conversation_id', conv.id)
-          .eq('is_deleted', false)
-          .order('created_at', { ascending: false })
-          .limit(1);
+    const otherParticipantsMap: Record<string, unknown> = {};
+    if (directConvIds.length > 0) {
+      const { data: otherParticipants } = await supabase
+        .from('conversation_participants')
+        .select('conversation_id, user:profiles(*)')
+        .in('conversation_id', directConvIds)
+        .neq('user_id', user.id);
 
-        // Nombre de messages non lus
-        let unreadQuery = supabase
-          .from('messages')
-          .select('*', { count: 'exact', head: true })
-          .eq('conversation_id', conv.id)
-          .eq('is_deleted', false)
-          .neq('sender_id', user.id);
-
-        if (participation?.last_read_at) {
-          unreadQuery = unreadQuery.gt('created_at', participation.last_read_at);
+      if (otherParticipants) {
+        for (const p of otherParticipants) {
+          otherParticipantsMap[p.conversation_id] = p.user;
         }
+      }
+    }
 
-        const { count: unreadCount } = await unreadQuery;
+    // Construire les conversations enrichies
+    const enrichedConversations = participations
+      .map((part) => {
+        const conv = part.conversation as unknown as Conversation | null;
+        if (!conv) return null;
 
-        // Pour les conversations directes, récupérer l'autre participant
-        let otherParticipant = null;
-        if (conv.type === 'direct') {
-          const { data: participants } = await supabase
-            .from('conversation_participants')
-            .select('user:profiles(*)')
-            .eq('conversation_id', conv.id)
-            .neq('user_id', user.id)
-            .limit(1);
-
-          if (participants?.[0]) {
-            otherParticipant = participants[0].user;
+        // Calculer unread_count simplement: messages après last_read_at qui ne sont pas de l'utilisateur
+        let unreadCount = 0;
+        if (allMessages) {
+          for (const msg of allMessages) {
+            if (msg.conversation_id === part.conversation_id && msg.sender_id !== user.id) {
+              if (!part.last_read_at || new Date(msg.created_at) > new Date(part.last_read_at)) {
+                unreadCount++;
+              }
+            }
           }
         }
 
         return {
           ...conv,
-          last_message: lastMessages?.[0] || null,
-          unread_count: unreadCount || 0,
-          other_participant: otherParticipant
-        };
+          last_message: lastMessageByConv[part.conversation_id] || null,
+          unread_count: unreadCount,
+          other_participant: otherParticipantsMap[part.conversation_id] || undefined
+        } as Conversation;
       })
-    );
+      .filter((c): c is Conversation => c !== null)
+      .sort((a, b) => {
+        const dateA = a.updated_at ? new Date(a.updated_at).getTime() : 0;
+        const dateB = b.updated_at ? new Date(b.updated_at).getTime() : 0;
+        return dateB - dateA;
+      });
 
     return { success: true, conversations: enrichedConversations };
   } catch (error) {
