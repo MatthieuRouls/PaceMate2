@@ -5,6 +5,7 @@
 
 -- Drop existing problematic policies
 DROP POLICY IF EXISTS "Users can view their conversations" ON conversations;
+DROP POLICY IF EXISTS "Users can create conversations" ON conversations;
 DROP POLICY IF EXISTS "Users can view participants of their conversations" ON conversation_participants;
 DROP POLICY IF EXISTS "Users can view their own participation" ON conversation_participants;
 DROP POLICY IF EXISTS "Users can view co-participants" ON conversation_participants;
@@ -33,6 +34,10 @@ CREATE POLICY "Users can view their conversations" ON conversations
   FOR SELECT USING (
     user_is_conversation_member(id, auth.uid())
   );
+
+-- Allow authenticated users to create conversations
+CREATE POLICY "Authenticated users can create conversations" ON conversations
+  FOR INSERT WITH CHECK (auth.uid() IS NOT NULL);
 
 CREATE POLICY "Users can view participants in their conversations" ON conversation_participants
   FOR SELECT USING (
