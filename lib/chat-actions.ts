@@ -384,71 +384,73 @@ export async function getOrCreateDirectConversation(friendId: string): Promise<C
       return { success: false, error: 'Vous devez être amis pour envoyer un message direct' };
     }
 
-    // Chercher une conversation directe existante entre les deux utilisateurs
-    const { data: existingConvs } = await supabase
-      .from('conversations')
-      .select(`
-        *,
-        participants:conversation_participants(user_id)
-      `)
-      .eq('type', 'direct');
+    // Utiliser la fonction RPC pour créer ou récupérer la conversation
+    // Cette fonction utilise SECURITY DEFINER pour bypasser les restrictions RLS
+    const { data: rpcResult, error: rpcError } = await supabase
+      .rpc('create_direct_conversation', { friend_id: friendId });
 
-    // Filtrer pour trouver la conversation avec exactement ces deux participants
-    let existingConv = null;
-    if (existingConvs) {
-      for (const conv of existingConvs) {
-        const participantIds = conv.participants?.map((p: { user_id: string }) => p.user_id) || [];
-        if (
-          participantIds.length === 2 &&
-          participantIds.includes(user.id) &&
-          participantIds.includes(friendId)
-        ) {
-          existingConv = conv;
-          break;
+    if (rpcError) {
+      console.error('Error in create_direct_conversation RPC:', rpcError);
+
+      // Fallback: essayer de trouver une conversation existante
+      const { data: existingConvs } = await supabase
+        .from('conversations')
+        .select(`
+          *,
+          participants:conversation_participants(user_id)
+        `)
+        .eq('type', 'direct');
+
+      let existingConv = null;
+      if (existingConvs) {
+        for (const conv of existingConvs) {
+          const participantIds = conv.participants?.map((p: { user_id: string }) => p.user_id) || [];
+          if (
+            participantIds.length === 2 &&
+            participantIds.includes(user.id) &&
+            participantIds.includes(friendId)
+          ) {
+            existingConv = conv;
+            break;
+          }
         }
       }
+
+      if (existingConv) {
+        const { data: otherUser } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('id', friendId)
+          .single();
+
+        return {
+          success: true,
+          conversation: {
+            ...existingConv,
+            other_participant: otherUser
+          }
+        };
+      }
+
+      return { success: false, error: 'Erreur lors de la création de la conversation' };
     }
 
-    if (existingConv) {
-      // Récupérer l'autre participant
-      const { data: otherUser } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('id', friendId)
-        .single();
+    // Récupérer la conversation complète
+    const conversationId = rpcResult?.[0]?.conversation_id;
 
-      return {
-        success: true,
-        conversation: {
-          ...existingConv,
-          other_participant: otherUser
-        }
-      };
+    if (!conversationId) {
+      return { success: false, error: 'Erreur lors de la création' };
     }
 
-    // Créer une nouvelle conversation directe
-    const { data: newConv, error: convError } = await supabase
+    const { data: conversation, error: convError } = await supabase
       .from('conversations')
-      .insert({ type: 'direct' })
-      .select()
+      .select('*')
+      .eq('id', conversationId)
       .single();
 
     if (convError) {
-      console.error('Error creating conversation:', convError);
-      return { success: false, error: 'Erreur lors de la création' };
-    }
-
-    // Ajouter les deux participants
-    const { error: partError } = await supabase
-      .from('conversation_participants')
-      .insert([
-        { conversation_id: newConv.id, user_id: user.id },
-        { conversation_id: newConv.id, user_id: friendId }
-      ]);
-
-    if (partError) {
-      console.error('Error adding participants:', partError);
-      return { success: false, error: 'Erreur lors de la création' };
+      console.error('Error fetching conversation:', convError);
+      return { success: false, error: 'Erreur lors de la récupération' };
     }
 
     // Récupérer l'autre participant
@@ -461,7 +463,7 @@ export async function getOrCreateDirectConversation(friendId: string): Promise<C
     return {
       success: true,
       conversation: {
-        ...newConv,
+        ...conversation,
         other_participant: otherUser
       }
     };
