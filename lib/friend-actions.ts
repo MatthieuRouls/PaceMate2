@@ -349,9 +349,9 @@ export async function getFriendsList(): Promise<FriendsListResult> {
     // Extraire les profils des amis
     const friends: Profile[] = friendships.map(f => {
       if (f.user_id === user.id) {
-        return f.friend as Profile;
+        return f.friend as unknown as Profile;
       }
-      return f.user as Profile;
+      return f.user as unknown as Profile;
     });
 
     return { success: true, friends };
