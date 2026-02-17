@@ -15,6 +15,17 @@ export function useRealtimeMessages(
   onMessageDeleted?: (messageId: string) => void
 ) {
   const channelRef = useRef<RealtimeChannel | null>(null);
+  // Use refs for callbacks to avoid re-subscribing when they change
+  const onNewMessageRef = useRef(onNewMessage);
+  const onMessageUpdatedRef = useRef(onMessageUpdated);
+  const onMessageDeletedRef = useRef(onMessageDeleted);
+
+  // Keep refs up to date
+  useEffect(() => {
+    onNewMessageRef.current = onNewMessage;
+    onMessageUpdatedRef.current = onMessageUpdated;
+    onMessageDeletedRef.current = onMessageDeleted;
+  });
 
   useEffect(() => {
     if (!conversationId) return;
@@ -39,7 +50,7 @@ export function useRealtimeMessages(
             .single();
 
           if (data) {
-            onNewMessage(data as Message);
+            onNewMessageRef.current(data as Message);
           }
         }
       )
@@ -52,9 +63,9 @@ export function useRealtimeMessages(
           filter: `conversation_id=eq.${conversationId}`
         },
         async (payload) => {
-          if (payload.new.is_deleted && onMessageDeleted) {
-            onMessageDeleted(payload.new.id);
-          } else if (onMessageUpdated) {
+          if (payload.new.is_deleted && onMessageDeletedRef.current) {
+            onMessageDeletedRef.current(payload.new.id);
+          } else if (onMessageUpdatedRef.current) {
             const { data } = await supabase
               .from('messages')
               .select(`*, sender:profiles(*)`)
@@ -62,7 +73,7 @@ export function useRealtimeMessages(
               .single();
 
             if (data) {
-              onMessageUpdated(data as Message);
+              onMessageUpdatedRef.current(data as Message);
             }
           }
         }
@@ -74,7 +85,7 @@ export function useRealtimeMessages(
     return () => {
       channel.unsubscribe();
     };
-  }, [conversationId, onNewMessage, onMessageUpdated, onMessageDeleted]);
+  }, [conversationId]); // Only re-subscribe when conversationId changes
 
   return channelRef.current;
 }
@@ -87,6 +98,15 @@ export function useFriendRequestNotifications(
   onNewRequest: (friendship: Friendship) => void,
   onRequestUpdated?: (friendship: Friendship) => void
 ) {
+  // Use refs for callbacks to avoid re-subscribing
+  const onNewRequestRef = useRef(onNewRequest);
+  const onRequestUpdatedRef = useRef(onRequestUpdated);
+
+  useEffect(() => {
+    onNewRequestRef.current = onNewRequest;
+    onRequestUpdatedRef.current = onRequestUpdated;
+  });
+
   useEffect(() => {
     if (!userId) return;
 
@@ -109,7 +129,7 @@ export function useFriendRequestNotifications(
             .single();
 
           if (data && data.status === 'pending') {
-            onNewRequest(data as Friendship);
+            onNewRequestRef.current(data as Friendship);
           }
         }
       )
@@ -126,7 +146,7 @@ export function useFriendRequestNotifications(
             return;
           }
 
-          if (onRequestUpdated) {
+          if (onRequestUpdatedRef.current) {
             const { data } = await supabase
               .from('friendships')
               .select(`
@@ -138,7 +158,7 @@ export function useFriendRequestNotifications(
               .single();
 
             if (data) {
-              onRequestUpdated(data as Friendship);
+              onRequestUpdatedRef.current(data as Friendship);
             }
           }
         }
@@ -148,7 +168,7 @@ export function useFriendRequestNotifications(
     return () => {
       channel.unsubscribe();
     };
-  }, [userId, onNewRequest, onRequestUpdated]);
+  }, [userId]); // Only re-subscribe when userId changes
 }
 
 /**
@@ -251,38 +271,12 @@ export function useConversationPresence(
 export function useNotificationCounts(userId: string | null) {
   const [unreadMessages, setUnreadMessages] = useState(0);
   const [pendingRequests, setPendingRequests] = useState(0);
+  const refreshTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const refresh = useCallback(async () => {
     if (!userId) return;
 
-    // Compter les messages non lus
-    const { data: participations } = await supabase
-      .from('conversation_participants')
-      .select('conversation_id, last_read_at')
-      .eq('user_id', userId)
-      .eq('is_muted', false);
-
-    if (participations) {
-      let total = 0;
-      for (const part of participations) {
-        let query = supabase
-          .from('messages')
-          .select('*', { count: 'exact', head: true })
-          .eq('conversation_id', part.conversation_id)
-          .eq('is_deleted', false)
-          .neq('sender_id', userId);
-
-        if (part.last_read_at) {
-          query = query.gt('created_at', part.last_read_at);
-        }
-
-        const { count } = await query;
-        total += count || 0;
-      }
-      setUnreadMessages(total);
-    }
-
-    // Compter les demandes d'ami en attente
+    // Compter les demandes d'ami en attente (simple et rapide)
     const { count: requestsCount } = await supabase
       .from('friendships')
       .select('*', { count: 'exact', head: true })
@@ -290,7 +284,49 @@ export function useNotificationCounts(userId: string | null) {
       .eq('status', 'pending');
 
     setPendingRequests(requestsCount || 0);
+
+    // Pour les messages non lus, on fait une requête simplifiée
+    // On compte juste le nombre de participations avec des messages non lus
+    const { data: participations } = await supabase
+      .from('conversation_participants')
+      .select('conversation_id, last_read_at')
+      .eq('user_id', userId)
+      .eq('is_muted', false);
+
+    if (participations && participations.length > 0) {
+      // Batch query: get all unread counts at once
+      const conversationIds = participations.map(p => p.conversation_id);
+
+      const { data: messages } = await supabase
+        .from('messages')
+        .select('conversation_id, created_at')
+        .in('conversation_id', conversationIds)
+        .eq('is_deleted', false)
+        .neq('sender_id', userId);
+
+      if (messages) {
+        let total = 0;
+        for (const part of participations) {
+          const unread = messages.filter(m =>
+            m.conversation_id === part.conversation_id &&
+            (!part.last_read_at || new Date(m.created_at) > new Date(part.last_read_at))
+          ).length;
+          total += unread;
+        }
+        setUnreadMessages(total);
+      }
+    } else {
+      setUnreadMessages(0);
+    }
   }, [userId]);
+
+  // Debounced refresh to avoid too many calls
+  const debouncedRefresh = useCallback(() => {
+    if (refreshTimeoutRef.current) {
+      clearTimeout(refreshTimeoutRef.current);
+    }
+    refreshTimeoutRef.current = setTimeout(refresh, 500);
+  }, [refresh]);
 
   useEffect(() => {
     refresh();
@@ -303,7 +339,7 @@ export function useNotificationCounts(userId: string | null) {
       .on(
         'postgres_changes',
         { event: '*', schema: 'public', table: 'messages' },
-        () => refresh()
+        () => debouncedRefresh()
       )
       .subscribe();
 
@@ -317,15 +353,18 @@ export function useNotificationCounts(userId: string | null) {
           table: 'friendships',
           filter: `friend_id=eq.${userId}`
         },
-        () => refresh()
+        () => debouncedRefresh()
       )
       .subscribe();
 
     return () => {
       messagesChannel.unsubscribe();
       friendsChannel.unsubscribe();
+      if (refreshTimeoutRef.current) {
+        clearTimeout(refreshTimeoutRef.current);
+      }
     };
-  }, [userId, refresh]);
+  }, [userId, refresh, debouncedRefresh]);
 
   return { unreadMessages, pendingRequests, refresh };
 }
