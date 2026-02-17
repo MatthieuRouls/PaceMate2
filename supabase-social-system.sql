@@ -105,25 +105,38 @@ CREATE POLICY "Users can update friendships they're part of" ON friendships
 CREATE POLICY "Users can delete own friendships" ON friendships
   FOR DELETE USING (auth.uid() = user_id OR auth.uid() = friend_id);
 
+-- Helper function to check conversation membership (bypasses RLS)
+CREATE OR REPLACE FUNCTION user_is_conversation_member(conv_id UUID, uid UUID)
+RETURNS BOOLEAN AS $$
+BEGIN
+  RETURN EXISTS (
+    SELECT 1 FROM conversation_participants
+    WHERE conversation_id = conv_id AND user_id = uid
+  );
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+-- Helper function to get user's conversation IDs (bypasses RLS)
+CREATE OR REPLACE FUNCTION get_user_conversation_ids(uid UUID)
+RETURNS SETOF UUID AS $$
+BEGIN
+  RETURN QUERY SELECT conversation_id FROM conversation_participants WHERE user_id = uid;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
 -- Conversations policies
 CREATE POLICY "Users can view their conversations" ON conversations
   FOR SELECT USING (
-    EXISTS (
-      SELECT 1 FROM conversation_participants
-      WHERE conversation_id = conversations.id AND user_id = auth.uid()
-    )
+    user_is_conversation_member(id, auth.uid())
   );
 
 CREATE POLICY "Users can create conversations" ON conversations
   FOR INSERT WITH CHECK (true);
 
--- Conversation participants policies
-CREATE POLICY "Users can view participants of their conversations" ON conversation_participants
+-- Conversation participants policies (no recursion)
+CREATE POLICY "Users can view participants in their conversations" ON conversation_participants
   FOR SELECT USING (
-    EXISTS (
-      SELECT 1 FROM conversation_participants cp
-      WHERE cp.conversation_id = conversation_participants.conversation_id AND cp.user_id = auth.uid()
-    )
+    user_is_conversation_member(conversation_id, auth.uid())
   );
 
 CREATE POLICY "Users can join conversations" ON conversation_participants
