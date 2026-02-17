@@ -1,17 +1,29 @@
 -- ============================================
--- FIX RLS RECURSION FOR CONVERSATION_PARTICIPANTS
+-- FIX RLS FOR CONVERSATIONS & PARTICIPANTS
 -- Execute this in Supabase SQL Editor
 -- ============================================
 
--- Drop existing problematic policies
-DROP POLICY IF EXISTS "Users can view their conversations" ON conversations;
-DROP POLICY IF EXISTS "Users can create conversations" ON conversations;
-DROP POLICY IF EXISTS "Users can view participants of their conversations" ON conversation_participants;
-DROP POLICY IF EXISTS "Users can view their own participation" ON conversation_participants;
-DROP POLICY IF EXISTS "Users can view co-participants" ON conversation_participants;
-DROP POLICY IF EXISTS "Users can view participants in their conversations" ON conversation_participants;
+-- STEP 1: Drop ALL existing policies on conversations
+DO $$
+DECLARE
+    pol RECORD;
+BEGIN
+    FOR pol IN SELECT policyname FROM pg_policies WHERE tablename = 'conversations' LOOP
+        EXECUTE 'DROP POLICY IF EXISTS "' || pol.policyname || '" ON conversations';
+    END LOOP;
+END $$;
 
--- Create helper functions (SECURITY DEFINER bypasses RLS)
+-- STEP 2: Drop ALL existing policies on conversation_participants
+DO $$
+DECLARE
+    pol RECORD;
+BEGIN
+    FOR pol IN SELECT policyname FROM pg_policies WHERE tablename = 'conversation_participants' LOOP
+        EXECUTE 'DROP POLICY IF EXISTS "' || pol.policyname || '" ON conversation_participants';
+    END LOOP;
+END $$;
+
+-- STEP 3: Create helper functions (SECURITY DEFINER bypasses RLS)
 CREATE OR REPLACE FUNCTION user_is_conversation_member(conv_id UUID, uid UUID)
 RETURNS BOOLEAN AS $$
 BEGIN
@@ -29,17 +41,19 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
--- Recreate policies using helper functions (no recursion)
-CREATE POLICY "Users can view their conversations" ON conversations
-  FOR SELECT USING (
-    user_is_conversation_member(id, auth.uid())
-  );
+-- STEP 4: Recreate clean policies for conversations
+CREATE POLICY "conversations_select" ON conversations
+  FOR SELECT USING (user_is_conversation_member(id, auth.uid()));
 
--- Allow authenticated users to create conversations
-CREATE POLICY "Authenticated users can create conversations" ON conversations
+CREATE POLICY "conversations_insert" ON conversations
   FOR INSERT WITH CHECK (auth.uid() IS NOT NULL);
 
-CREATE POLICY "Users can view participants in their conversations" ON conversation_participants
-  FOR SELECT USING (
-    user_is_conversation_member(conversation_id, auth.uid())
-  );
+-- STEP 5: Recreate clean policies for conversation_participants
+CREATE POLICY "conv_participants_select" ON conversation_participants
+  FOR SELECT USING (user_is_conversation_member(conversation_id, auth.uid()));
+
+CREATE POLICY "conv_participants_insert" ON conversation_participants
+  FOR INSERT WITH CHECK (auth.uid() = user_id);
+
+CREATE POLICY "conv_participants_update" ON conversation_participants
+  FOR UPDATE USING (auth.uid() = user_id);
