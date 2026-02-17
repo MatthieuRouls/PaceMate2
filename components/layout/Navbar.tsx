@@ -6,18 +6,27 @@ import { usePathname } from 'next/navigation';
 import { useState, useEffect } from 'react';
 import { Bell } from 'lucide-react';
 import { useAuth } from '../providers/AuthProvider';
+import { useTheme } from '../providers/ThemeProvider';
 import AuthDrawer from '../ui/AuthDrawer';
 import DarkModeToggle from '../ui/DarkModeToggle';
 
 export default function Navbar() {
   const pathname = usePathname();
   const { profile, signOut, loading } = useAuth();
+  const { theme, setTheme } = useTheme();
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [authDrawerOpen, setAuthDrawerOpen] = useState(false);
   const [authMode, setAuthMode] = useState<'login' | 'signup'>('login');
   const [scrolled, setScrolled] = useState(false);
 
   const isHomepage = pathname === '/';
+
+  // Force light mode when not logged in
+  useEffect(() => {
+    if (!loading && !profile && theme === 'dark') {
+      setTheme('light');
+    }
+  }, [loading, profile, theme, setTheme]);
 
   const handleSignOut = async () => {
     setDropdownOpen(false);
@@ -119,8 +128,8 @@ export default function Navbar() {
 
         {/* Right side actions */}
         <div className="flex items-center gap-3">
-          {/* Dark mode toggle */}
-          <DarkModeToggle />
+          {/* Dark mode toggle - only for connected users */}
+          {profile && <DarkModeToggle />}
 
           {!loading && profile ? (
             <>
