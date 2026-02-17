@@ -1,6 +1,8 @@
 'use client';
 
 import { useEffect, useState, FormEvent } from 'react';
+import { useRouter } from 'next/navigation';
+import { MessageCircle } from 'lucide-react';
 import { Team } from '@/lib/types';
 import {
   getUserTeam,
@@ -8,12 +10,14 @@ import {
   createTeam,
   leaveTeam,
 } from '@/lib/actions';
+import { getTeamConversation } from '@/lib/chat-actions';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
 
 // Desactiver la pre-generation statique
 export const dynamic = 'force-dynamic';
 
 export default function TeamsPage() {
+  const router = useRouter();
 
   // State
   const [userTeam, setUserTeam] = useState<Team | null>(null);
@@ -124,6 +128,20 @@ export default function TeamsPage() {
     }
   };
 
+  // Ouvrir le chat de l'equipe
+  const handleOpenChat = async () => {
+    if (!userTeam) return;
+
+    try {
+      const result = await getTeamConversation(userTeam.id);
+      if (result.success && result.conversation) {
+        router.push(`/messages?conv=${result.conversation.id}`);
+      }
+    } catch (err) {
+      console.error('Error opening team chat:', err);
+    }
+  };
+
   // Calculer le rang de l'equipe de l'utilisateur
   const getUserTeamRank = () => {
     if (!userTeam) return null;
@@ -217,8 +235,19 @@ export default function TeamsPage() {
                       </div>
                     </div>
 
-                    {/* Section informations supplementaires */}
+                    {/* Chat d'equipe */}
                     <div className="border-t border-silver-300 pt-5">
+                      <button
+                        onClick={handleOpenChat}
+                        className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-neon-500 hover:bg-neon-400 text-dark-800 font-semibold rounded-lg transition-colors"
+                      >
+                        <MessageCircle className="w-5 h-5" />
+                        Chat de l'equipe
+                      </button>
+                    </div>
+
+                    {/* Section informations supplementaires */}
+                    <div className="border-t border-silver-300 pt-5 mt-5">
                       <h3 className="text-xs font-semibold text-silver-600 uppercase tracking-wider mb-3">Activite recente</h3>
                       <div className="bg-silver-100 rounded-lg p-4 text-center text-dark-500 text-sm">
                         Les statistiques detaillees arrivent bientot...

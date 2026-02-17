@@ -14,8 +14,9 @@ import {
 } from '@/lib/actions';
 import RatingModal from '@/components/ui/RatingModal';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
-import { ArrowLeft, Calendar, MapPin, Users, Clock, Target, Zap, Trash2 } from 'lucide-react';
+import { ArrowLeft, Calendar, MapPin, Users, Clock, Target, Zap, Trash2, MessageCircle } from 'lucide-react';
 import { useAuth } from '@/components/providers/AuthProvider';
+import { getSessionConversation } from '@/lib/chat-actions';
 
 // Désactiver la pré-génération statique
 export const dynamic = 'force-dynamic';
@@ -210,6 +211,23 @@ export default function SessionDetailsPage() {
   // Check if current user is the creator
   const isCreator = profile && session && session.creator_id === profile.id;
 
+  // Check if current user is a participant (confirmed or creator)
+  const isParticipant = userStatus?.status === 'confirmed' || isCreator;
+
+  // Open session chat
+  const handleOpenChat = async () => {
+    if (!session) return;
+
+    try {
+      const result = await getSessionConversation(sessionId);
+      if (result.success && result.conversation) {
+        router.push(`/messages?conv=${result.conversation.id}`);
+      }
+    } catch (err) {
+      console.error('Error opening session chat:', err);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-silver-50 pt-24 pb-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-5xl mx-auto">
@@ -400,6 +418,19 @@ export default function SessionDetailsPage() {
               ) : (
                 <div className="text-center py-8 text-dark-500">
                   Sois le premier a rejoindre cette session !
+                </div>
+              )}
+
+              {/* Chat Button - Only for participants */}
+              {isParticipant && (
+                <div className="mt-6 pt-5 border-t border-silver-300">
+                  <button
+                    onClick={handleOpenChat}
+                    className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-neon-500 hover:bg-neon-400 text-dark-800 font-semibold rounded-lg transition-colors"
+                  >
+                    <MessageCircle className="w-5 h-5" />
+                    Chat de la session
+                  </button>
                 </div>
               )}
             </div>
