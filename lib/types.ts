@@ -66,3 +66,70 @@ export interface TeamMembership {
   role: 'captain' | 'member';
   created_at?: string;
 }
+
+// ============================================
+// SOCIAL SYSTEM TYPES
+// ============================================
+
+export type FriendshipStatus = 'pending' | 'accepted' | 'rejected' | 'blocked';
+
+export interface Friendship {
+  id: string;
+  user_id: string;
+  friend_id: string;
+  status: FriendshipStatus;
+  created_at?: string;
+  updated_at?: string;
+
+  // Relations (populated via joins)
+  user?: Profile;
+  friend?: Profile;
+}
+
+export type ConversationType = 'direct' | 'team' | 'session';
+
+export interface Conversation {
+  id: string;
+  type: ConversationType;
+  team_id?: string;
+  session_id?: string;
+  created_at?: string;
+  updated_at?: string;
+
+  // Relations (populated via joins)
+  team?: Team;
+  session?: Session;
+  participants?: ConversationParticipant[];
+  last_message?: Message;
+  unread_count?: number;
+  other_participant?: Profile; // For direct conversations
+}
+
+export interface ConversationParticipant {
+  id: string;
+  conversation_id: string;
+  user_id: string;
+  joined_at?: string;
+  last_read_at?: string;
+  is_muted: boolean;
+
+  // Relations (populated via joins)
+  user?: Profile;
+}
+
+export type MessageType = 'text' | 'image' | 'system';
+
+export interface Message {
+  id: string;
+  conversation_id: string;
+  sender_id: string;
+  content: string;
+  message_type: MessageType;
+  is_edited: boolean;
+  is_deleted: boolean;
+  created_at?: string;
+  updated_at?: string;
+
+  // Relations (populated via joins)
+  sender?: Profile;
+}

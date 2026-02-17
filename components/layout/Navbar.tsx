@@ -69,8 +69,10 @@ export default function Navbar() {
   const connectedNavItems = [
     { href: '/sessions', label: 'Sessions' },
     { href: '/mes-sorties', label: 'Mes sorties' },
-    { href: '/sessions/create', label: 'Creer une sortie' },
+    { href: '/sessions/create', label: 'Creer' },
     { href: '/teams', label: 'Equipes' },
+    { href: '/friends', label: 'Amis' },
+    { href: '/messages', label: 'Messages' },
   ];
 
   // Navigation items for guests
