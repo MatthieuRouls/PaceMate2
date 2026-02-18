@@ -14,10 +14,12 @@ import { useRealtimeMessages, useConversationPresence } from '@/lib/realtime';
 import type { Conversation, Message } from '@/lib/types';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
 
+// Page protégée par le middleware - l'auth est garantie
+
 export default function MessagesPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { profile, loading: authLoading } = useAuth();
+  const { profile } = useAuth();
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [selectedConversation, setSelectedConversation] = useState<Conversation | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
@@ -30,10 +32,8 @@ export default function MessagesPage() {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  // Fetch conversations
+  // Fetch conversations - middleware garantit l'auth
   useEffect(() => {
-    if (!profile) return;
-
     const fetchConversations = async () => {
       setLoading(true);
       try {
@@ -59,7 +59,7 @@ export default function MessagesPage() {
     };
 
     fetchConversations();
-  }, [profile, searchParams]);
+  }, [searchParams]);
 
   // Fetch messages when conversation changes
   useEffect(() => {
@@ -191,14 +191,6 @@ export default function MessagesPage() {
     setSelectedConversation(null);
     router.replace('/messages', { scroll: false });
   };
-
-  if (authLoading || !profile) {
-    return (
-      <div className="min-h-screen bg-neu-base flex items-center justify-center">
-        <LoadingSpinner size="lg" />
-      </div>
-    );
-  }
 
   // Get conversation display name
   const getConversationName = (conv: Conversation) => {
@@ -379,7 +371,7 @@ export default function MessagesPage() {
                   </div>
                 ) : (
                   messages.map((message, index) => {
-                    const isOwn = message.sender_id === profile.id;
+                    const isOwn = message.sender_id === profile?.id;
                     const showAvatar = !isOwn && (
                       index === 0 ||
                       messages[index - 1]?.sender_id !== message.sender_id

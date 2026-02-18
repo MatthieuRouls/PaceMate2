@@ -2,8 +2,6 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { useAuth } from '@/components/providers/AuthProvider';
-// Page protégée par le middleware - seuls les utilisateurs connectés y accèdent
 import { Users, UserPlus, Clock, Search, MessageCircle, UserMinus, Check, X } from 'lucide-react';
 import {
   getFriendsList,
@@ -25,7 +23,6 @@ type Tab = 'friends' | 'requests' | 'search';
 
 export default function FriendsPage() {
   const router = useRouter();
-  const { profile, loading: authLoading } = useAuth();
   const [activeTab, setActiveTab] = useState<Tab>('friends');
   const [loading, setLoading] = useState(true);
 
@@ -41,10 +38,8 @@ export default function FriendsPage() {
   // Action states
   const [actionLoading, setActionLoading] = useState<string | null>(null);
 
-  // Fetch data on mount and tab change
+  // Fetch data on mount and tab change - middleware garantit l'auth
   useEffect(() => {
-    if (!profile) return;
-
     const fetchData = async () => {
       setLoading(true);
       try {
@@ -73,7 +68,7 @@ export default function FriendsPage() {
     };
 
     fetchData();
-  }, [profile, activeTab]);
+  }, [activeTab]);
 
   // Search users
   useEffect(() => {
@@ -186,14 +181,6 @@ export default function FriendsPage() {
       setActionLoading(null);
     }
   };
-
-  if (authLoading || !profile) {
-    return (
-      <div className="min-h-screen bg-neu-base flex items-center justify-center">
-        <LoadingSpinner size="lg" />
-      </div>
-    );
-  }
 
   const tabs = [
     { id: 'friends' as Tab, label: 'Mes amis', icon: Users, count: friends.length },

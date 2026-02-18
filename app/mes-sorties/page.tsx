@@ -1,14 +1,14 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useAuth } from '@/components/providers/AuthProvider';
 import SessionCard from '@/components/ui/SessionCard';
 import { Session } from '@/lib/types';
 import { getUserSessions } from '@/lib/actions';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
 
+// Page protégée par le middleware - l'auth est garantie
+
 export default function MesSortiesPage() {
-  const { profile, loading } = useAuth();
   const [activeTab, setActiveTab] = useState<'upcoming' | 'past'>('upcoming');
   const [upcomingCreated, setUpcomingCreated] = useState<Session[]>([]);
   const [upcomingJoined, setUpcomingJoined] = useState<Session[]>([]);
@@ -16,12 +16,10 @@ export default function MesSortiesPage() {
   const [pastJoined, setPastJoined] = useState<Session[]>([]);
   const [sessionsLoading, setSessionsLoading] = useState(true);
 
+  // Charger immédiatement - le middleware garantit l'auth
   useEffect(() => {
     async function fetchUserSessions() {
-      if (!profile) return;
-
       try {
-        setSessionsLoading(true);
         const { upcomingJoined, pastJoined, upcomingCreated, pastCreated } = await getUserSessions();
         setUpcomingCreated(upcomingCreated);
         setUpcomingJoined(upcomingJoined);
@@ -35,15 +33,7 @@ export default function MesSortiesPage() {
     }
 
     fetchUserSessions();
-  }, [profile]);
-
-  if (loading || !profile) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <LoadingSpinner size="md" />
-      </div>
-    );
-  }
+  }, []);
 
   return (
     <div className="min-h-screen bg-silver-50 pt-20 pb-8 px-4 sm:px-6 lg:px-8">

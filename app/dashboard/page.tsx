@@ -12,10 +12,11 @@ import LoadingSpinner from '@/components/ui/LoadingSpinner';
 // Seuls les utilisateurs connectés y accèdent.
 
 export default function DashboardPage() {
-  const { profile, loading } = useAuth();
+  const { profile } = useAuth();
   const [upcomingSessions, setUpcomingSessions] = useState<Session[]>([]);
   const [sessionsLoading, setSessionsLoading] = useState(true);
 
+  // Charger les sessions immédiatement (le middleware garantit l'auth)
   useEffect(() => {
     async function fetchSessions() {
       try {
@@ -27,18 +28,8 @@ export default function DashboardPage() {
         setSessionsLoading(false);
       }
     }
-    if (profile) {
-      fetchSessions();
-    }
-  }, [profile]);
-
-  if (loading || !profile) {
-    return (
-      <div className="min-h-screen bg-neu-base flex items-center justify-center">
-        <LoadingSpinner size="md" />
-      </div>
-    );
-  }
+    fetchSessions();
+  }, []);
 
   return (
     <div className="min-h-screen bg-neu-base pt-28 pb-12 px-4 sm:px-6 lg:px-8">
@@ -48,7 +39,7 @@ export default function DashboardPage() {
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
             <div>
               <h1 className="text-3xl font-bold text-dark-800 mb-2">
-                Salut {profile.username} !
+                Salut {profile?.username || ''} !
               </h1>
               <p className="text-dark-500">
                 Pret pour ta prochaine sortie ?
