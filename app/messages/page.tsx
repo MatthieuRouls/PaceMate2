@@ -30,13 +30,6 @@ export default function MessagesPage() {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  // Redirect if not authenticated
-  useEffect(() => {
-    if (!authLoading && !profile) {
-      router.push('/');
-    }
-  }, [authLoading, profile, router]);
-
   // Fetch conversations
   useEffect(() => {
     if (!profile) return;

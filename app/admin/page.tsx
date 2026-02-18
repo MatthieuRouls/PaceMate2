@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from 'react';
 import { useAuth } from '@/components/providers/AuthProvider';
-import { useRouter } from 'next/navigation';
 import { getAdminStats } from '@/lib/admin-actions';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
 import { Users, Calendar, Shield, BarChart3 } from 'lucide-react';
@@ -22,16 +21,9 @@ interface Stats {
 
 export default function AdminPage() {
   const { user, loading: authLoading } = useAuth();
-  const router = useRouter();
   const [activeTab, setActiveTab] = useState<Tab>('dashboard');
   const [stats, setStats] = useState<Stats | null>(null);
   const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    if (!authLoading && !user) {
-      router.push('/');
-    }
-  }, [user, authLoading, router]);
 
   useEffect(() => {
     if (user) {

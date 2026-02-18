@@ -3,30 +3,21 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { useRouter } from 'next/navigation';
 import { Session, Team } from '@/lib/types';
 import SessionCard from '@/components/ui/SessionCard';
 import SessionDetailsDrawer from '@/components/ui/SessionDetailsDrawer';
 import { getUpcomingSessions, getTopTeams } from '@/lib/actions';
-import { useAuth } from '@/components/providers/AuthProvider';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
 
+// Cette page n'est accessible que pour les visiteurs non connectés.
+// Le middleware redirige les utilisateurs connectés vers /dashboard.
+
 export default function Home() {
-  const router = useRouter();
-  const { profile, loading: authLoading } = useAuth();
   const [upcomingSessions, setUpcomingSessions] = useState<Session[]>([]);
   const [topTeams, setTopTeams] = useState<Team[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedSession, setSelectedSession] = useState<Session | null>(null);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
-
-  // Redirect to dashboard if user is logged in
-  useEffect(() => {
-    if (authLoading) return;
-    if (profile) {
-      router.replace('/dashboard');
-    }
-  }, [authLoading, profile, router]);
 
   useEffect(() => {
     async function fetchData() {

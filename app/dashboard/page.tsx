@@ -3,29 +3,18 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useAuth } from '@/components/providers/AuthProvider';
-import { useRouter } from 'next/navigation';
 import SessionCard from '@/components/ui/SessionCard';
 import { getUpcomingSessions } from '@/lib/actions';
 import { Session } from '@/lib/types';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
 
+// Cette page est protégée par le middleware.
+// Seuls les utilisateurs connectés y accèdent.
+
 export default function DashboardPage() {
   const { profile, loading } = useAuth();
-  const router = useRouter();
   const [upcomingSessions, setUpcomingSessions] = useState<Session[]>([]);
   const [sessionsLoading, setSessionsLoading] = useState(true);
-
-  useEffect(() => {
-    // Only redirect if we're sure user is not authenticated
-    // Wait for loading to complete before checking
-    if (!loading && !profile) {
-      // Add a small delay to ensure auth state is fully settled
-      const timeoutId = setTimeout(() => {
-        router.push('/');
-      }, 300);
-      return () => clearTimeout(timeoutId);
-    }
-  }, [loading, profile, router]);
 
   useEffect(() => {
     async function fetchSessions() {

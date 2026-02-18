@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/components/providers/AuthProvider';
+// Page protégée par le middleware - seuls les utilisateurs connectés y accèdent
 import { Users, UserPlus, Clock, Search, MessageCircle, UserMinus, Check, X } from 'lucide-react';
 import {
   getFriendsList,
@@ -39,13 +40,6 @@ export default function FriendsPage() {
 
   // Action states
   const [actionLoading, setActionLoading] = useState<string | null>(null);
-
-  // Redirect if not authenticated
-  useEffect(() => {
-    if (!authLoading && !profile) {
-      router.push('/');
-    }
-  }, [authLoading, profile, router]);
 
   // Fetch data on mount and tab change
   useEffect(() => {

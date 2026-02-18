@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from 'react';
 import { useAuth } from '@/components/providers/AuthProvider';
-import { useRouter } from 'next/navigation';
 import SessionCard from '@/components/ui/SessionCard';
 import { Session } from '@/lib/types';
 import { getUserSessions } from '@/lib/actions';
@@ -10,19 +9,12 @@ import LoadingSpinner from '@/components/ui/LoadingSpinner';
 
 export default function MesSortiesPage() {
   const { profile, loading } = useAuth();
-  const router = useRouter();
   const [activeTab, setActiveTab] = useState<'upcoming' | 'past'>('upcoming');
   const [upcomingCreated, setUpcomingCreated] = useState<Session[]>([]);
   const [upcomingJoined, setUpcomingJoined] = useState<Session[]>([]);
   const [pastCreated, setPastCreated] = useState<Session[]>([]);
   const [pastJoined, setPastJoined] = useState<Session[]>([]);
   const [sessionsLoading, setSessionsLoading] = useState(true);
-
-  useEffect(() => {
-    if (!loading && !profile) {
-      router.push('/');
-    }
-  }, [loading, profile, router]);
 
   useEffect(() => {
     async function fetchUserSessions() {
