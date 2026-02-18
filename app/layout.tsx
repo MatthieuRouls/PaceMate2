@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { AuthProvider } from "../components/providers/AuthProvider";
 import { ThemeProvider } from "../components/providers/ThemeProvider";
+import { ChatProvider, ChatContainer } from "../components/chat";
 import Navbar from "../components/layout/Navbar";
 
 export const metadata: Metadata = {
@@ -19,10 +20,13 @@ export default function RootLayout({
       <body>
         <ThemeProvider>
           <AuthProvider>
-            <Navbar />
-            <main className="min-h-screen">
-              {children}
-            </main>
+            <ChatProvider>
+              <Navbar />
+              <main className="min-h-screen">
+                {children}
+              </main>
+              <ChatContainer />
+            </ChatProvider>
           </AuthProvider>
         </ThemeProvider>
       </body>
