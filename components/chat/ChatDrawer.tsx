@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { X, Search, Users, User, MessageCircle } from 'lucide-react';
+import { X, Search, Users, User, MessageCircle, ChevronRight } from 'lucide-react';
 import { useChat } from './ChatProvider';
 import { useAuth } from '@/components/providers/AuthProvider';
 import type { Conversation } from '@/lib/types';
@@ -15,7 +15,6 @@ export default function ChatDrawer() {
     closeDrawer,
     openChat,
     loading,
-    refreshConversations
   } = useChat();
   const [searchQuery, setSearchQuery] = useState('');
 
@@ -41,13 +40,6 @@ export default function ChatDrawer() {
     return 'Conversation';
   }
 
-  function getConversationIcon(conv: Conversation) {
-    if (conv.type === 'direct') {
-      return <User className="w-5 h-5" />;
-    }
-    return <Users className="w-5 h-5" />;
-  }
-
   function formatTime(dateString: string | undefined): string {
     if (!dateString) return '';
     const date = new Date(dateString);
@@ -57,8 +49,8 @@ export default function ChatDrawer() {
     const diffHours = Math.floor(diffMs / 3600000);
     const diffDays = Math.floor(diffMs / 86400000);
 
-    if (diffMins < 1) return 'maintenant';
-    if (diffMins < 60) return `${diffMins}min`;
+    if (diffMins < 1) return 'now';
+    if (diffMins < 60) return `${diffMins}m`;
     if (diffHours < 24) return `${diffHours}h`;
     if (diffDays < 7) return `${diffDays}j`;
     return date.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' });
@@ -71,103 +63,99 @@ export default function ChatDrawer() {
 
   return (
     <>
-      {/* Overlay */}
+      {/* Backdrop - click to close */}
       <div
-        className="fixed inset-0 bg-black/30 z-40 lg:hidden"
+        className="fixed inset-0 z-40"
         onClick={closeDrawer}
       />
 
-      {/* Drawer */}
-      <div className={`fixed right-0 top-0 h-full w-full sm:w-96 bg-white dark:bg-dark-800 shadow-2xl z-50 flex flex-col transform transition-transform duration-300 ${
-        isDrawerOpen ? 'translate-x-0' : 'translate-x-full'
-      }`}>
+      {/* Floating Panel */}
+      <div className="fixed bottom-24 right-6 z-50 w-80 max-h-[70vh] bg-white/95 dark:bg-dark-800/95 backdrop-blur-xl rounded-2xl shadow-2xl border border-silver-200/50 dark:border-dark-600/50 flex flex-col overflow-hidden animate-in slide-in-from-bottom-4 fade-in duration-200">
         {/* Header */}
-        <div className="flex items-center justify-between p-4 border-b border-silver-300 dark:border-dark-600">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-neon-500 flex items-center justify-center">
-              <MessageCircle className="w-5 h-5 text-dark-800" />
-            </div>
-            <div>
-              <h2 className="text-lg font-bold text-dark-800 dark:text-white">Messages</h2>
-              <p className="text-xs text-dark-500">{conversations.length} conversation{conversations.length > 1 ? 's' : ''}</p>
-            </div>
-          </div>
+        <div className="flex items-center justify-between px-4 py-3 border-b border-silver-200/50 dark:border-dark-600/50">
+          <h2 className="text-base font-semibold text-dark-800 dark:text-white">Messages</h2>
           <button
             onClick={closeDrawer}
-            className="p-2 rounded-lg hover:bg-silver-100 dark:hover:bg-dark-700 transition-colors"
+            className="p-1.5 rounded-full hover:bg-silver-100 dark:hover:bg-dark-700 transition-colors"
           >
-            <X className="w-5 h-5 text-dark-500" />
+            <X className="w-4 h-4 text-dark-500" />
           </button>
         </div>
 
         {/* Search */}
-        <div className="p-3 border-b border-silver-200 dark:border-dark-600">
+        <div className="px-3 py-2">
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-dark-400" />
             <input
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Rechercher une conversation..."
-              className="w-full pl-10 pr-4 py-2.5 rounded-lg bg-silver-100 dark:bg-dark-700 border-0 text-sm text-dark-800 dark:text-white placeholder:text-dark-400 focus:outline-none focus:ring-2 focus:ring-neon-500/50"
+              placeholder="Rechercher..."
+              className="w-full pl-9 pr-3 py-2 rounded-xl bg-silver-100/80 dark:bg-dark-700/80 border-0 text-sm text-dark-800 dark:text-white placeholder:text-dark-400 focus:outline-none focus:ring-2 focus:ring-neon-500/30"
             />
           </div>
         </div>
 
         {/* Conversations List */}
-        <div className="flex-1 overflow-y-auto">
+        <div className="flex-1 overflow-y-auto overscroll-contain">
           {loading ? (
             <div className="flex justify-center py-8">
               <LoadingSpinner />
             </div>
           ) : filteredConversations.length === 0 ? (
-            <div className="text-center py-12 px-4">
-              <div className="w-16 h-16 rounded-full bg-silver-100 dark:bg-dark-700 flex items-center justify-center mx-auto mb-4">
-                <MessageCircle className="w-8 h-8 text-dark-400" />
+            <div className="text-center py-10 px-4">
+              <div className="w-12 h-12 rounded-full bg-silver-100 dark:bg-dark-700 flex items-center justify-center mx-auto mb-3">
+                <MessageCircle className="w-6 h-6 text-dark-400" />
               </div>
               <p className="text-dark-500 text-sm">
-                {searchQuery ? 'Aucune conversation trouvee' : 'Aucune conversation'}
+                {searchQuery ? 'Aucun resultat' : 'Aucune conversation'}
               </p>
             </div>
           ) : (
-            <div className="divide-y divide-silver-200 dark:divide-dark-600">
+            <div className="py-1">
               {filteredConversations.map((conv) => (
                 <button
                   key={conv.id}
                   onClick={() => handleConversationClick(conv)}
-                  className="w-full p-4 flex items-start gap-3 hover:bg-silver-50 dark:hover:bg-dark-700 transition-colors text-left"
+                  className="w-full px-3 py-2.5 flex items-center gap-3 hover:bg-silver-100/80 dark:hover:bg-dark-700/80 transition-colors text-left group"
                 >
                   {/* Avatar */}
-                  <div className={`w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0 ${
-                    conv.type === 'direct' ? 'bg-neon-100 text-neon-700' : 'bg-pink-100 text-pink-600'
-                  }`}>
-                    {conv.type === 'direct' && conv.other_participant?.avatar_url ? (
-                      <img
-                        src={conv.other_participant.avatar_url}
-                        alt=""
-                        className="w-12 h-12 rounded-full object-cover"
-                      />
-                    ) : (
-                      getConversationIcon(conv)
-                    )}
+                  <div className="relative flex-shrink-0">
+                    <div className={`w-11 h-11 rounded-full flex items-center justify-center ${
+                      conv.type === 'direct' ? 'bg-gradient-to-br from-neon-400 to-neon-600' : 'bg-gradient-to-br from-pink-400 to-pink-600'
+                    }`}>
+                      {conv.type === 'direct' && conv.other_participant?.avatar_url ? (
+                        <img
+                          src={conv.other_participant.avatar_url}
+                          alt=""
+                          className="w-11 h-11 rounded-full object-cover"
+                        />
+                      ) : conv.type === 'direct' ? (
+                        <User className="w-5 h-5 text-white" />
+                      ) : (
+                        <Users className="w-5 h-5 text-white" />
+                      )}
+                    </div>
+                    {/* Online indicator - for future use */}
+                    {/* <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-white dark:border-dark-800" /> */}
                   </div>
 
                   {/* Content */}
                   <div className="flex-1 min-w-0">
-                    <div className="flex items-center justify-between mb-1">
-                      <span className={`font-semibold text-sm truncate ${
+                    <div className="flex items-center justify-between gap-2">
+                      <span className={`font-medium text-sm truncate ${
                         conv.unread_count && conv.unread_count > 0
                           ? 'text-dark-800 dark:text-white'
                           : 'text-dark-700 dark:text-silver-300'
                       }`}>
                         {getConversationName(conv)}
                       </span>
-                      <span className="text-xs text-dark-400 flex-shrink-0 ml-2">
+                      <span className="text-[11px] text-dark-400 flex-shrink-0">
                         {formatTime(conv.last_message?.created_at || conv.updated_at)}
                       </span>
                     </div>
-                    <div className="flex items-center gap-2">
-                      <p className={`text-sm truncate flex-1 ${
+                    <div className="flex items-center gap-2 mt-0.5">
+                      <p className={`text-[13px] truncate flex-1 ${
                         conv.unread_count && conv.unread_count > 0
                           ? 'text-dark-700 dark:text-silver-300 font-medium'
                           : 'text-dark-500'
@@ -175,12 +163,15 @@ export default function ChatDrawer() {
                         {conv.last_message?.content || 'Aucun message'}
                       </p>
                       {conv.unread_count && conv.unread_count > 0 && (
-                        <span className="w-5 h-5 rounded-full bg-pink-500 text-white text-xs font-bold flex items-center justify-center flex-shrink-0">
+                        <span className="w-5 h-5 rounded-full bg-neon-500 text-dark-800 text-[11px] font-bold flex items-center justify-center flex-shrink-0">
                           {conv.unread_count > 9 ? '9+' : conv.unread_count}
                         </span>
                       )}
                     </div>
                   </div>
+
+                  {/* Chevron */}
+                  <ChevronRight className="w-4 h-4 text-dark-400 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0" />
                 </button>
               ))}
             </div>
@@ -188,12 +179,14 @@ export default function ChatDrawer() {
         </div>
 
         {/* Footer */}
-        <div className="p-3 border-t border-silver-200 dark:border-dark-600">
+        <div className="px-3 py-2 border-t border-silver-200/50 dark:border-dark-600/50">
           <a
             href="/messages"
-            className="block w-full py-2.5 text-center text-sm font-medium text-neon-700 hover:bg-neon-50 dark:hover:bg-dark-700 rounded-lg transition-colors"
+            onClick={closeDrawer}
+            className="flex items-center justify-center gap-2 w-full py-2 text-sm font-medium text-neon-600 hover:text-neon-700 hover:bg-neon-50/50 dark:hover:bg-dark-700 rounded-xl transition-colors"
           >
-            Voir tous les messages
+            Voir tout
+            <ChevronRight className="w-4 h-4" />
           </a>
         </div>
       </div>
