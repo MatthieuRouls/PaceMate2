@@ -528,13 +528,12 @@ export async function getUserSessionHistory() {
 
     const supabase = await getServerSupabaseClient();
 
-    // 1. Récupérer les participations complétées avec les session_ids
+    // 1. Récupérer les participations complétées
     const { data: participations, error: participationsError } = await supabase
       .from('session_participants')
       .select('*')
       .eq('user_id', user.id)
       .eq('status', 'completed')
-      .order('created_at', { ascending: false })
       .limit(5);
 
     if (participationsError) {
