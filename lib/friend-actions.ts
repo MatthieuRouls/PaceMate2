@@ -494,6 +494,76 @@ export async function searchUsers(query: string): Promise<SearchUsersResult> {
   }
 }
 
+export interface BatchFriendshipStatusResult extends ActionResult {
+  statuses?: Record<string, 'none' | 'pending_sent' | 'pending_received' | 'accepted' | 'blocked'>;
+}
+
+/**
+ * Vérifier le statut d'amitié avec plusieurs utilisateurs en une seule requête
+ */
+export async function checkFriendshipStatusBatch(targetUserIds: string[]): Promise<BatchFriendshipStatusResult> {
+  try {
+    const user = await getCurrentUser();
+    if (!user) {
+      return { success: false, error: 'Non authentifié' };
+    }
+
+    if (targetUserIds.length === 0) {
+      return { success: true, statuses: {} };
+    }
+
+    const supabase = await getServerSupabaseClient();
+
+    // Get all friendships involving the current user and any of the target users
+    const { data: friendships, error } = await supabase
+      .from('friendships')
+      .select('*')
+      .or(`user_id.eq.${user.id},friend_id.eq.${user.id}`);
+
+    if (error) {
+      console.error('Error fetching friendships:', error);
+      return { success: false, error: 'Erreur lors de la récupération' };
+    }
+
+    // Build a map of statuses
+    const statuses: Record<string, 'none' | 'pending_sent' | 'pending_received' | 'accepted' | 'blocked'> = {};
+
+    for (const targetId of targetUserIds) {
+      if (targetId === user.id) {
+        statuses[targetId] = 'none';
+        continue;
+      }
+
+      // Find friendship with this user
+      const friendship = friendships?.find(f =>
+        (f.user_id === user.id && f.friend_id === targetId) ||
+        (f.user_id === targetId && f.friend_id === user.id)
+      );
+
+      if (!friendship) {
+        statuses[targetId] = 'none';
+      } else if (friendship.status === 'accepted') {
+        statuses[targetId] = 'accepted';
+      } else if (friendship.status === 'blocked') {
+        statuses[targetId] = 'blocked';
+      } else if (friendship.status === 'pending') {
+        if (friendship.user_id === user.id) {
+          statuses[targetId] = 'pending_sent';
+        } else {
+          statuses[targetId] = 'pending_received';
+        }
+      } else {
+        statuses[targetId] = 'none';
+      }
+    }
+
+    return { success: true, statuses };
+  } catch (error) {
+    console.error('Error in checkFriendshipStatusBatch:', error);
+    return { success: false, error: 'Une erreur est survenue' };
+  }
+}
+
 /**
  * Vérifier le statut d'amitié avec un utilisateur
  */

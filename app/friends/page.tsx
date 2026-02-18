@@ -14,7 +14,7 @@ import {
   rejectFriendRequest,
   cancelFriendRequest,
   removeFriend,
-  checkFriendshipStatus
+  checkFriendshipStatusBatch
 } from '@/lib/friend-actions';
 import { getOrCreateDirectConversation } from '@/lib/chat-actions';
 import type { Profile, Friendship } from '@/lib/types';
@@ -33,6 +33,7 @@ export default function FriendsPage() {
   const [pendingRequests, setPendingRequests] = useState<Friendship[]>([]);
   const [sentRequests, setSentRequests] = useState<Friendship[]>([]);
   const [searchResults, setSearchResults] = useState<Profile[]>([]);
+  const [searchStatuses, setSearchStatuses] = useState<Record<string, string>>({});
   const [searchQuery, setSearchQuery] = useState('');
   const [searchLoading, setSearchLoading] = useState(false);
 
@@ -84,6 +85,7 @@ export default function FriendsPage() {
   useEffect(() => {
     if (activeTab !== 'search' || !searchQuery || searchQuery.length < 2) {
       setSearchResults([]);
+      setSearchStatuses({});
       return;
     }
 
@@ -93,6 +95,12 @@ export default function FriendsPage() {
         const result = await searchUsers(searchQuery);
         if (result.success && result.users) {
           setSearchResults(result.users);
+          // Fetch all friendship statuses in one batch call
+          const ids = result.users.map(u => u.id);
+          const statusResult = await checkFriendshipStatusBatch(ids);
+          if (statusResult.success && statusResult.statuses) {
+            setSearchStatuses(statusResult.statuses);
+          }
         }
       } catch (error) {
         console.error('Error searching:', error);
@@ -361,7 +369,7 @@ export default function FriendsPage() {
                       <SearchResultCard
                         key={user.id}
                         profile={user}
-                        currentUserId={profile.id}
+                        status={searchStatuses[user.id] || 'none'}
                         onSendRequest={() => handleSendRequest(user.id)}
                         loading={actionLoading === user.id}
                       />
@@ -485,27 +493,15 @@ function RequestCard({
 
 function SearchResultCard({
   profile,
-  currentUserId,
+  status,
   onSendRequest,
   loading
 }: {
   profile: Profile;
-  currentUserId: string;
+  status: string;
   onSendRequest: () => void;
   loading: boolean;
 }) {
-  const [status, setStatus] = useState<'none' | 'pending_sent' | 'pending_received' | 'accepted' | 'blocked' | 'loading'>('loading');
-
-  useEffect(() => {
-    checkFriendshipStatus(profile.id).then((result) => {
-      if (result.success) {
-        setStatus(result.status || 'none');
-      } else {
-        setStatus('none');
-      }
-    });
-  }, [profile.id]);
-
   return (
     <div className="flex items-center justify-between p-4 bg-silver-50 dark:bg-dark-600 rounded-lg">
       <div className="flex items-center gap-4">
@@ -518,11 +514,7 @@ function SearchResultCard({
         </div>
       </div>
       <div>
-        {status === 'loading' ? (
-          <div className="px-4 py-2">
-            <LoadingSpinner size="sm" />
-          </div>
-        ) : status === 'accepted' ? (
+        {status === 'accepted' ? (
           <span className="px-4 py-2 rounded-lg bg-neon-100 text-neon-700 text-sm font-medium">
             Ami
           </span>
