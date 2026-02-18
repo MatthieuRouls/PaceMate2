@@ -22,7 +22,8 @@ export default function Home() {
 
   // Redirect to dashboard if user is logged in
   useEffect(() => {
-    if (!authLoading && profile) {
+    if (authLoading) return;
+    if (profile) {
       router.replace('/dashboard');
     }
   }, [authLoading, profile, router]);

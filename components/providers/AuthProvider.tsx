@@ -85,19 +85,33 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   // Initialiser l'état d'authentification au chargement
   useEffect(() => {
+    let isMounted = true;
+
+    // Safety timeout: force loading to false after 5 seconds
+    const safetyTimeout = setTimeout(() => {
+      if (isMounted && loading) {
+        console.warn('Auth loading timeout - forcing loading to false');
+        setLoading(false);
+      }
+    }, 5000);
+
     const initAuth = async () => {
       try {
         const { data: { session } } = await supabase.auth.getSession();
 
-        if (session?.user) {
+        if (session?.user && isMounted) {
           setUser(session.user);
           const userProfile = await fetchProfile(session.user.id);
-          setProfile(userProfile);
+          if (isMounted) {
+            setProfile(userProfile);
+          }
         }
       } catch (error) {
         console.error('Error initializing auth:', error);
       } finally {
-        setLoading(false);
+        if (isMounted) {
+          setLoading(false);
+        }
       }
     };
 
@@ -106,10 +120,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     // Écouter les changements d'authentification
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
+        if (!isMounted) return;
+
         if (session?.user) {
           setUser(session.user);
           const userProfile = await fetchProfile(session.user.id);
-          setProfile(userProfile);
+          if (isMounted) {
+            setProfile(userProfile);
+          }
         } else {
           setUser(null);
           setProfile(null);
@@ -120,6 +138,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     );
 
     return () => {
+      isMounted = false;
+      clearTimeout(safetyTimeout);
       subscription.unsubscribe();
     };
   }, []);

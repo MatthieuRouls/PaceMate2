@@ -101,38 +101,36 @@ export default function Navbar() {
         </Link>
 
         {/* Center Navigation - Inside glass pill */}
-        {!loading && (
-          <div className={`hidden md:flex items-center transition-all duration-300 ${
-            scrolled
-              ? 'glass-pill px-2 py-1 shadow-lg'
-              : 'bg-white/10 backdrop-blur-sm rounded-full px-2 py-1'
-          }`}>
-            {navItems.map((item) => (
-              <Link
-                key={item.href}
-                href={item.href}
-                className={`px-4 py-2 text-sm font-medium rounded-full transition-all ${
-                  isActive(item.href)
-                    ? scrolled
-                      ? 'neu-tab-active'
-                      : 'bg-white/20 text-white'
-                    : scrolled
-                    ? 'text-dark-600 hover:text-dark-800'
-                    : 'text-white/80 hover:text-white'
-                }`}
-              >
-                {item.label}
-              </Link>
-            ))}
-          </div>
-        )}
+        <div className={`hidden md:flex items-center transition-all duration-300 ${
+          scrolled
+            ? 'glass-pill px-2 py-1 shadow-lg'
+            : 'bg-white/10 backdrop-blur-sm rounded-full px-2 py-1'
+        }`}>
+          {navItems.map((item) => (
+            <Link
+              key={item.href}
+              href={item.href}
+              className={`px-4 py-2 text-sm font-medium rounded-full transition-all ${
+                isActive(item.href)
+                  ? scrolled
+                    ? 'neu-tab-active'
+                    : 'bg-white/20 text-white'
+                  : scrolled
+                  ? 'text-dark-600 hover:text-dark-800'
+                  : 'text-white/80 hover:text-white'
+              }`}
+            >
+              {item.label}
+            </Link>
+          ))}
+        </div>
 
         {/* Right side actions */}
         <div className="flex items-center gap-3">
           {/* Dark mode toggle - only for connected users */}
           {profile && <DarkModeToggle />}
 
-          {!loading && profile ? (
+          {profile ? (
             <>
               {/* Notifications */}
               <button className={`relative w-10 h-10 rounded-full flex items-center justify-center transition-colors ${
