@@ -1,7 +1,6 @@
 'use client';
 
 import { useEffect, useState, FormEvent } from 'react';
-import { useRouter } from 'next/navigation';
 import { MessageCircle } from 'lucide-react';
 import { Team } from '@/lib/types';
 import {
@@ -11,13 +10,14 @@ import {
   leaveTeam,
 } from '@/lib/actions';
 import { getTeamConversation } from '@/lib/chat-actions';
+import { useChat } from '@/components/chat';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
 
 // Desactiver la pre-generation statique
 export const dynamic = 'force-dynamic';
 
 export default function TeamsPage() {
-  const router = useRouter();
+  const { openChat } = useChat();
 
   // State
   const [userTeam, setUserTeam] = useState<Team | null>(null);
@@ -128,14 +128,14 @@ export default function TeamsPage() {
     }
   };
 
-  // Ouvrir le chat de l'equipe
+  // Ouvrir le chat de l'equipe (popup)
   const handleOpenChat = async () => {
     if (!userTeam) return;
 
     try {
       const result = await getTeamConversation(userTeam.id);
       if (result.success && result.conversation) {
-        router.push(`/messages?conv=${result.conversation.id}`);
+        openChat(result.conversation.id);
       }
     } catch (err) {
       console.error('Error opening team chat:', err);

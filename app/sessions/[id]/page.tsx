@@ -17,6 +17,7 @@ import LoadingSpinner from '@/components/ui/LoadingSpinner';
 import { ArrowLeft, Calendar, MapPin, Users, Clock, Target, Zap, Trash2, MessageCircle } from 'lucide-react';
 import { useAuth } from '@/components/providers/AuthProvider';
 import { getSessionConversation } from '@/lib/chat-actions';
+import { useChat } from '@/components/chat';
 
 // Désactiver la pré-génération statique
 export const dynamic = 'force-dynamic';
@@ -32,6 +33,7 @@ export default function SessionDetailsPage() {
   const searchParams = useSearchParams();
   const sessionId = params.id as string;
   const { profile } = useAuth();
+  const { openChat } = useChat();
 
   // Mode debug pour tester la notation (ajoutez ?testRating=true à l'URL)
   const debugTestRating = searchParams.get('testRating') === 'true';
@@ -214,14 +216,14 @@ export default function SessionDetailsPage() {
   // Check if current user is a participant (confirmed or creator)
   const isParticipant = userStatus?.status === 'confirmed' || isCreator;
 
-  // Open session chat
+  // Open session chat (popup)
   const handleOpenChat = async () => {
     if (!session) return;
 
     try {
       const result = await getSessionConversation(sessionId);
       if (result.success && result.conversation) {
-        router.push(`/messages?conv=${result.conversation.id}`);
+        openChat(result.conversation.id);
       }
     } catch (err) {
       console.error('Error opening session chat:', err);

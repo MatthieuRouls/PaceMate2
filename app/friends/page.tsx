@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
 import { Users, UserPlus, Clock, Search, MessageCircle, UserMinus, Check, X } from 'lucide-react';
 import {
   getFriendsList,
@@ -16,13 +15,14 @@ import {
   checkFriendshipStatusBatch
 } from '@/lib/friend-actions';
 import { getOrCreateDirectConversation } from '@/lib/chat-actions';
+import { useChat } from '@/components/chat';
 import type { Profile, Friendship } from '@/lib/types';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
 
 type Tab = 'friends' | 'requests' | 'search';
 
 export default function FriendsPage() {
-  const router = useRouter();
+  const { openChat } = useChat();
   const [activeTab, setActiveTab] = useState<Tab>('friends');
   const [loading, setLoading] = useState(true);
 
@@ -175,7 +175,7 @@ export default function FriendsPage() {
     try {
       const result = await getOrCreateDirectConversation(friendId);
       if (result.success && result.conversation) {
-        router.push(`/messages?conv=${result.conversation.id}`);
+        openChat(result.conversation.id);
       }
     } finally {
       setActionLoading(null);

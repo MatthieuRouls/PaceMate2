@@ -72,7 +72,6 @@ export default function Navbar() {
     { href: '/sessions/create', label: 'Creer' },
     { href: '/teams', label: 'Equipes' },
     { href: '/friends', label: 'Amis' },
-    { href: '/messages', label: 'Messages' },
   ];
 
   // Navigation items for guests
