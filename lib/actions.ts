@@ -321,20 +321,28 @@ export async function getTeamsLeaderboard() {
       throw error;
     }
 
-    // Compter les membres de chaque équipe
-    const teamsWithCounts = await Promise.all(
-      (data || []).map(async (team) => {
-        const { count } = await supabase
-          .from('team_memberships')
-          .select('*', { count: 'exact', head: true })
-          .eq('team_id', team.id);
+    if (!data || data.length === 0) {
+      return [];
+    }
 
-        return {
-          ...team,
-          members_count: count || 0,
-        };
-      })
-    );
+    // Récupérer tous les membres en une seule requête
+    const teamIds = data.map(t => t.id);
+    const { data: allMemberships } = await supabase
+      .from('team_memberships')
+      .select('team_id')
+      .in('team_id', teamIds);
+
+    // Compter les membres par équipe
+    const memberCounts: Record<string, number> = {};
+    (allMemberships || []).forEach(m => {
+      memberCounts[m.team_id] = (memberCounts[m.team_id] || 0) + 1;
+    });
+
+    // Ajouter les counts aux équipes
+    const teamsWithCounts = data.map(team => ({
+      ...team,
+      members_count: memberCounts[team.id] || 0,
+    }));
 
     return teamsWithCounts;
   } catch (error) {
