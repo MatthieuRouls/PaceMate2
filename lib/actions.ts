@@ -992,9 +992,13 @@ export async function getUpcomingSessions(limit: number = 3) {
   try {
     const supabase = await getServerSupabaseClient();
 
+    // Récupérer les sessions avec le créateur en une seule requête (JOIN)
     const { data: sessions, error } = await supabase
       .from('sessions')
-      .select('*')
+      .select(`
+        *,
+        creator:profiles!sessions_creator_id_fkey(id, username, running_level, avatar_url)
+      `)
       .gte('start_time', new Date().toISOString())
       .order('start_time', { ascending: true })
       .limit(limit);
@@ -1004,30 +1008,29 @@ export async function getUpcomingSessions(limit: number = 3) {
       return [];
     }
 
-    // Récupérer les créateurs et compter les participants
-    const sessionsWithDetails = await Promise.all(
-      (sessions || []).map(async (session) => {
-        // Créateur
-        const { data: creator } = await supabase
-          .from('profiles')
-          .select('id, username, running_level, avatar_url')
-          .eq('id', session.creator_id)
-          .single();
+    if (!sessions || sessions.length === 0) {
+      return [];
+    }
 
-        // Compter les participants
-        const { count } = await supabase
-          .from('session_participants')
-          .select('*', { count: 'exact', head: true })
-          .eq('session_id', session.id)
-          .eq('status', 'confirmed');
+    // Récupérer tous les participants confirmés en une seule requête
+    const sessionIds = sessions.map(s => s.id);
+    const { data: allParticipants } = await supabase
+      .from('session_participants')
+      .select('session_id')
+      .in('session_id', sessionIds)
+      .eq('status', 'confirmed');
 
-        return {
-          ...session,
-          creator,
-          participants_count: count || 0,
-        };
-      })
-    );
+    // Compter les participants par session
+    const participantCounts: Record<string, number> = {};
+    (allParticipants || []).forEach(p => {
+      participantCounts[p.session_id] = (participantCounts[p.session_id] || 0) + 1;
+    });
+
+    // Ajouter les counts aux sessions
+    const sessionsWithDetails = sessions.map(session => ({
+      ...session,
+      participants_count: participantCounts[session.id] || 0,
+    }));
 
     return sessionsWithDetails;
   } catch (error) {
@@ -1098,21 +1101,29 @@ export async function getAllUpcomingSessions() {
       return [];
     }
 
-    // Compter les participants pour chaque session
-    const sessionsWithDetails = await Promise.all(
-      (sessions || []).map(async (session) => {
-        const { count } = await supabase
-          .from('session_participants')
-          .select('*', { count: 'exact', head: true })
-          .eq('session_id', session.id)
-          .eq('status', 'confirmed');
+    if (!sessions || sessions.length === 0) {
+      return [];
+    }
 
-        return {
-          ...session,
-          participants_count: count || 0,
-        };
-      })
-    );
+    // Récupérer tous les participants confirmés en une seule requête
+    const sessionIds = sessions.map(s => s.id);
+    const { data: allParticipants } = await supabase
+      .from('session_participants')
+      .select('session_id')
+      .in('session_id', sessionIds)
+      .eq('status', 'confirmed');
+
+    // Compter les participants par session
+    const participantCounts: Record<string, number> = {};
+    (allParticipants || []).forEach(p => {
+      participantCounts[p.session_id] = (participantCounts[p.session_id] || 0) + 1;
+    });
+
+    // Ajouter les counts aux sessions
+    const sessionsWithDetails = sessions.map(session => ({
+      ...session,
+      participants_count: participantCounts[session.id] || 0,
+    }));
 
     return sessionsWithDetails;
   } catch (error) {
@@ -1179,22 +1190,28 @@ export async function getUserSessions() {
       }
     }
 
-    // Compter les participants pour toutes les sessions
+    // Compter les participants pour toutes les sessions en une seule requête
     const allSessions = [...(createdSessions || []), ...joinedSessions];
-    const sessionsWithCounts = await Promise.all(
-      allSessions.map(async (session) => {
-        const { count } = await supabase
-          .from('session_participants')
-          .select('*', { count: 'exact', head: true })
-          .eq('session_id', session.id)
-          .eq('status', 'confirmed');
+    const allSessionIds = allSessions.map(s => s.id);
 
-        return {
-          ...session,
-          participants_count: count || 0,
-        };
-      })
-    );
+    // Récupérer tous les participants confirmés en une seule requête
+    const { data: allParticipants } = await supabase
+      .from('session_participants')
+      .select('session_id')
+      .in('session_id', allSessionIds)
+      .eq('status', 'confirmed');
+
+    // Compter les participants par session
+    const participantCounts: Record<string, number> = {};
+    (allParticipants || []).forEach(p => {
+      participantCounts[p.session_id] = (participantCounts[p.session_id] || 0) + 1;
+    });
+
+    // Ajouter les counts aux sessions
+    const sessionsWithCounts = allSessions.map(session => ({
+      ...session,
+      participants_count: participantCounts[session.id] || 0,
+    }));
 
     // Séparer par type et par date
     const createdSessionIds = new Set((createdSessions || []).map(s => s.id));

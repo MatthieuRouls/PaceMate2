@@ -228,11 +228,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       // 2. Déconnexion côté client
       await supabase.auth.signOut();
+
+      // 3. Rediriger vers la landing page
+      window.location.href = '/';
     } catch (error) {
       console.error('Erreur lors de la déconnexion:', error);
       // Même en cas d'erreur, on force la déconnexion côté client
       setUser(null);
       setProfile(null);
+      // Rediriger quand même
+      window.location.href = '/';
     }
   };
 
