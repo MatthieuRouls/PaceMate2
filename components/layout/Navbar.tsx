@@ -189,7 +189,7 @@ export default function Navbar() {
                         Mes statistiques
                       </Link>
                       <Link
-                        href="/profile/settings"
+                        href="/settings"
                         onClick={() => setDropdownOpen(false)}
                         className="flex items-center gap-3 px-4 py-3 text-sm text-dark-800 dark:text-silver-200 hover:bg-silver-100 dark:hover:bg-dark-600 transition-colors"
                       >

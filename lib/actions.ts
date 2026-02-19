@@ -1226,6 +1226,89 @@ export async function updateProfileLocation(data: {
 }
 
 /**
+ * Mettre a jour le profil utilisateur (username, bio)
+ */
+export async function updateProfile(data: {
+  username?: string;
+  bio?: string;
+  avatar_url?: string;
+}) {
+  try {
+    const user = await getCurrentUser();
+    if (!user) return { success: false, error: 'Non authentifie' };
+
+    const supabase = await getServerSupabaseClient();
+
+    const updateData: Record<string, string> = {};
+    if (data.username !== undefined) updateData.username = data.username.trim();
+    if (data.bio !== undefined) updateData.bio = data.bio.trim();
+    if (data.avatar_url !== undefined) updateData.avatar_url = data.avatar_url;
+
+    if (Object.keys(updateData).length === 0) {
+      return { success: false, error: 'Aucune donnee a mettre a jour' };
+    }
+
+    // Validation username
+    if (updateData.username !== undefined) {
+      if (updateData.username.length < 2) {
+        return { success: false, error: 'Le nom doit faire au moins 2 caracteres' };
+      }
+      if (updateData.username.length > 30) {
+        return { success: false, error: 'Le nom ne peut pas depasser 30 caracteres' };
+      }
+    }
+
+    const { error } = await supabase
+      .from('profiles')
+      .update(updateData)
+      .eq('id', user.id);
+
+    if (error) {
+      console.error('Error updating profile:', error);
+      return { success: false, error: error.message };
+    }
+
+    return { success: true };
+  } catch (error) {
+    console.error('Error in updateProfile:', error);
+    return { success: false, error: 'Erreur inattendue' };
+  }
+}
+
+/**
+ * Supprimer le compte utilisateur
+ * Supprime le profil (les autres donnees sont supprimees en cascade ou via RLS)
+ */
+export async function deleteAccount(): Promise<{ success: boolean; error?: string }> {
+  try {
+    const user = await getCurrentUser();
+    if (!user) return { success: false, error: 'Non authentifie' };
+
+    const supabase = await getServerSupabaseClient();
+
+    // 1. Supprimer le profil (les participations, messages, etc. seront supprimés en cascade)
+    const { error: profileError } = await supabase
+      .from('profiles')
+      .delete()
+      .eq('id', user.id);
+
+    if (profileError) {
+      console.error('Error deleting profile:', profileError);
+      return { success: false, error: 'Erreur lors de la suppression du profil' };
+    }
+
+    // 2. Supprimer l'utilisateur auth via admin API
+    // Note: Ceci nécessite que le service role key soit configuré
+    // Pour l'instant, on supprime juste le profil et on déconnecte
+
+    return { success: true };
+  } catch (error) {
+    console.error('Error in deleteAccount:', error);
+    return { success: false, error: 'Erreur inattendue' };
+  }
+}
+
+/**
  * Récupérer les sessions auxquelles l'utilisateur est inscrit ou qu'il a créées
  */
 export async function getUserSessions() {

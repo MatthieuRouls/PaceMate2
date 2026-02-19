@@ -1,5 +1,6 @@
 export interface Profile {
   id: string;
+  email?: string;
   username: string;
   running_level: number; // 1-5
   avatar_url?: string;
