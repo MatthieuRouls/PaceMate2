@@ -12,16 +12,25 @@ import {
   getUserSessionHistory,
   updateProfileLocation,
 } from '@/lib/actions';
-import { MapPin, Search, Crosshair } from 'lucide-react';
+import {
+  MapPin,
+  Search,
+  Crosshair,
+  Route,
+  CheckCircle,
+  Star,
+  Zap,
+  Users,
+  Calendar,
+  ChevronRight,
+} from 'lucide-react';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
 
-// Désactiver la pré-génération statique
 export const dynamic = 'force-dynamic';
 
 export default function ProfilePage() {
   const { profile, loading: authLoading } = useAuth();
 
-  // State
   const [upcomingSessions, setUpcomingSessions] = useState<Session[]>([]);
   const [sessionHistory, setSessionHistory] = useState<SessionParticipant[]>([]);
   const [loading, setLoading] = useState(true);
@@ -59,7 +68,6 @@ export default function ProfilePage() {
         home_longitude: lng,
         home_city: cityName,
       });
-      // Force page reload to refresh profile
       window.location.reload();
     } catch {
       // silently fail
@@ -92,13 +100,12 @@ export default function ProfilePage() {
     );
   };
 
-  // Récupérer les données
   useEffect(() => {
     async function fetchData() {
       if (authLoading) return;
 
       if (!profile) {
-        setError('Profil non trouvé');
+        setError('Profil non trouve');
         setLoading(false);
         return;
       }
@@ -107,16 +114,15 @@ export default function ProfilePage() {
         setLoading(true);
         setError(null);
 
-        // Récupérer les sessions à venir
-        const upcoming = await getUserUpcomingSessions();
+        const [upcoming, history] = await Promise.all([
+          getUserUpcomingSessions(),
+          getUserSessionHistory(),
+        ]);
         setUpcomingSessions(upcoming);
-
-        // Récupérer l'historique
-        const history = await getUserSessionHistory();
         setSessionHistory(history);
       } catch (err) {
         console.error('Error fetching profile data:', err);
-        setError(err instanceof Error ? err.message : 'Erreur lors du chargement des données');
+        setError(err instanceof Error ? err.message : 'Erreur lors du chargement des donnees');
       } finally {
         setLoading(false);
       }
@@ -125,10 +131,8 @@ export default function ProfilePage() {
     fetchData();
   }, [profile, authLoading]);
 
-  // Calculer le niveau
   const levelInfo = profile ? calculateLevel(profile.xp_points || 0) : null;
 
-  // Générer les initiales pour l'avatar
   const getInitials = (username: string) => {
     const parts = username.split(' ');
     if (parts.length >= 2) {
@@ -137,23 +141,17 @@ export default function ProfilePage() {
     return username.substring(0, 2).toUpperCase();
   };
 
-  // Formater la date pour l'historique
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
-    const days = ['Dim', 'Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam'];
-    const months = ['jan', 'fév', 'mar', 'avr', 'mai', 'juin', 'juil', 'août', 'sep', 'oct', 'nov', 'déc'];
-
-    const dayName = days[date.getDay()];
-    const day = date.getDate();
-    const month = months[date.getMonth()];
-
-    return `${dayName} ${day} ${month}`;
+    return date.toLocaleDateString('fr-FR', {
+      weekday: 'short',
+      day: 'numeric',
+      month: 'short',
+    });
   };
 
-  // Parser les meilleurs temps
   const parseBestTimes = (bestTimesJson?: string) => {
     if (!bestTimesJson) return null;
-
     try {
       const times = JSON.parse(bestTimesJson);
       const firstKey = Object.keys(times)[0];
@@ -164,12 +162,12 @@ export default function ProfilePage() {
   };
 
   return (
-    <div className="min-h-screen pt-24 pb-8 px-4 md:px-8">
+    <div className="min-h-screen bg-neu-base pt-28 pb-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-6xl mx-auto">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-3xl md:text-4xl font-bold mb-2">Mon Profil</h1>
-          <p className="opacity-75">Suis ta progression et consulte tes statistiques</p>
+          <h1 className="text-3xl md:text-4xl font-bold text-dark-800 mb-2">Mon Profil</h1>
+          <p className="text-dark-500">Suis ta progression et consulte tes statistiques</p>
         </div>
 
         {/* Loading */}
@@ -181,45 +179,44 @@ export default function ProfilePage() {
 
         {/* Error */}
         {error && (
-          <div className="card border-2 border-red-500 text-center py-8">
-            <p className="text-red-500 font-semibold mb-2">❌ Erreur</p>
-            <p className="opacity-75">{error}</p>
+          <div className="card border-2 border-pink-500 text-center py-8">
+            <div className="w-12 h-12 mx-auto mb-4 rounded-full bg-pink-100 flex items-center justify-center">
+              <Zap className="w-6 h-6 text-pink-500" />
+            </div>
+            <p className="text-pink-500 font-semibold mb-2">Erreur</p>
+            <p className="text-dark-500">{error}</p>
           </div>
         )}
 
-        {/* Contenu principal */}
+        {/* Main content */}
         {!loading && !authLoading && !error && profile && (
           <div className="space-y-8">
-            {/* Section Header avec avatar et niveau */}
-            <div className="card">
+            {/* Profile Header Card */}
+            <div className="card p-8">
               <div className="flex flex-col md:flex-row items-start md:items-center gap-6">
                 {/* Avatar */}
-                <div
-                  className="flex-shrink-0 w-24 h-24 rounded-full flex items-center justify-center text-3xl font-bold"
-                  style={{
-                    backgroundColor: '#0066cc',
-                    color: 'white',
-                  }}
-                >
+                <div className="flex-shrink-0 w-24 h-24 rounded-2xl bg-gradient-to-br from-pink-500 to-neon-600 flex items-center justify-center text-3xl font-bold text-white shadow-lg">
                   {getInitials(profile.username)}
                 </div>
 
-                {/* Infos profil */}
+                {/* Profile Info */}
                 <div className="flex-1 w-full">
-                  <h2 className="text-2xl font-bold mb-2">{profile.username}</h2>
+                  <h2 className="text-2xl font-bold text-dark-800 mb-2">{profile.username}</h2>
 
-                  {profile.bio && <p className="opacity-75 mb-4">{profile.bio}</p>}
+                  {profile.bio && (
+                    <p className="text-dark-500 mb-4">{profile.bio}</p>
+                  )}
 
-                  {/* Niveau et progression */}
+                  {/* Level progression */}
                   {levelInfo && (
                     <div className="mb-4">
                       <div className="flex items-center justify-between mb-2">
-                        <span className="font-semibold">
+                        <span className="font-semibold text-dark-800">
                           Niveau {levelInfo.currentLevel} - {levelInfo.levelName}
                         </span>
                         {levelInfo.currentLevel < 5 && (
-                          <span className="text-sm opacity-75">
-                            Niveau {levelInfo.currentLevel + 1} à {levelInfo.nextLevelXP} XP
+                          <span className="text-sm text-dark-500">
+                            Niveau {levelInfo.currentLevel + 1} a {levelInfo.nextLevelXP} XP
                           </span>
                         )}
                       </div>
@@ -231,90 +228,90 @@ export default function ProfilePage() {
                     </div>
                   )}
 
-                  {/* Badge équipe */}
+                  {/* Team badge */}
                   {profile.team && (
                     <Link
                       href="/teams"
-                      className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border-2 transition-all hover:scale-105"
-                      style={{
-                        borderColor: '#0066cc',
-                        backgroundColor: '#f0f7ff',
-                      }}
+                      className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-neon-50 border border-neon-200 text-neon-700 font-semibold hover:bg-neon-100 transition-colors"
                     >
-                      <span>🏆</span>
-                      <span className="font-semibold">{profile.team.name}</span>
+                      <Users className="w-4 h-4" />
+                      {profile.team.name}
                     </Link>
                   )}
                 </div>
               </div>
             </div>
 
-            {/* Section Statistiques */}
+            {/* Stats Grid */}
             <div>
-              <h2 className="text-2xl font-bold mb-4">Statistiques</h2>
+              <h2 className="text-2xl font-bold text-dark-800 mb-4">Statistiques</h2>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                {/* Distance totale */}
-                <div className="card">
-                  <div className="text-3xl mb-2">🏃‍♂️</div>
-                  <div
-                    className="text-3xl font-mono font-bold mb-1"
-                    style={{ color: 'var(--color-primary)' }}
-                  >
+                {/* Distance */}
+                <div className="card p-6">
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="w-12 h-12 rounded-xl bg-pink-100 flex items-center justify-center">
+                      <Route className="w-6 h-6 text-pink-500" />
+                    </div>
+                  </div>
+                  <div className="text-3xl font-bold text-dark-800 mb-1">
                     {(profile.total_distance_km || 0).toFixed(1)}
                   </div>
-                  <div className="text-sm opacity-75">km parcourus</div>
+                  <div className="text-sm text-dark-500">km parcourus</div>
                 </div>
 
-                {/* Sessions complétées */}
-                <div className="card">
-                  <div className="text-3xl mb-2">✅</div>
-                  <div
-                    className="text-3xl font-mono font-bold mb-1"
-                    style={{ color: 'var(--color-primary)' }}
-                  >
+                {/* Sessions */}
+                <div className="card p-6">
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="w-12 h-12 rounded-xl bg-neon-100 flex items-center justify-center">
+                      <CheckCircle className="w-6 h-6 text-neon-700" />
+                    </div>
+                  </div>
+                  <div className="text-3xl font-bold text-dark-800 mb-1">
                     {profile.completed_sessions_count || 0}
                   </div>
-                  <div className="text-sm opacity-75">sorties</div>
+                  <div className="text-sm text-dark-500">sorties</div>
                 </div>
 
-                {/* XP Points */}
-                <div className="card">
-                  <div className="text-3xl mb-2">⭐</div>
-                  <div
-                    className="text-3xl font-mono font-bold mb-1"
-                    style={{ color: 'var(--color-primary)' }}
-                  >
+                {/* XP */}
+                <div className="card p-6">
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="w-12 h-12 rounded-xl bg-yellow-100 flex items-center justify-center">
+                      <Star className="w-6 h-6 text-yellow-500" />
+                    </div>
+                  </div>
+                  <div className="text-3xl font-bold text-dark-800 mb-1">
                     {profile.xp_points || 0}
                   </div>
-                  <div className="text-sm opacity-75">points</div>
+                  <div className="text-sm text-dark-500">points XP</div>
                 </div>
 
-                {/* Meilleur temps */}
-                <div className="card">
-                  <div className="text-3xl mb-2">⚡</div>
-                  <div
-                    className="text-xl font-mono font-bold mb-1"
-                    style={{ color: 'var(--color-primary)' }}
-                  >
+                {/* Best time */}
+                <div className="card p-6">
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="w-12 h-12 rounded-xl bg-purple-100 flex items-center justify-center">
+                      <Zap className="w-6 h-6 text-purple-500" />
+                    </div>
+                  </div>
+                  <div className="text-xl font-bold text-dark-800 mb-1">
                     {parseBestTimes(profile.best_times) || '--'}
                   </div>
-                  <div className="text-sm opacity-75">meilleur temps</div>
+                  <div className="text-sm text-dark-500">meilleur temps</div>
                 </div>
               </div>
             </div>
 
-            {/* Section Localisation */}
+            {/* Location Section */}
             <div>
-              <h2 className="text-2xl font-bold mb-4">Ma localisation</h2>
-              <div className="card">
+              <h2 className="text-2xl font-bold text-dark-800 mb-4">Ma localisation</h2>
+              <div className="card p-6">
                 {profile.home_city ? (
                   <div className="flex items-center gap-3 mb-4">
                     <div className="w-10 h-10 rounded-full bg-pink-100 flex items-center justify-center">
                       <MapPin className="w-5 h-5 text-pink-600" />
                     </div>
                     <div>
-                      <div className="font-semibold">{profile.home_city}</div>
-                      <div className="text-xs opacity-75">
+                      <div className="font-semibold text-dark-800">{profile.home_city}</div>
+                      <div className="text-xs text-dark-500">
                         Utilise pour trouver les sorties a proximite
                       </div>
                     </div>
@@ -325,8 +322,8 @@ export default function ProfilePage() {
                       <MapPin className="w-5 h-5 text-dark-500" />
                     </div>
                     <div>
-                      <div className="font-semibold">Aucune localisation</div>
-                      <div className="text-xs opacity-75">
+                      <div className="font-semibold text-dark-800">Aucune localisation</div>
+                      <div className="text-xs text-dark-500">
                         Renseigne ta ville pour trouver les sorties pres de chez toi
                       </div>
                     </div>
@@ -387,21 +384,34 @@ export default function ProfilePage() {
               </div>
             </div>
 
-            {/* Section Prochaines sessions */}
+            {/* Upcoming Sessions */}
             <div>
-              <h2 className="text-2xl font-bold mb-4">Mes prochaines sessions</h2>
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-2xl font-bold text-dark-800">Mes prochaines sessions</h2>
+                <Link
+                  href="/mes-sorties"
+                  className="text-sm font-semibold text-neon-700 hover:text-neon-600 transition-colors"
+                >
+                  Voir tout
+                </Link>
+              </div>
 
               {upcomingSessions.length === 0 ? (
                 <div className="card text-center py-12">
-                  <p className="text-2xl mb-4">🏃‍♂️</p>
-                  <h3 className="text-xl font-semibold mb-2">Aucune sortie prévue</h3>
-                  <p className="opacity-75 mb-6">Rejoins une session pour courir avec la communauté !</p>
-                  <Link href="/sessions" className="btn-primary">
+                  <div className="w-16 h-16 mx-auto mb-6 rounded-xl bg-silver-100 flex items-center justify-center">
+                    <Calendar className="w-8 h-8 text-dark-400" />
+                  </div>
+                  <h3 className="text-xl font-semibold text-dark-800 mb-2">Aucune sortie prevue</h3>
+                  <p className="text-dark-500 mb-6">Rejoins une session pour courir avec la communaute !</p>
+                  <Link
+                    href="/sessions"
+                    className="neu-btn inline-block px-8 py-3 text-dark-800 font-semibold"
+                  >
                     Voir les sessions
                   </Link>
                 </div>
               ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                   {upcomingSessions.map((session) => (
                     <SessionCard key={session.id} session={session} />
                   ))}
@@ -409,11 +419,11 @@ export default function ProfilePage() {
               )}
             </div>
 
-            {/* Section Historique */}
+            {/* History Section */}
             {sessionHistory.length > 0 && (
               <div>
-                <h2 className="text-2xl font-bold mb-4">Historique</h2>
-                <div className="card space-y-3">
+                <h2 className="text-2xl font-bold text-dark-800 mb-4">Historique</h2>
+                <div className="card divide-y divide-silver-200">
                   {sessionHistory.map((participant) => {
                     const session = participant.session;
                     if (!session) return null;
@@ -421,22 +431,29 @@ export default function ProfilePage() {
                     return (
                       <div
                         key={participant.id}
-                        className="flex items-center justify-between p-3 rounded-lg border transition-all hover:bg-gray-50"
-                        style={{
-                          borderColor: '#dee2e6',
-                        }}
+                        className="flex items-center justify-between p-4 hover:bg-silver-50 transition-colors"
                       >
-                        <div className="flex-1">
-                          <div className="font-semibold mb-1">{session.title}</div>
-                          <div className="text-sm opacity-75">
-                            {formatDate(session.start_time)} · {session.distance_km} km
+                        <div className="flex items-center gap-4">
+                          <div className="w-10 h-10 rounded-lg bg-neon-100 flex items-center justify-center">
+                            <CheckCircle className="w-5 h-5 text-neon-700" />
+                          </div>
+                          <div>
+                            <div className="font-semibold text-dark-800">{session.title}</div>
+                            <div className="text-sm text-dark-500">
+                              {formatDate(session.start_time)} · {session.distance_km} km
+                            </div>
                           </div>
                         </div>
-                        {participant.rating && (
-                          <div className="flex items-center gap-1 ml-4">
-                            {'⭐'.repeat(participant.rating)}
-                          </div>
-                        )}
+                        <div className="flex items-center gap-3">
+                          {participant.rating && (
+                            <div className="flex items-center gap-1 text-yellow-500">
+                              {Array.from({ length: participant.rating }).map((_, i) => (
+                                <Star key={i} className="w-4 h-4 fill-current" />
+                              ))}
+                            </div>
+                          )}
+                          <ChevronRight className="w-5 h-5 text-dark-400" />
+                        </div>
                       </div>
                     );
                   })}
