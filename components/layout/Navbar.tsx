@@ -145,9 +145,17 @@ export default function Navbar() {
                   onClick={() => setDropdownOpen(!dropdownOpen)}
                   className="flex items-center gap-2 hover:opacity-80 transition-opacity"
                 >
-                  <div className="w-9 h-9 rounded-full bg-neon-400 flex items-center justify-center text-white text-sm font-semibold">
-                    {profile.username.substring(0, 2).toUpperCase()}
-                  </div>
+                  {profile.avatar_url ? (
+                    <img
+                      src={profile.avatar_url}
+                      alt={profile.username}
+                      className="w-9 h-9 rounded-full object-cover"
+                    />
+                  ) : (
+                    <div className="w-9 h-9 rounded-full bg-neon-400 flex items-center justify-center text-white text-sm font-semibold">
+                      {profile.username.substring(0, 2).toUpperCase()}
+                    </div>
+                  )}
                   <span className={`hidden md:block font-medium transition-colors ${scrolled ? 'text-dark-800' : 'text-white'}`}>
                     {profile.username}
                   </span>

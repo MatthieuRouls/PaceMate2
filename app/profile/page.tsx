@@ -195,9 +195,17 @@ export default function ProfilePage() {
             <div className="card p-8">
               <div className="flex flex-col md:flex-row items-start md:items-center gap-6">
                 {/* Avatar */}
-                <div className="flex-shrink-0 w-24 h-24 rounded-2xl bg-gradient-to-br from-pink-500 to-neon-600 flex items-center justify-center text-3xl font-bold text-white shadow-lg">
-                  {getInitials(profile.username)}
-                </div>
+                {profile.avatar_url ? (
+                  <img
+                    src={profile.avatar_url}
+                    alt={profile.username}
+                    className="flex-shrink-0 w-24 h-24 rounded-2xl object-cover shadow-lg"
+                  />
+                ) : (
+                  <div className="flex-shrink-0 w-24 h-24 rounded-2xl bg-gradient-to-br from-pink-500 to-neon-600 flex items-center justify-center text-3xl font-bold text-white shadow-lg">
+                    {getInitials(profile.username)}
+                  </div>
+                )}
 
                 {/* Profile Info */}
                 <div className="flex-1 w-full">
