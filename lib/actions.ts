@@ -96,6 +96,20 @@ export async function createSession(data: CreateSessionData): Promise<CreateSess
       };
     }
 
+    // 6. Ajouter le créateur comme participant confirmé
+    const { error: participantError } = await supabase
+      .from('session_participants')
+      .insert({
+        session_id: session.id,
+        user_id: user.id,
+        status: 'confirmed',
+      });
+
+    if (participantError) {
+      console.error('Error adding creator as participant:', participantError);
+      // On ne bloque pas car la session est créée
+    }
+
     return {
       success: true,
       session_id: session.id,
