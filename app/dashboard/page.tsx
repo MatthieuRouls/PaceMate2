@@ -4,31 +4,43 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useAuth } from '@/components/providers/AuthProvider';
 import SessionCard from '@/components/ui/SessionCard';
-import { getUpcomingSessions } from '@/lib/actions';
-import { Session } from '@/lib/types';
+import { getUpcomingSessions, getUserTeam } from '@/lib/actions';
+import { Session, Team } from '@/lib/types';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
+import { Users } from 'lucide-react';
 
 // Cette page est protégée par le middleware.
 // Seuls les utilisateurs connectés y accèdent.
+
+interface TeamWithCount extends Team {
+  members_count: number;
+}
 
 export default function DashboardPage() {
   const { profile } = useAuth();
   const [upcomingSessions, setUpcomingSessions] = useState<Session[]>([]);
   const [sessionsLoading, setSessionsLoading] = useState(true);
+  const [userTeam, setUserTeam] = useState<TeamWithCount | null>(null);
+  const [teamLoading, setTeamLoading] = useState(true);
 
-  // Charger les sessions immédiatement (le middleware garantit l'auth)
+  // Charger les sessions et l'équipe
   useEffect(() => {
-    async function fetchSessions() {
+    async function fetchData() {
       try {
-        const sessions = await getUpcomingSessions(3);
+        const [sessions, team] = await Promise.all([
+          getUpcomingSessions(3),
+          getUserTeam(),
+        ]);
         setUpcomingSessions(sessions);
+        setUserTeam(team);
       } catch (error) {
-        console.error('Error fetching sessions:', error);
+        console.error('Error fetching data:', error);
       } finally {
         setSessionsLoading(false);
+        setTeamLoading(false);
       }
     }
-    fetchSessions();
+    fetchData();
   }, []);
 
   return (
@@ -172,6 +184,48 @@ export default function DashboardPage() {
           </Link>
         </div>
 
+        {/* My Team Section */}
+        {!teamLoading && userTeam && (
+          <div className="mb-10">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-2xl font-bold text-dark-800">Mon equipe</h2>
+              <Link
+                href="/teams"
+                className="text-sm font-semibold text-neon-700 hover:text-neon-600 transition-colors"
+              >
+                Voir les equipes
+              </Link>
+            </div>
+            <Link href="/teams" className="card p-6 block hover:shadow-lg transition-shadow">
+              <div className="flex items-center gap-5">
+                <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-pink-500 to-neon-600 flex items-center justify-center text-white text-2xl font-bold">
+                  {userTeam.name.charAt(0).toUpperCase()}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <h3 className="text-xl font-bold text-dark-800 mb-1">{userTeam.name}</h3>
+                  <div className="flex items-center gap-4 text-sm text-dark-500">
+                    <span className="flex items-center gap-1">
+                      <Users className="w-4 h-4" />
+                      {userTeam.members_count} membre{userTeam.members_count > 1 ? 's' : ''}
+                    </span>
+                    {userTeam.city && (
+                      <span>{userTeam.city}</span>
+                    )}
+                  </div>
+                  {userTeam.total_distance != null && userTeam.total_distance > 0 && (
+                    <div className="mt-2 text-sm font-semibold text-pink-500">
+                      {userTeam.total_distance.toFixed(1)} km parcourus
+                    </div>
+                  )}
+                </div>
+                <svg className="w-6 h-6 text-dark-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                </svg>
+              </div>
+            </Link>
+          </div>
+        )}
+
         {/* Upcoming Sessions */}
         <div className="mb-10">
           <div className="flex items-center justify-between mb-6">
@@ -214,27 +268,29 @@ export default function DashboardPage() {
           )}
         </div>
 
-        {/* CTA Section - Glassmorphism on dark background */}
-        <div className="relative overflow-hidden rounded-3xl bg-dark-800 p-10">
-          {/* Background decoration */}
-          <div className="absolute top-0 right-0 w-64 h-64 bg-pink-500/20 rounded-full blur-3xl" />
-          <div className="absolute bottom-0 left-0 w-48 h-48 bg-neon-500/20 rounded-full blur-3xl" />
+        {/* CTA Section - Only show if user has no team */}
+        {!teamLoading && !userTeam && (
+          <div className="relative overflow-hidden rounded-3xl bg-dark-800 p-10">
+            {/* Background decoration */}
+            <div className="absolute top-0 right-0 w-64 h-64 bg-pink-500/20 rounded-full blur-3xl" />
+            <div className="absolute bottom-0 left-0 w-48 h-48 bg-neon-500/20 rounded-full blur-3xl" />
 
-          <div className="relative z-10 text-center">
-            <h3 className="text-3xl font-bold text-white mb-4">
-              Rejoins une <span className="text-pink-500">equipe</span>
-            </h3>
-            <p className="text-silver-400 mb-8 max-w-xl mx-auto">
-              Cours en equipe, progresse ensemble et grimpe dans le classement !
-            </p>
-            <Link
-              href="/teams"
-              className="neu-btn inline-block px-10 py-4 text-dark-800 font-bold text-lg"
-            >
-              Decouvrir les equipes
-            </Link>
+            <div className="relative z-10 text-center">
+              <h3 className="text-3xl font-bold text-white mb-4">
+                Rejoins une <span className="text-pink-500">equipe</span>
+              </h3>
+              <p className="text-silver-400 mb-8 max-w-xl mx-auto">
+                Cours en equipe, progresse ensemble et grimpe dans le classement !
+              </p>
+              <Link
+                href="/teams"
+                className="neu-btn inline-block px-10 py-4 text-dark-800 font-bold text-lg"
+              >
+                Decouvrir les equipes
+              </Link>
+            </div>
           </div>
-        </div>
+        )}
       </div>
     </div>
   );
