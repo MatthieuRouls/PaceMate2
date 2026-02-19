@@ -1,9 +1,13 @@
 export const LEVEL_THRESHOLDS = {
   1: { min: 0, max: 50, name: 'Débutant' },
-  2: { min: 50, max: 200, name: 'Régulier' },
-  3: { min: 200, max: 500, name: 'Confirmé' },
-  4: { min: 500, max: 1000, name: 'Expert' },
-  5: { min: 1000, max: Infinity, name: 'Élite' },
+  2: { min: 50, max: 100, name: 'Occasionnel' },
+  3: { min: 100, max: 200, name: 'Régulier' },
+  4: { min: 200, max: 350, name: 'Confirmé' },
+  5: { min: 350, max: 500, name: 'Compétiteur' },
+  6: { min: 500, max: 750, name: 'Expert' },
+  7: { min: 750, max: 1000, name: 'Performance' },
+  8: { min: 1000, max: 1500, name: 'Élite amateur' },
+  9: { min: 1500, max: Infinity, name: 'Élite national' },
 } as const;
 
 export interface LevelInfo {
@@ -21,7 +25,7 @@ export function calculateLevel(xp_points: number = 0): LevelInfo {
   let currentLevel = 1;
 
   // Trouver le niveau actuel
-  for (let level = 5; level >= 1; level--) {
+  for (let level = 9; level >= 1; level--) {
     const threshold = LEVEL_THRESHOLDS[level as keyof typeof LEVEL_THRESHOLDS];
     if (xp_points >= threshold.min) {
       currentLevel = level;
