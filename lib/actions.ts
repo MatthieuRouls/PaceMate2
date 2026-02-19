@@ -1403,3 +1403,149 @@ export async function getUserSessions() {
     return { upcomingJoined: [], pastJoined: [], upcomingCreated: [], pastCreated: [] };
   }
 }
+
+// ============================================
+// STRAVA INTEGRATION ACTIONS
+// ============================================
+
+import {
+  refreshStravaToken,
+  fetchStravaActivities,
+  calculateStravaStats,
+  calculateRunningLevel,
+  getStravaAuthUrl,
+} from './strava';
+
+/**
+ * Genere l'URL de connexion Strava
+ */
+export async function getStravaConnectUrl(): Promise<{ url: string } | { error: string }> {
+  try {
+    const user = await getCurrentUser();
+    if (!user) return { error: 'Non authentifie' };
+
+    // Utiliser l'ID utilisateur comme state pour la securite
+    const url = getStravaAuthUrl(user.id);
+    return { url };
+  } catch (error) {
+    console.error('Error generating Strava URL:', error);
+    return { error: 'Erreur inattendue' };
+  }
+}
+
+/**
+ * Synchronise les donnees Strava et recalcule le niveau
+ */
+export async function syncStravaData(): Promise<{ success: boolean; level?: number; error?: string }> {
+  try {
+    const user = await getCurrentUser();
+    if (!user) return { success: false, error: 'Non authentifie' };
+
+    const supabase = await getServerSupabaseClient();
+
+    // 1. Recuperer les tokens Strava du profil
+    const { data: profile, error: profileError } = await supabase
+      .from('profiles')
+      .select('strava_access_token, strava_refresh_token, strava_token_expires_at, strava_connected')
+      .eq('id', user.id)
+      .single();
+
+    if (profileError || !profile?.strava_connected) {
+      return { success: false, error: 'Strava non connecte' };
+    }
+
+    let accessToken = profile.strava_access_token;
+
+    // 2. Rafraichir le token si expire
+    const expiresAt = new Date(profile.strava_token_expires_at).getTime();
+    if (Date.now() >= expiresAt - 60000) { // 1 minute de marge
+      try {
+        const newTokens = await refreshStravaToken(profile.strava_refresh_token);
+        accessToken = newTokens.access_token;
+
+        // Mettre a jour les tokens
+        await supabase
+          .from('profiles')
+          .update({
+            strava_access_token: newTokens.access_token,
+            strava_refresh_token: newTokens.refresh_token,
+            strava_token_expires_at: new Date(newTokens.expires_at * 1000).toISOString(),
+          })
+          .eq('id', user.id);
+      } catch {
+        return { success: false, error: 'Erreur de rafraichissement du token' };
+      }
+    }
+
+    // 3. Recuperer les activites
+    const activities = await fetchStravaActivities(accessToken);
+    const stats = calculateStravaStats(activities);
+    const calculatedLevel = calculateRunningLevel(stats);
+
+    // 4. Convertir l'allure en format interval
+    const avgPaceMinutes = Math.floor(stats.avgPaceSeconds / 60);
+    const avgPaceSeconds = Math.round(stats.avgPaceSeconds % 60);
+    const paceInterval = `00:${avgPaceMinutes.toString().padStart(2, '0')}:${avgPaceSeconds.toString().padStart(2, '0')}`;
+
+    // 5. Mettre a jour le profil
+    const { error: updateError } = await supabase
+      .from('profiles')
+      .update({
+        strava_last_sync: new Date().toISOString(),
+        running_level: calculatedLevel,
+        calculated_avg_pace: paceInterval,
+        calculated_weekly_km: Math.round(stats.weeklyKm * 10) / 10,
+        calculated_longest_run: Math.round(stats.longestRunKm * 10) / 10,
+        calculated_total_runs: stats.totalRuns,
+      })
+      .eq('id', user.id);
+
+    if (updateError) {
+      return { success: false, error: 'Erreur de mise a jour' };
+    }
+
+    return { success: true, level: calculatedLevel };
+  } catch (error) {
+    console.error('Error syncing Strava data:', error);
+    return { success: false, error: 'Erreur inattendue' };
+  }
+}
+
+/**
+ * Deconnecte le compte Strava
+ */
+export async function disconnectStrava(): Promise<{ success: boolean; error?: string }> {
+  try {
+    const user = await getCurrentUser();
+    if (!user) return { success: false, error: 'Non authentifie' };
+
+    const supabase = await getServerSupabaseClient();
+
+    const { error } = await supabase
+      .from('profiles')
+      .update({
+        strava_athlete_id: null,
+        strava_access_token: null,
+        strava_refresh_token: null,
+        strava_token_expires_at: null,
+        strava_connected: false,
+        strava_last_sync: null,
+        // Remettre le niveau a 1 (debutant) par defaut
+        running_level: 1,
+        calculated_avg_pace: null,
+        calculated_weekly_km: 0,
+        calculated_longest_run: 0,
+        calculated_total_runs: 0,
+      })
+      .eq('id', user.id);
+
+    if (error) {
+      return { success: false, error: 'Erreur de deconnexion' };
+    }
+
+    return { success: true };
+  } catch (error) {
+    console.error('Error disconnecting Strava:', error);
+    return { success: false, error: 'Erreur inattendue' };
+  }
+}

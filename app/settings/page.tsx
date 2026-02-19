@@ -1,10 +1,17 @@
 'use client';
 
-import { useState, useRef } from 'react';
-import { useRouter } from 'next/navigation';
+import { useState, useRef, useEffect } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '@/components/providers/AuthProvider';
-import { updateProfile, deleteAccount } from '@/lib/actions';
+import {
+  updateProfile,
+  deleteAccount,
+  getStravaConnectUrl,
+  syncStravaData,
+  disconnectStrava,
+} from '@/lib/actions';
 import { supabase } from '@/lib/supabase';
+import { LEVEL_THRESHOLDS } from '@/lib/constants';
 import {
   User,
   Camera,
@@ -14,6 +21,13 @@ import {
   Check,
   X,
   LogOut,
+  Link2,
+  RefreshCw,
+  Unlink,
+  TrendingUp,
+  Route,
+  Calendar,
+  Timer,
 } from 'lucide-react';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
 
@@ -21,6 +35,7 @@ export const dynamic = 'force-dynamic';
 
 export default function SettingsPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { profile, loading: authLoading, signOut } = useAuth();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -39,6 +54,33 @@ export default function SettingsPage() {
   const [deleteConfirmText, setDeleteConfirmText] = useState('');
   const [deleting, setDeleting] = useState(false);
 
+  // Strava state
+  const [connectingStrava, setConnectingStrava] = useState(false);
+  const [syncingStrava, setSyncingStrava] = useState(false);
+  const [disconnectingStrava, setDisconnectingStrava] = useState(false);
+
+  // Check for Strava callback params
+  useEffect(() => {
+    const stravaSuccess = searchParams.get('strava_success');
+    const stravaError = searchParams.get('strava_error');
+
+    if (stravaSuccess === 'true') {
+      setSuccess('Compte Strava connecte avec succes ! Ton niveau a ete calcule.');
+      // Clean URL
+      router.replace('/settings');
+    } else if (stravaError) {
+      const errorMessages: Record<string, string> = {
+        access_denied: 'Acces refuse. Tu as annule la connexion.',
+        no_code: 'Erreur de connexion Strava.',
+        not_authenticated: 'Tu dois etre connecte.',
+        update_failed: 'Erreur lors de la mise a jour du profil.',
+        exchange_failed: 'Erreur de communication avec Strava.',
+      };
+      setError(errorMessages[stravaError] || 'Erreur Strava inconnue.');
+      router.replace('/settings');
+    }
+  }, [searchParams, router]);
+
   // Initialize form with profile data
   if (profile && !initialized) {
     setUsername(profile.username || '');
@@ -55,11 +97,14 @@ export default function SettingsPage() {
     return name.substring(0, 2).toUpperCase();
   };
 
+  const getLevelName = (level: number) => {
+    return LEVEL_THRESHOLDS[level as keyof typeof LEVEL_THRESHOLDS]?.name || 'Inconnu';
+  };
+
   const handlePhotoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file || !profile) return;
 
-    // Validate file
     if (!file.type.startsWith('image/')) {
       setError('Le fichier doit etre une image');
       return;
@@ -77,7 +122,6 @@ export default function SettingsPage() {
       const fileName = `${profile.id}-${Date.now()}.${fileExt}`;
       const filePath = `avatars/${fileName}`;
 
-      // Upload to Supabase Storage
       const { error: uploadError } = await supabase.storage
         .from('avatars')
         .upload(filePath, file, { upsert: true });
@@ -88,14 +132,11 @@ export default function SettingsPage() {
         return;
       }
 
-      // Get public URL
       const { data: urlData } = supabase.storage
         .from('avatars')
         .getPublicUrl(filePath);
 
       const newAvatarUrl = urlData.publicUrl;
-
-      // Update profile with new avatar URL
       const result = await updateProfile({ avatar_url: newAvatarUrl });
 
       if (result.success) {
@@ -129,7 +170,6 @@ export default function SettingsPage() {
       if (result.success) {
         setSuccess('Profil mis a jour avec succes');
         setTimeout(() => setSuccess(null), 3000);
-        // Reload to refresh profile in context
         window.location.reload();
       } else {
         setError(result.error || 'Erreur lors de la mise a jour');
@@ -139,6 +179,71 @@ export default function SettingsPage() {
       setError('Erreur inattendue');
     } finally {
       setSaving(false);
+    }
+  };
+
+  const handleConnectStrava = async () => {
+    setConnectingStrava(true);
+    setError(null);
+
+    try {
+      const result = await getStravaConnectUrl();
+      if ('url' in result) {
+        window.location.href = result.url;
+      } else {
+        setError(result.error);
+        setConnectingStrava(false);
+      }
+    } catch (err) {
+      console.error('Error connecting Strava:', err);
+      setError('Erreur lors de la connexion Strava');
+      setConnectingStrava(false);
+    }
+  };
+
+  const handleSyncStrava = async () => {
+    setSyncingStrava(true);
+    setError(null);
+
+    try {
+      const result = await syncStravaData();
+      if (result.success) {
+        setSuccess(`Donnees synchronisees ! Niveau calcule : ${getLevelName(result.level || 1)}`);
+        setTimeout(() => {
+          setSuccess(null);
+          window.location.reload();
+        }, 2000);
+      } else {
+        setError(result.error || 'Erreur de synchronisation');
+      }
+    } catch (err) {
+      console.error('Error syncing Strava:', err);
+      setError('Erreur inattendue');
+    } finally {
+      setSyncingStrava(false);
+    }
+  };
+
+  const handleDisconnectStrava = async () => {
+    setDisconnectingStrava(true);
+    setError(null);
+
+    try {
+      const result = await disconnectStrava();
+      if (result.success) {
+        setSuccess('Compte Strava deconnecte');
+        setTimeout(() => {
+          setSuccess(null);
+          window.location.reload();
+        }, 2000);
+      } else {
+        setError(result.error || 'Erreur de deconnexion');
+      }
+    } catch (err) {
+      console.error('Error disconnecting Strava:', err);
+      setError('Erreur inattendue');
+    } finally {
+      setDisconnectingStrava(false);
     }
   };
 
@@ -153,9 +258,7 @@ export default function SettingsPage() {
 
     try {
       const result = await deleteAccount();
-
       if (result.success) {
-        // Sign out and redirect
         await signOut();
         router.push('/');
       } else {
@@ -219,7 +322,6 @@ export default function SettingsPage() {
             </h2>
 
             <div className="flex items-center gap-6">
-              {/* Avatar preview */}
               <div className="relative">
                 {avatarUrl ? (
                   <img
@@ -309,6 +411,124 @@ export default function SettingsPage() {
                 {saving ? 'Enregistrement...' : 'Enregistrer'}
               </button>
             </div>
+          </div>
+
+          {/* Integration Strava */}
+          <div className="card p-6 border-2 border-orange-200">
+            <h2 className="text-lg font-bold text-dark-800 mb-4 flex items-center gap-2">
+              <svg className="w-5 h-5 text-orange-500" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M15.387 17.944l-2.089-4.116h-3.065L15.387 24l5.15-10.172h-3.066m-7.008-5.599l2.836 5.598h4.172L10.463 0l-7 13.828h4.169" />
+              </svg>
+              Connexion Strava
+            </h2>
+
+            {profile.strava_connected ? (
+              <div className="space-y-4">
+                <div className="p-4 bg-orange-50 rounded-lg">
+                  <div className="flex items-center gap-2 mb-3">
+                    <Check className="w-5 h-5 text-orange-600" />
+                    <span className="font-semibold text-orange-700">Compte Strava connecte</span>
+                  </div>
+
+                  {/* Stats from Strava */}
+                  <div className="grid grid-cols-2 gap-3 mt-4">
+                    <div className="bg-white rounded-lg p-3">
+                      <div className="flex items-center gap-2 text-dark-500 text-xs mb-1">
+                        <TrendingUp className="w-3 h-3" />
+                        Niveau calcule
+                      </div>
+                      <div className="font-bold text-dark-800">
+                        {getLevelName(profile.running_level)}
+                      </div>
+                    </div>
+
+                    <div className="bg-white rounded-lg p-3">
+                      <div className="flex items-center gap-2 text-dark-500 text-xs mb-1">
+                        <Timer className="w-3 h-3" />
+                        Allure moyenne
+                      </div>
+                      <div className="font-bold text-dark-800">
+                        {profile.calculated_avg_pace || '--'}
+                      </div>
+                    </div>
+
+                    <div className="bg-white rounded-lg p-3">
+                      <div className="flex items-center gap-2 text-dark-500 text-xs mb-1">
+                        <Route className="w-3 h-3" />
+                        Km/semaine
+                      </div>
+                      <div className="font-bold text-dark-800">
+                        {profile.calculated_weekly_km?.toFixed(1) || '0'} km
+                      </div>
+                    </div>
+
+                    <div className="bg-white rounded-lg p-3">
+                      <div className="flex items-center gap-2 text-dark-500 text-xs mb-1">
+                        <Calendar className="w-3 h-3" />
+                        Courses (3 mois)
+                      </div>
+                      <div className="font-bold text-dark-800">
+                        {profile.calculated_total_runs || 0}
+                      </div>
+                    </div>
+                  </div>
+
+                  {profile.strava_last_sync && (
+                    <p className="text-xs text-dark-500 mt-3">
+                      Derniere sync : {new Date(profile.strava_last_sync).toLocaleDateString('fr-FR', {
+                        day: 'numeric',
+                        month: 'short',
+                        hour: '2-digit',
+                        minute: '2-digit',
+                      })}
+                    </p>
+                  )}
+                </div>
+
+                <div className="flex gap-3">
+                  <button
+                    onClick={handleSyncStrava}
+                    disabled={syncingStrava}
+                    className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-orange-500 text-white text-sm font-medium hover:bg-orange-600 transition-colors disabled:opacity-50"
+                  >
+                    <RefreshCw className={`w-4 h-4 ${syncingStrava ? 'animate-spin' : ''}`} />
+                    {syncingStrava ? 'Synchronisation...' : 'Synchroniser'}
+                  </button>
+
+                  <button
+                    onClick={handleDisconnectStrava}
+                    disabled={disconnectingStrava}
+                    className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-dark-300 text-dark-700 text-sm font-medium hover:bg-silver-100 transition-colors disabled:opacity-50"
+                  >
+                    <Unlink className="w-4 h-4" />
+                    {disconnectingStrava ? 'Deconnexion...' : 'Deconnecter'}
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <div>
+                <p className="text-sm text-dark-600 mb-4">
+                  Connecte ton compte Strava pour calculer automatiquement ton niveau de course
+                  basé sur tes performances reelles. Ton niveau sera mis a jour a chaque synchronisation.
+                </p>
+
+                <div className="p-4 bg-silver-100 rounded-lg mb-4">
+                  <p className="text-xs text-dark-500">
+                    <strong>Donnees utilisees :</strong> allure moyenne, volume hebdomadaire,
+                    plus longue sortie, regularite des entrainements (3 derniers mois).
+                  </p>
+                </div>
+
+                <button
+                  onClick={handleConnectStrava}
+                  disabled={connectingStrava}
+                  className="inline-flex items-center gap-2 px-6 py-3 rounded-lg bg-orange-500 text-white font-semibold hover:bg-orange-600 transition-colors disabled:opacity-50"
+                >
+                  <Link2 className="w-4 h-4" />
+                  {connectingStrava ? 'Connexion...' : 'Connecter Strava'}
+                </button>
+              </div>
+            )}
           </div>
 
           {/* Compte */}

@@ -14,6 +14,15 @@ export interface Profile {
   home_city?: string;
   created_at?: string;
 
+  // Strava integration
+  strava_connected?: boolean;
+  strava_athlete_id?: number;
+  strava_last_sync?: string;
+  calculated_avg_pace?: string;
+  calculated_weekly_km?: number;
+  calculated_longest_run?: number;
+  calculated_total_runs?: number;
+
   // Relations (populated via joins)
   team?: Team;
   completed_sessions_count?: number;
