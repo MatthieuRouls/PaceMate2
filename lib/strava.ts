@@ -36,12 +36,20 @@ export interface StravaActivity {
   max_heartrate?: number;
 }
 
+export interface BestEffort {
+  distance: '5k' | '10k' | 'semi' | 'marathon';
+  timeSeconds: number;
+  activityId: number;
+  date: string;
+}
+
 export interface StravaStats {
   avgPaceSeconds: number; // secondes par km
   weeklyKm: number;
   longestRunKm: number;
   totalRuns: number;
   recentRuns: StravaActivity[];
+  bestEfforts: BestEffort[];
 }
 
 /**
@@ -130,6 +138,14 @@ export async function fetchStravaActivities(accessToken: string): Promise<Strava
   );
 }
 
+// Distances standards avec tolerance (en km)
+const RACE_DISTANCES = {
+  '5k': { target: 5, min: 4.8, max: 5.3 },
+  '10k': { target: 10, min: 9.5, max: 10.5 },
+  'semi': { target: 21.0975, min: 20.5, max: 22 },
+  'marathon': { target: 42.195, min: 41, max: 43.5 },
+} as const;
+
 /**
  * Calcule les statistiques a partir des activites
  */
@@ -141,6 +157,7 @@ export function calculateStravaStats(activities: StravaActivity[]): StravaStats 
       longestRunKm: 0,
       totalRuns: 0,
       recentRuns: [],
+      bestEfforts: [],
     };
   }
 
@@ -154,12 +171,32 @@ export function calculateStravaStats(activities: StravaActivity[]): StravaStats 
   let totalMovingTime = 0;
   let longestRun = 0;
 
+  // Stocker les meilleures performances par distance
+  const bestByDistance: Record<string, BestEffort> = {};
+
   for (const activity of activities) {
     const distanceKm = activity.distance / 1000;
     totalDistance += distanceKm;
     totalMovingTime += activity.moving_time;
     if (distanceKm > longestRun) {
       longestRun = distanceKm;
+    }
+
+    // Verifier si c'est une course sur distance standard
+    for (const [distKey, range] of Object.entries(RACE_DISTANCES)) {
+      if (distanceKm >= range.min && distanceKm <= range.max) {
+        // Normaliser le temps a la distance exacte
+        const normalizedTime = (activity.moving_time / distanceKm) * range.target;
+
+        if (!bestByDistance[distKey] || normalizedTime < bestByDistance[distKey].timeSeconds) {
+          bestByDistance[distKey] = {
+            distance: distKey as BestEffort['distance'],
+            timeSeconds: Math.round(normalizedTime),
+            activityId: activity.id,
+            date: activity.start_date,
+          };
+        }
+      }
     }
   }
 
@@ -175,17 +212,40 @@ export function calculateStravaStats(activities: StravaActivity[]): StravaStats 
     longestRunKm: longestRun,
     totalRuns: activities.length,
     recentRuns: sortedActivities.slice(0, 10),
+    bestEfforts: Object.values(bestByDistance),
   };
 }
 
 /**
- * Calcule le niveau du coureur (1-5) basé sur ses stats Strava
+ * Calcule le niveau du coureur (1-9) basé sur ses stats Strava
  *
- * Criteres:
- * - Allure moyenne
- * - Volume hebdomadaire
- * - Plus longue sortie
- * - Regularite (nombre de courses)
+ * Criteres (100 pts de base):
+ * - Allure moyenne (max 30 pts)
+ * - Volume hebdomadaire (max 30 pts)
+ * - Plus longue sortie (max 25 pts)
+ * - Regularite (max 15 pts)
+ *
+ * Bonus performance (max 20 pts):
+ * - Marathon < 2h30: +20
+ * - Marathon < 2h45: +18
+ * - Marathon < 3h00: +15
+ * - Marathon < 3h15: +12
+ * - Marathon < 3h30: +9
+ * - Marathon < 3h45: +6
+ * - Semi < 1h40: +4
+ *
+ * Score total possible: 120 pts
+ *
+ * Niveaux:
+ * 1: Debutant (<20)
+ * 2: Occasionnel (20-34)
+ * 3: Regulier (35-49)
+ * 4: Confirme (50-64)
+ * 5: Competiteur (65-79)
+ * 6: Expert (80-94)
+ * 7: Performance (95-109)
+ * 8: Elite amateur (110-117)
+ * 9: Elite national (>=118)
  */
 export function calculateRunningLevel(stats: StravaStats): number {
   if (stats.totalRuns === 0) {
@@ -234,12 +294,49 @@ export function calculateRunningLevel(stats: StravaStats): number {
   else if (runsPerWeek >= 1) score += 3;
   else score += 1;
 
-  // Convertir le score (0-100) en niveau (1-5)
-  if (score >= 80) return 5; // Elite
-  if (score >= 60) return 4; // Expert
-  if (score >= 40) return 3; // Confirme
-  if (score >= 20) return 2; // Regulier
+  // 5. Bonus basé sur les meilleures performances (max 20 points)
+  const perfBonus = calculatePerformanceBonus(stats.bestEfforts);
+  score += perfBonus;
+
+  // Convertir le score (0-120) en niveau (1-9)
+  if (score >= 118) return 9; // Elite national
+  if (score >= 110) return 8; // Elite amateur
+  if (score >= 95) return 7;  // Performance
+  if (score >= 80) return 6;  // Expert
+  if (score >= 65) return 5;  // Competiteur
+  if (score >= 50) return 4;  // Confirme
+  if (score >= 35) return 3;  // Regulier
+  if (score >= 20) return 2;  // Occasionnel
   return 1; // Debutant
+}
+
+/**
+ * Calcule le bonus de performance basé sur les meilleures courses
+ */
+function calculatePerformanceBonus(bestEfforts: BestEffort[]): number {
+  let bonus = 0;
+
+  const marathon = bestEfforts.find(e => e.distance === 'marathon');
+  const semi = bestEfforts.find(e => e.distance === 'semi');
+
+  // Bonus marathon (prioritaire)
+  if (marathon) {
+    const timeMinutes = marathon.timeSeconds / 60;
+    if (timeMinutes < 150) bonus = 20;       // < 2h30
+    else if (timeMinutes < 165) bonus = 18;  // < 2h45
+    else if (timeMinutes < 180) bonus = 15;  // < 3h00
+    else if (timeMinutes < 195) bonus = 12;  // < 3h15
+    else if (timeMinutes < 210) bonus = 9;   // < 3h30
+    else if (timeMinutes < 225) bonus = 6;   // < 3h45
+  }
+
+  // Bonus semi (si pas de marathon ou marathon > 3h45)
+  if (bonus === 0 && semi) {
+    const timeMinutes = semi.timeSeconds / 60;
+    if (timeMinutes < 100) bonus = 4; // < 1h40
+  }
+
+  return bonus;
 }
 
 /**
