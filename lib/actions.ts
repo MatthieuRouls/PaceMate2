@@ -487,40 +487,33 @@ export async function getUserProfile() {
 
 /**
  * Récupérer les prochaines sessions de l'utilisateur
+ * Inclut les sessions où l'utilisateur est participant OU créateur
  */
 export async function getUserUpcomingSessions() {
   try {
-    // Récupérer l'utilisateur connecté
     const user = await getCurrentUser();
     if (!user) {
       return [];
     }
 
     const supabase = await getServerSupabaseClient();
+    const now = new Date().toISOString();
 
-    // 1. Récupérer les IDs des sessions confirmées de l'utilisateur
-    const { data: participations, error: participationsError } = await supabase
+    // 1. Récupérer les IDs des sessions où l'utilisateur est participant confirmé
+    const { data: participations } = await supabase
       .from('session_participants')
       .select('session_id')
       .eq('user_id', user.id)
       .eq('status', 'confirmed');
 
-    if (participationsError) {
-      console.error('Error fetching participations:', participationsError);
-      return [];
-    }
+    const participationIds = (participations || []).map((p) => p.session_id);
 
-    if (!participations || participations.length === 0) {
-      return [];
-    }
-
-    // 2. Récupérer les sessions correspondantes
-    const sessionIds = participations.map((p) => p.session_id);
+    // 2. Récupérer les sessions créées par l'utilisateur OU où il est participant
     const { data: sessions, error: sessionsError } = await supabase
       .from('sessions')
       .select('*')
-      .in('id', sessionIds)
-      .gte('start_time', new Date().toISOString())
+      .gte('start_time', now)
+      .or(`creator_id.eq.${user.id},id.in.(${participationIds.length > 0 ? participationIds.join(',') : '00000000-0000-0000-0000-000000000000'})`)
       .order('start_time', { ascending: true })
       .limit(3);
 
