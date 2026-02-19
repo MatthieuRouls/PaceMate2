@@ -225,14 +225,11 @@ export function calculateStravaStats(activities: StravaActivity[]): StravaStats 
  * - Plus longue sortie (max 25 pts)
  * - Regularite (max 15 pts)
  *
- * Bonus performance (max 20 pts):
- * - Marathon < 2h30: +20
- * - Marathon < 2h45: +18
- * - Marathon < 3h00: +15
- * - Marathon < 3h15: +12
- * - Marathon < 3h30: +9
- * - Marathon < 3h45: +6
- * - Semi < 1h40: +4
+ * Bonus performance - meilleure perf parmi (max 20 pts):
+ * Marathon: <2h30 +20, <2h45 +18, <3h00 +15, <3h15 +12, <3h30 +9, <3h45 +6
+ * Semi: <1h15 +12, <1h20 +10, <1h25 +8, <1h30 +6, <1h35 +5, <1h40 +4, <1h50 +2
+ * 10K: <32' +10, <35' +8, <38' +6, <40' +5, <45' +4, <50' +3, <55' +2, <60' +1
+ * 5K: <15' +8, <16' +6, <17' +5, <18' +4, <19' +3, <20' +2, <25' +1
  *
  * Score total possible: 120 pts
  *
@@ -312,28 +309,62 @@ export function calculateRunningLevel(stats: StravaStats): number {
 
 /**
  * Calcule le bonus de performance basé sur les meilleures courses
+ * Prend le meilleur bonus parmi toutes les distances
  */
 function calculatePerformanceBonus(bestEfforts: BestEffort[]): number {
   let bonus = 0;
 
   const marathon = bestEfforts.find(e => e.distance === 'marathon');
   const semi = bestEfforts.find(e => e.distance === 'semi');
+  const tenK = bestEfforts.find(e => e.distance === '10k');
+  const fiveK = bestEfforts.find(e => e.distance === '5k');
 
-  // Bonus marathon (prioritaire)
+  // Bonus marathon (max 20 pts)
   if (marathon) {
     const timeMinutes = marathon.timeSeconds / 60;
-    if (timeMinutes < 150) bonus = 20;       // < 2h30
-    else if (timeMinutes < 165) bonus = 18;  // < 2h45
-    else if (timeMinutes < 180) bonus = 15;  // < 3h00
-    else if (timeMinutes < 195) bonus = 12;  // < 3h15
-    else if (timeMinutes < 210) bonus = 9;   // < 3h30
-    else if (timeMinutes < 225) bonus = 6;   // < 3h45
+    if (timeMinutes < 150) bonus = Math.max(bonus, 20);       // < 2h30
+    else if (timeMinutes < 165) bonus = Math.max(bonus, 18);  // < 2h45
+    else if (timeMinutes < 180) bonus = Math.max(bonus, 15);  // < 3h00
+    else if (timeMinutes < 195) bonus = Math.max(bonus, 12);  // < 3h15
+    else if (timeMinutes < 210) bonus = Math.max(bonus, 9);   // < 3h30
+    else if (timeMinutes < 225) bonus = Math.max(bonus, 6);   // < 3h45
   }
 
-  // Bonus semi (si pas de marathon ou marathon > 3h45)
-  if (bonus === 0 && semi) {
+  // Bonus semi (max 12 pts)
+  if (semi) {
     const timeMinutes = semi.timeSeconds / 60;
-    if (timeMinutes < 100) bonus = 4; // < 1h40
+    if (timeMinutes < 75) bonus = Math.max(bonus, 12);        // < 1h15
+    else if (timeMinutes < 80) bonus = Math.max(bonus, 10);   // < 1h20
+    else if (timeMinutes < 85) bonus = Math.max(bonus, 8);    // < 1h25
+    else if (timeMinutes < 90) bonus = Math.max(bonus, 6);    // < 1h30
+    else if (timeMinutes < 95) bonus = Math.max(bonus, 5);    // < 1h35
+    else if (timeMinutes < 100) bonus = Math.max(bonus, 4);   // < 1h40
+    else if (timeMinutes < 110) bonus = Math.max(bonus, 2);   // < 1h50
+  }
+
+  // Bonus 10K (max 10 pts)
+  if (tenK) {
+    const timeMinutes = tenK.timeSeconds / 60;
+    if (timeMinutes < 32) bonus = Math.max(bonus, 10);        // < 32 min
+    else if (timeMinutes < 35) bonus = Math.max(bonus, 8);    // < 35 min
+    else if (timeMinutes < 38) bonus = Math.max(bonus, 6);    // < 38 min
+    else if (timeMinutes < 40) bonus = Math.max(bonus, 5);    // < 40 min
+    else if (timeMinutes < 45) bonus = Math.max(bonus, 4);    // < 45 min
+    else if (timeMinutes < 50) bonus = Math.max(bonus, 3);    // < 50 min
+    else if (timeMinutes < 55) bonus = Math.max(bonus, 2);    // < 55 min
+    else if (timeMinutes < 60) bonus = Math.max(bonus, 1);    // < 60 min
+  }
+
+  // Bonus 5K (max 8 pts)
+  if (fiveK) {
+    const timeMinutes = fiveK.timeSeconds / 60;
+    if (timeMinutes < 15) bonus = Math.max(bonus, 8);         // < 15 min
+    else if (timeMinutes < 16) bonus = Math.max(bonus, 6);    // < 16 min
+    else if (timeMinutes < 17) bonus = Math.max(bonus, 5);    // < 17 min
+    else if (timeMinutes < 18) bonus = Math.max(bonus, 4);    // < 18 min
+    else if (timeMinutes < 19) bonus = Math.max(bonus, 3);    // < 19 min
+    else if (timeMinutes < 20) bonus = Math.max(bonus, 2);    // < 20 min
+    else if (timeMinutes < 25) bonus = Math.max(bonus, 1);    // < 25 min
   }
 
   return bonus;
