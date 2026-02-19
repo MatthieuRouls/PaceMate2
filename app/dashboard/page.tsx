@@ -7,7 +7,8 @@ import SessionCard from '@/components/ui/SessionCard';
 import { getUpcomingSessions, getUserTeam } from '@/lib/actions';
 import { Session, Team } from '@/lib/types';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
-import { Users } from 'lucide-react';
+import { Users, Zap, Trophy, TrendingUp, Target, Settings } from 'lucide-react';
+import { LEVEL_THRESHOLDS } from '@/lib/constants';
 
 // Cette page est protégée par le middleware.
 // Seuls les utilisateurs connectés y accèdent.
@@ -46,26 +47,104 @@ export default function DashboardPage() {
   return (
     <div className="min-h-screen bg-neu-base pt-28 pb-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
-        {/* Welcome Header */}
-        <div className="card p-8 mb-10">
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
-            <div>
-              <h1 className="text-3xl font-bold text-dark-800 mb-2">
-                Salut {profile?.username || ''} !
-              </h1>
-              <p className="text-dark-500">
-                Pret pour ta prochaine sortie ?
-              </p>
+        {/* Welcome Header with Level Showcase */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-10">
+          {/* Welcome Card */}
+          <div className="lg:col-span-2 card p-8">
+            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
+              <div>
+                <h1 className="text-3xl font-bold text-dark-800 mb-2">
+                  Salut {profile?.username || ''} !
+                </h1>
+                <p className="text-dark-500">
+                  Pret pour ta prochaine sortie ?
+                </p>
+              </div>
+              <Link
+                href="/sessions/create"
+                className="neu-btn-white inline-flex items-center justify-center gap-2 px-8 py-4 text-dark-800 font-bold text-lg"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                </svg>
+                Creer une sortie
+              </Link>
             </div>
-            <Link
-              href="/sessions/create"
-              className="neu-btn-white inline-flex items-center justify-center gap-2 px-8 py-4 text-dark-800 font-bold text-lg"
-            >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-              </svg>
-              Creer une sortie
-            </Link>
+          </div>
+
+          {/* Level Showcase Card */}
+          <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-dark-800 via-dark-700 to-dark-800 p-6">
+            {/* Background effects */}
+            <div className="absolute top-0 right-0 w-32 h-32 bg-pink-500/30 rounded-full blur-2xl" />
+            <div className="absolute bottom-0 left-0 w-24 h-24 bg-neon-500/20 rounded-full blur-2xl" />
+
+            <div className="relative z-10">
+              <div className="flex items-center justify-between mb-4">
+                <span className="text-xs font-semibold text-silver-400 uppercase tracking-wider flex items-center gap-1">
+                  <Trophy className="w-3 h-3" />
+                  Ton niveau
+                </span>
+                <Link href="/settings" className="text-silver-500 hover:text-white transition-colors">
+                  <Settings className="w-4 h-4" />
+                </Link>
+              </div>
+
+              <div className="flex items-center gap-4">
+                {/* Level Badge */}
+                <div className="relative">
+                  <div className={`w-20 h-20 rounded-2xl flex items-center justify-center text-3xl font-black text-white shadow-lg ${
+                    (profile?.running_level || 1) >= 7
+                      ? 'bg-gradient-to-br from-yellow-400 via-orange-500 to-red-500'
+                      : (profile?.running_level || 1) >= 5
+                        ? 'bg-gradient-to-br from-pink-500 to-purple-600'
+                        : (profile?.running_level || 1) >= 3
+                          ? 'bg-gradient-to-br from-neon-500 to-teal-500'
+                          : 'bg-gradient-to-br from-silver-400 to-silver-600'
+                  }`}>
+                    {profile?.running_level || 1}
+                  </div>
+                  {(profile?.running_level || 1) >= 7 && (
+                    <div className="absolute -top-1 -right-1 w-6 h-6 bg-yellow-400 rounded-full flex items-center justify-center">
+                      <Zap className="w-3 h-3 text-yellow-900" />
+                    </div>
+                  )}
+                </div>
+
+                {/* Level Info */}
+                <div className="flex-1 min-w-0">
+                  <div className="text-xl font-bold text-white mb-1">
+                    {LEVEL_THRESHOLDS[profile?.running_level as keyof typeof LEVEL_THRESHOLDS]?.name || 'Débutant'}
+                  </div>
+                  <div className="text-sm text-silver-400">
+                    {profile?.strava_connected ? (
+                      <span className="flex items-center gap-1 text-neon-400">
+                        <TrendingUp className="w-3 h-3" />
+                        Synchro Strava
+                      </span>
+                    ) : (
+                      <Link href="/settings" className="flex items-center gap-1 hover:text-white transition-colors">
+                        <Target className="w-3 h-3" />
+                        Connecter Strava
+                      </Link>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              {/* Level Progress Bar */}
+              <div className="mt-4">
+                <div className="flex justify-between text-xs text-silver-500 mb-1">
+                  <span>Niveau {profile?.running_level || 1}</span>
+                  <span>Niveau {Math.min((profile?.running_level || 1) + 1, 9)}</span>
+                </div>
+                <div className="h-2 bg-dark-600 rounded-full overflow-hidden">
+                  <div
+                    className="h-full bg-gradient-to-r from-pink-500 to-neon-500 rounded-full transition-all duration-500"
+                    style={{ width: `${(profile?.running_level || 1) >= 9 ? 100 : 45}%` }}
+                  />
+                </div>
+              </div>
+            </div>
           </div>
         </div>
 
