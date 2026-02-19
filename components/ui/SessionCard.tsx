@@ -118,7 +118,12 @@ export default function SessionCard({ session, onClick, showJoinButton = true }:
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
               </svg>
             </div>
-            <span className="font-medium text-sm line-clamp-1">{session.location_name}</span>
+            <div className="flex-1 min-w-0">
+              <span className="font-medium text-sm line-clamp-1">{session.location_name}</span>
+              {session.distance_from_user != null && (
+                <span className="text-xs text-neon-700 font-medium">a {session.distance_from_user} km de chez toi</span>
+              )}
+            </div>
           </div>
         </div>
 

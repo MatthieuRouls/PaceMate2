@@ -7,6 +7,8 @@ export interface CreateSessionData {
   description?: string;
   start_time: string; // datetime-local format
   location_name: string;
+  latitude?: number;
+  longitude?: number;
   distance_km: number;
   session_type?: 'casual' | 'recovery' | 'tempo' | 'long_run' | 'intervals';
   level_required: number;
@@ -60,7 +62,7 @@ export async function createSession(data: CreateSessionData): Promise<CreateSess
     const start_time = new Date(data.start_time).toISOString();
 
     // 4. Préparer les données pour l'insertion
-    const sessionData = {
+    const sessionData: Record<string, unknown> = {
       title: data.title,
       description: data.description || null,
       creator_id: user.id,
@@ -73,6 +75,11 @@ export async function createSession(data: CreateSessionData): Promise<CreateSess
       walk_breaks_ok: data.walk_breaks_ok,
       max_participants: data.max_participants,
     };
+
+    if (data.latitude != null && data.longitude != null) {
+      sessionData.latitude = data.latitude;
+      sessionData.longitude = data.longitude;
+    }
 
     // 5. Insérer dans Supabase
     const { data: session, error: insertError } = await supabase
@@ -1087,9 +1094,28 @@ export async function getTopTeams(limit: number = 3) {
 }
 
 /**
- * Récupérer toutes les sessions à venir (pour la page /sessions)
+ * Calcul de distance Haversine cote client (en km)
  */
-export async function getAllUpcomingSessions() {
+function haversineDistance(lat1: number, lon1: number, lat2: number, lon2: number): number {
+  const R = 6371;
+  const dLat = (lat2 - lat1) * Math.PI / 180;
+  const dLon = (lon2 - lon1) * Math.PI / 180;
+  const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+    Math.sin(dLon / 2) * Math.sin(dLon / 2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  return R * c;
+}
+
+/**
+ * Récupérer toutes les sessions à venir (pour la page /sessions)
+ * Si userLat/userLng fournis, calcule la distance et peut filtrer par rayon
+ */
+export async function getAllUpcomingSessions(options?: {
+  userLat?: number;
+  userLng?: number;
+  radiusKm?: number;
+}) {
   try {
     const supabase = await getServerSupabaseClient();
     const now = new Date().toISOString();
@@ -1126,16 +1152,69 @@ export async function getAllUpcomingSessions() {
       participantCounts[p.session_id] = (participantCounts[p.session_id] || 0) + 1;
     });
 
-    // Ajouter les counts aux sessions
-    const sessionsWithDetails = sessions.map(session => ({
-      ...session,
-      participants_count: participantCounts[session.id] || 0,
-    }));
+    // Ajouter les counts et distance aux sessions
+    const userLat = options?.userLat;
+    const userLng = options?.userLng;
+    const radiusKm = options?.radiusKm;
+
+    let sessionsWithDetails = sessions.map(session => {
+      let distance_from_user: number | undefined;
+      if (userLat != null && userLng != null && session.latitude != null && session.longitude != null) {
+        distance_from_user = Math.round(haversineDistance(userLat, userLng, session.latitude, session.longitude) * 10) / 10;
+      }
+      return {
+        ...session,
+        participants_count: participantCounts[session.id] || 0,
+        distance_from_user,
+      };
+    });
+
+    // Filtrer par rayon si demande
+    if (radiusKm != null && userLat != null && userLng != null) {
+      sessionsWithDetails = sessionsWithDetails.filter(s =>
+        s.distance_from_user == null || s.distance_from_user <= radiusKm
+      );
+    }
 
     return sessionsWithDetails;
   } catch (error) {
     console.error('Error in getAllUpcomingSessions:', error);
     return [];
+  }
+}
+
+/**
+ * Mettre a jour la localisation du profil utilisateur
+ */
+export async function updateProfileLocation(data: {
+  home_latitude: number;
+  home_longitude: number;
+  home_city: string;
+}) {
+  try {
+    const user = await getCurrentUser();
+    if (!user) return { success: false, error: 'Non authentifie' };
+
+    const supabase = await getServerSupabaseClient();
+
+    const { error } = await supabase
+      .from('profiles')
+      .update({
+        home_latitude: data.home_latitude,
+        home_longitude: data.home_longitude,
+        home_city: data.home_city,
+      })
+      .eq('id', user.id);
+
+    if (error) {
+      console.error('Error updating profile location:', error);
+      return { success: false, error: error.message };
+    }
+
+    return { success: true };
+  } catch (error) {
+    console.error('Error in updateProfileLocation:', error);
+    return { success: false, error: 'Erreur inattendue' };
   }
 }
 

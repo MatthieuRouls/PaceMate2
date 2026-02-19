@@ -10,7 +10,9 @@ import SessionCard from '@/components/ui/SessionCard';
 import {
   getUserUpcomingSessions,
   getUserSessionHistory,
+  updateProfileLocation,
 } from '@/lib/actions';
+import { MapPin, Search, Crosshair } from 'lucide-react';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
 
 // Désactiver la pré-génération statique
@@ -24,6 +26,71 @@ export default function ProfilePage() {
   const [sessionHistory, setSessionHistory] = useState<SessionParticipant[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  // Location state
+  const [locationSearchQuery, setLocationSearchQuery] = useState('');
+  const [locationSearchResults, setLocationSearchResults] = useState<Array<{ display_name: string; lat: string; lon: string }>>([]);
+  const [locationSearching, setLocationSearching] = useState(false);
+  const [locationSaving, setLocationSaving] = useState(false);
+  const [locationGeolocating, setLocationGeolocating] = useState(false);
+
+  const searchLocationForProfile = async (query: string) => {
+    if (!query.trim()) return;
+    setLocationSearching(true);
+    try {
+      const res = await fetch(
+        `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=5&addressdetails=1`,
+        { headers: { 'Accept-Language': 'fr' } }
+      );
+      const data = await res.json();
+      setLocationSearchResults(data);
+    } catch {
+      setLocationSearchResults([]);
+    } finally {
+      setLocationSearching(false);
+    }
+  };
+
+  const saveProfileLocation = async (lat: number, lng: number, cityName: string) => {
+    setLocationSaving(true);
+    try {
+      await updateProfileLocation({
+        home_latitude: lat,
+        home_longitude: lng,
+        home_city: cityName,
+      });
+      // Force page reload to refresh profile
+      window.location.reload();
+    } catch {
+      // silently fail
+    } finally {
+      setLocationSaving(false);
+    }
+  };
+
+  const useCurrentPositionForProfile = () => {
+    if (!navigator.geolocation) return;
+    setLocationGeolocating(true);
+    navigator.geolocation.getCurrentPosition(
+      async (pos) => {
+        const { latitude, longitude } = pos.coords;
+        try {
+          const res = await fetch(
+            `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&addressdetails=1`,
+            { headers: { 'Accept-Language': 'fr' } }
+          );
+          const data = await res.json();
+          const city = data.address?.city || data.address?.town || data.address?.village || 'Ma position';
+          await saveProfileLocation(latitude, longitude, city);
+        } catch {
+          await saveProfileLocation(latitude, longitude, 'Ma position');
+        }
+        setLocationGeolocating(false);
+      },
+      () => { setLocationGeolocating(false); },
+      { enableHighAccuracy: true, timeout: 10000 }
+    );
+  };
 
   // Récupérer les données
   useEffect(() => {
@@ -232,6 +299,90 @@ export default function ProfilePage() {
                     {parseBestTimes(profile.best_times) || '--'}
                   </div>
                   <div className="text-sm opacity-75">meilleur temps</div>
+                </div>
+              </div>
+            </div>
+
+            {/* Section Localisation */}
+            <div>
+              <h2 className="text-2xl font-bold mb-4">Ma localisation</h2>
+              <div className="card">
+                {profile.home_city ? (
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="w-10 h-10 rounded-full bg-pink-100 flex items-center justify-center">
+                      <MapPin className="w-5 h-5 text-pink-600" />
+                    </div>
+                    <div>
+                      <div className="font-semibold">{profile.home_city}</div>
+                      <div className="text-xs opacity-75">
+                        Utilise pour trouver les sorties a proximite
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="w-10 h-10 rounded-full bg-silver-200 flex items-center justify-center">
+                      <MapPin className="w-5 h-5 text-dark-500" />
+                    </div>
+                    <div>
+                      <div className="font-semibold">Aucune localisation</div>
+                      <div className="text-xs opacity-75">
+                        Renseigne ta ville pour trouver les sorties pres de chez toi
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                <div className="space-y-3">
+                  <button
+                    type="button"
+                    onClick={useCurrentPositionForProfile}
+                    disabled={locationGeolocating || locationSaving}
+                    className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-neon-700 text-neon-700 text-sm font-medium hover:bg-neon-50 transition-colors disabled:opacity-50"
+                  >
+                    <Crosshair className="w-4 h-4" />
+                    {locationGeolocating ? 'Localisation...' : locationSaving ? 'Enregistrement...' : 'Utiliser ma position GPS'}
+                  </button>
+
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      value={locationSearchQuery}
+                      onChange={(e) => setLocationSearchQuery(e.target.value)}
+                      onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); searchLocationForProfile(locationSearchQuery); } }}
+                      placeholder="Rechercher une ville..."
+                      className="flex-1 px-3 py-2 rounded-lg border border-silver-400 text-sm focus:border-neon-700 focus:ring-2 focus:ring-neon-700/20 outline-none"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => searchLocationForProfile(locationSearchQuery)}
+                      disabled={locationSearching}
+                      className="px-3 py-2 rounded-lg bg-dark-800 text-white text-sm hover:bg-dark-700 transition-colors disabled:opacity-50"
+                    >
+                      <Search className="w-4 h-4" />
+                    </button>
+                  </div>
+
+                  {locationSearchResults.length > 0 && (
+                    <div className="space-y-1 max-h-40 overflow-y-auto">
+                      {locationSearchResults.map((result, i) => (
+                        <button
+                          key={i}
+                          type="button"
+                          disabled={locationSaving}
+                          onClick={() => {
+                            const city = result.display_name.split(',')[0].trim();
+                            saveProfileLocation(parseFloat(result.lat), parseFloat(result.lon), city);
+                            setLocationSearchResults([]);
+                            setLocationSearchQuery('');
+                          }}
+                          className="w-full text-left px-3 py-2 rounded-lg text-xs text-dark-700 hover:bg-neon-50 transition-colors border border-transparent hover:border-neon-300 disabled:opacity-50"
+                        >
+                          {result.display_name}
+                        </button>
+                      ))}
+                    </div>
+                  )}
                 </div>
               </div>
             </div>

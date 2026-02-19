@@ -8,6 +8,9 @@ export interface Profile {
   total_distance_km?: number;
   xp_points?: number;
   best_times?: string; // JSON string with best times, ex: {"5k": "00:25:30", "10k": "00:52:15"}
+  home_latitude?: number;
+  home_longitude?: number;
+  home_city?: string;
   created_at?: string;
 
   // Relations (populated via joins)
@@ -22,6 +25,8 @@ export interface Session {
   creator_id: string;
   start_time: string;
   location_name: string;
+  latitude?: number;
+  longitude?: number;
   target_pace?: string; // Format: "5:30" (min/km)
   distance_km: number;
   level_required: number; // 1-5
@@ -33,6 +38,7 @@ export interface Session {
   // Relations (populated via joins)
   creator?: Profile;
   participants_count?: number;
+  distance_from_user?: number; // calculated distance in km from user's location
 }
 
 export interface SessionParticipant {

@@ -1,10 +1,10 @@
 'use client';
 
-import { useState, FormEvent } from 'react';
+import { useState, FormEvent, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { createSession, CreateSessionData } from '@/lib/actions';
-import { Check, ChevronRight, ChevronLeft } from 'lucide-react';
+import { Check, ChevronRight, ChevronLeft, MapPin, Search, Crosshair } from 'lucide-react';
 
 export const dynamic = 'force-dynamic';
 
@@ -18,6 +18,8 @@ export default function CreateSessionPage() {
     description: '',
     start_time: '',
     location_name: '',
+    latitude: undefined,
+    longitude: undefined,
     distance_km: 5,
     session_type: 'casual',
     level_required: 3,
@@ -28,6 +30,53 @@ export default function CreateSessionPage() {
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [geoSearchQuery, setGeoSearchQuery] = useState('');
+  const [geoSearchResults, setGeoSearchResults] = useState<Array<{ display_name: string; lat: string; lon: string }>>([]);
+  const [geoSearching, setGeoSearching] = useState(false);
+  const [geoLocating, setGeoLocating] = useState(false);
+
+  const searchLocation = useCallback(async (query: string) => {
+    if (!query.trim()) return;
+    setGeoSearching(true);
+    try {
+      const res = await fetch(
+        `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=5&addressdetails=1`,
+        { headers: { 'Accept-Language': 'fr' } }
+      );
+      const data = await res.json();
+      setGeoSearchResults(data);
+    } catch {
+      setGeoSearchResults([]);
+    } finally {
+      setGeoSearching(false);
+    }
+  }, []);
+
+  const useCurrentPosition = useCallback(() => {
+    if (!navigator.geolocation) return;
+    setGeoLocating(true);
+    navigator.geolocation.getCurrentPosition(
+      async (pos) => {
+        const { latitude, longitude } = pos.coords;
+        setFormData(prev => ({ ...prev, latitude, longitude }));
+        // Reverse geocode to get location name
+        try {
+          const res = await fetch(
+            `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`,
+            { headers: { 'Accept-Language': 'fr' } }
+          );
+          const data = await res.json();
+          if (data.display_name && !formData.location_name) {
+            const short = [data.address?.road, data.address?.city || data.address?.town || data.address?.village].filter(Boolean).join(', ');
+            setFormData(prev => ({ ...prev, location_name: short || data.display_name.split(',').slice(0, 2).join(',') }));
+          }
+        } catch { /* ignore reverse geocode errors */ }
+        setGeoLocating(false);
+      },
+      () => { setGeoLocating(false); },
+      { enableHighAccuracy: true, timeout: 10000 }
+    );
+  }, [formData.location_name]);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
@@ -342,6 +391,89 @@ export default function CreateSessionPage() {
                     className="w-full px-4 py-3 rounded-lg border border-silver-400 focus:border-neon-700 focus:ring-2 focus:ring-neon-700/20 outline-none transition-all"
                     required
                   />
+                </div>
+
+                {/* Geolocalisation */}
+                <div className="p-4 bg-silver-100 rounded-lg space-y-3">
+                  <div className="flex items-center gap-2 mb-1">
+                    <MapPin className="w-4 h-4 text-neon-700" />
+                    <span className="text-sm font-semibold text-dark-800">Position GPS (optionnel)</span>
+                  </div>
+                  <p className="text-xs text-dark-500">
+                    Ajoute la position GPS pour que les coureurs puissent trouver ta sortie par proximite
+                  </p>
+
+                  {/* Current position button */}
+                  <button
+                    type="button"
+                    onClick={useCurrentPosition}
+                    disabled={geoLocating}
+                    className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-neon-700 text-neon-700 text-sm font-medium hover:bg-neon-50 transition-colors disabled:opacity-50"
+                  >
+                    <Crosshair className="w-4 h-4" />
+                    {geoLocating ? 'Localisation...' : 'Utiliser ma position'}
+                  </button>
+
+                  {/* Search address */}
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      value={geoSearchQuery}
+                      onChange={(e) => setGeoSearchQuery(e.target.value)}
+                      onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); searchLocation(geoSearchQuery); } }}
+                      placeholder="Rechercher une adresse..."
+                      className="flex-1 px-3 py-2 rounded-lg border border-silver-400 text-sm focus:border-neon-700 focus:ring-2 focus:ring-neon-700/20 outline-none"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => searchLocation(geoSearchQuery)}
+                      disabled={geoSearching}
+                      className="px-3 py-2 rounded-lg bg-dark-800 text-white text-sm hover:bg-dark-700 transition-colors disabled:opacity-50"
+                    >
+                      <Search className="w-4 h-4" />
+                    </button>
+                  </div>
+
+                  {/* Search results */}
+                  {geoSearchResults.length > 0 && (
+                    <div className="space-y-1 max-h-40 overflow-y-auto">
+                      {geoSearchResults.map((result, i) => (
+                        <button
+                          key={i}
+                          type="button"
+                          onClick={() => {
+                            setFormData(prev => ({
+                              ...prev,
+                              latitude: parseFloat(result.lat),
+                              longitude: parseFloat(result.lon),
+                              location_name: prev.location_name || result.display_name.split(',').slice(0, 2).join(',').trim(),
+                            }));
+                            setGeoSearchResults([]);
+                            setGeoSearchQuery('');
+                          }}
+                          className="w-full text-left px-3 py-2 rounded-lg text-xs text-dark-700 hover:bg-neon-50 transition-colors border border-transparent hover:border-neon-300"
+                        >
+                          {result.display_name}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+
+                  {/* Show selected coordinates */}
+                  {formData.latitude != null && formData.longitude != null && (
+                    <div className="flex items-center justify-between p-2 bg-neon-50 rounded-lg">
+                      <span className="text-xs text-neon-700 font-medium">
+                        Position : {formData.latitude.toFixed(4)}, {formData.longitude.toFixed(4)}
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => setFormData(prev => ({ ...prev, latitude: undefined, longitude: undefined }))}
+                        className="text-xs text-dark-500 hover:text-pink-500"
+                      >
+                        Supprimer
+                      </button>
+                    </div>
+                  )}
                 </div>
 
                 <div>

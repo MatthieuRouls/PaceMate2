@@ -1,24 +1,50 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import Link from 'next/link';
 import { Session } from '@/lib/types';
 import SessionCard from '@/components/ui/SessionCard';
 import SessionDetailsDrawer from '@/components/ui/SessionDetailsDrawer';
 import { getAllUpcomingSessions } from '@/lib/actions';
-import { Filter } from 'lucide-react';
+import { useAuth } from '@/components/providers/AuthProvider';
+import { Filter, MapPin, Navigation } from 'lucide-react';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
 
 type FilterLevel = 'all' | 'beginner' | 'intermediate' | 'advanced';
+type FilterRadius = 'all' | '5' | '10' | '25' | '50';
 
 export default function SessionsPage() {
+  const { profile } = useAuth();
   const [sessions, setSessions] = useState<Session[]>([]);
   const [filteredSessions, setFilteredSessions] = useState<Session[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [filterLevel, setFilterLevel] = useState<FilterLevel>('all');
+  const [filterRadius, setFilterRadius] = useState<FilterRadius>('all');
   const [selectedSession, setSelectedSession] = useState<Session | null>(null);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
+  const [locationSource, setLocationSource] = useState<'profile' | 'browser' | null>(null);
+
+  // Determiner la localisation de l'utilisateur (profil ou GPS navigateur)
+  useEffect(() => {
+    if (profile?.home_latitude && profile?.home_longitude) {
+      setUserLocation({ lat: profile.home_latitude, lng: profile.home_longitude });
+      setLocationSource('profile');
+    }
+  }, [profile]);
+
+  const useGeoLocation = useCallback(() => {
+    if (!navigator.geolocation) return;
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        setUserLocation({ lat: pos.coords.latitude, lng: pos.coords.longitude });
+        setLocationSource('browser');
+      },
+      () => { /* silently fail */ },
+      { enableHighAccuracy: true, timeout: 10000 }
+    );
+  }, []);
 
   // Récupérer les sessions
   useEffect(() => {
@@ -27,9 +53,13 @@ export default function SessionsPage() {
         setLoading(true);
         setError(null);
 
-        const data = await getAllUpcomingSessions();
+        const radiusKm = filterRadius !== 'all' ? parseInt(filterRadius) : undefined;
+        const data = await getAllUpcomingSessions(
+          userLocation
+            ? { userLat: userLocation.lat, userLng: userLocation.lng, radiusKm }
+            : undefined
+        );
         setSessions(data);
-        setFilteredSessions(data);
       } catch (err) {
         console.error('Error fetching sessions:', err);
         setError('Erreur lors du chargement des sessions');
@@ -39,9 +69,9 @@ export default function SessionsPage() {
     }
 
     fetchSessions();
-  }, []);
+  }, [userLocation, filterRadius]);
 
-  // Appliquer les filtres
+  // Appliquer les filtres de niveau (cote client)
   useEffect(() => {
     let filtered = [...sessions];
 
@@ -53,8 +83,13 @@ export default function SessionsPage() {
       filtered = filtered.filter((s) => s.level_required >= 4);
     }
 
+    // Sort by distance if available
+    if (userLocation && filterRadius !== 'all') {
+      filtered.sort((a, b) => (a.distance_from_user ?? Infinity) - (b.distance_from_user ?? Infinity));
+    }
+
     setFilteredSessions(filtered);
-  }, [filterLevel, sessions]);
+  }, [filterLevel, sessions, userLocation, filterRadius]);
 
   return (
     <div className="min-h-screen bg-neu-base pt-20 pb-8 px-4 sm:px-6 lg:px-8">
@@ -81,54 +116,101 @@ export default function SessionsPage() {
         </div>
 
         {/* Filtres */}
-        <div className="card p-4 mb-6">
-          <div className="flex items-center gap-2 mb-3">
-            <div className="w-8 h-8 rounded-lg bg-neon-100 flex items-center justify-center">
-              <Filter className="w-4 h-4 text-neon-700" />
+        <div className="card p-4 mb-6 space-y-4">
+          {/* Filtre par niveau */}
+          <div>
+            <div className="flex items-center gap-2 mb-3">
+              <div className="w-8 h-8 rounded-lg bg-neon-100 flex items-center justify-center">
+                <Filter className="w-4 h-4 text-neon-700" />
+              </div>
+              <h2 className="text-sm font-semibold text-dark-800">Filtrer par niveau</h2>
             </div>
-            <h2 className="text-sm font-semibold text-dark-800">Filtrer par niveau</h2>
+            <div className="flex flex-wrap gap-2">
+              <button
+                onClick={() => setFilterLevel('all')}
+                className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+                  filterLevel === 'all'
+                    ? 'bg-dark-800 text-white'
+                    : 'bg-silver-200 text-dark-700 hover:bg-silver-300'
+                }`}
+              >
+                Tous
+              </button>
+              <button
+                onClick={() => setFilterLevel('beginner')}
+                className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+                  filterLevel === 'beginner'
+                    ? 'bg-silver-400 text-white'
+                    : 'bg-silver-200 text-dark-700 hover:bg-silver-300'
+                }`}
+              >
+                Debutant
+              </button>
+              <button
+                onClick={() => setFilterLevel('intermediate')}
+                className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+                  filterLevel === 'intermediate'
+                    ? 'bg-neon-400 text-white'
+                    : 'bg-silver-200 text-dark-700 hover:bg-silver-300'
+                }`}
+              >
+                Intermediaire
+              </button>
+              <button
+                onClick={() => setFilterLevel('advanced')}
+                className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+                  filterLevel === 'advanced'
+                    ? 'bg-pink-500 text-white'
+                    : 'bg-silver-200 text-dark-700 hover:bg-silver-300'
+                }`}
+              >
+                Avance
+              </button>
+            </div>
           </div>
-          <div className="flex flex-wrap gap-2">
-            <button
-              onClick={() => setFilterLevel('all')}
-              className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
-                filterLevel === 'all'
-                  ? 'bg-dark-800 text-white'
-                  : 'bg-silver-200 text-dark-700 hover:bg-silver-300'
-              }`}
-            >
-              Tous
-            </button>
-            <button
-              onClick={() => setFilterLevel('beginner')}
-              className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
-                filterLevel === 'beginner'
-                  ? 'bg-silver-400 text-white'
-                  : 'bg-silver-200 text-dark-700 hover:bg-silver-300'
-              }`}
-            >
-              Debutant
-            </button>
-            <button
-              onClick={() => setFilterLevel('intermediate')}
-              className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
-                filterLevel === 'intermediate'
-                  ? 'bg-neon-400 text-white'
-                  : 'bg-silver-200 text-dark-700 hover:bg-silver-300'
-              }`}
-            >
-              Intermediaire
-            </button>
-            <button
-              onClick={() => setFilterLevel('advanced')}
-              className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
-                filterLevel === 'advanced'
-                  ? 'bg-pink-500 text-white'
-                  : 'bg-silver-200 text-dark-700 hover:bg-silver-300'
-              }`}
-            >
-              Avance
-            </button>
+
+          {/* Filtre par proximite */}
+          <div className="pt-3 border-t border-silver-300">
+            <div className="flex items-center gap-2 mb-3">
+              <div className="w-8 h-8 rounded-lg bg-pink-100 flex items-center justify-center">
+                <MapPin className="w-4 h-4 text-pink-600" />
+              </div>
+              <h2 className="text-sm font-semibold text-dark-800">Filtrer par proximite</h2>
+              {!userLocation && (
+                <button
+                  onClick={useGeoLocation}
+                  className="ml-auto inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-neon-100 text-neon-700 text-xs font-medium hover:bg-neon-200 transition-colors"
+                >
+                  <Navigation className="w-3 h-3" />
+                  Activer ma position
+                </button>
+              )}
+              {locationSource && (
+                <span className="ml-auto text-xs text-dark-500">
+                  {locationSource === 'profile'
+                    ? `Position : ${profile?.home_city || 'profil'}`
+                    : 'Position GPS'}
+                </span>
+              )}
+            </div>
+            <div className="flex flex-wrap gap-2">
+              {(['all', '5', '10', '25', '50'] as FilterRadius[]).map((radius) => (
+                <button
+                  key={radius}
+                  onClick={() => setFilterRadius(radius)}
+                  disabled={!userLocation && radius !== 'all'}
+                  className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+                    filterRadius === radius
+                      ? 'bg-pink-500 text-white'
+                      : !userLocation && radius !== 'all'
+                        ? 'bg-silver-100 text-dark-400 cursor-not-allowed'
+                        : 'bg-silver-200 text-dark-700 hover:bg-silver-300'
+                  }`}
+                >
+                  {radius === 'all' ? 'Toutes' : `${radius} km`}
+                </button>
+              ))}
+            </div>
           </div>
         </div>
 
