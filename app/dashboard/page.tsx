@@ -158,9 +158,9 @@ export default function DashboardPage() {
             <div
               className="absolute inset-0 bg-cover bg-center"
               style={{
-                backgroundImage: `url('https://images.unsplash.com/photo-1552674605-db6ffd4facb5?w=1200&q=80')`,
-                filter: 'brightness(0.55) contrast(1.1) saturate(0.8) blur(2px)',
-                opacity: 0.12,
+                backgroundImage: `url('${featuredSession ? getSessionCover(featuredSession) : '/easy-run-1.jpeg'}')`,
+                filter: 'brightness(0.6) contrast(1.1) saturate(0.9)',
+                opacity: 0.35,
               }}
             />
             <div
