@@ -18,6 +18,22 @@ interface SessionPanelProps {
   onClose: () => void;
 }
 
+// Images par type de session (locales)
+const SESSION_COVERS: Record<string, string[]> = {
+  intervals: ['/fractionne-1.jpeg'],
+  long_run: ['/long-run-1.jpeg'],
+  casual: ['/easy-run-1.jpeg', '/easy-run-2.jpeg'],
+  recovery: ['/recovery-1.jpeg'],
+  tempo: ['/tempo-1.jpg'],
+  default: ['/easy-run-1.jpeg', '/easy-run-2.jpeg'],
+};
+
+const getSessionCover = (session: Session): string => {
+  const covers = SESSION_COVERS[session.session_type || 'default'] || SESSION_COVERS.default;
+  const index = session.id.charCodeAt(0) % covers.length;
+  return covers[index];
+};
+
 export default function SessionPanel({ sessionId, isOpen, onClose }: SessionPanelProps) {
   const { user } = useAuth();
   const [session, setSession] = useState<Session | null>(null);
@@ -110,9 +126,9 @@ export default function SessionPanel({ sessionId, isOpen, onClose }: SessionPane
           {/* Hero Image */}
           <div className="relative h-48 bg-gradient-to-br from-pink-500 to-purple-600">
             <div
-              className="absolute inset-0 bg-cover bg-center opacity-60"
+              className="absolute inset-0 bg-cover bg-center opacity-80"
               style={{
-                backgroundImage: `url('https://images.unsplash.com/photo-1552674605-db6ffd4facb5?w=800&q=80')`
+                backgroundImage: `url('${getSessionCover(session)}')`
               }}
             />
             <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />

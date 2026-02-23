@@ -20,14 +20,22 @@ interface TeamWithCount extends Team {
   members_count: number;
 }
 
-// Images par type de session
-const SESSION_COVERS: Record<string, string> = {
-  intervals: 'https://images.unsplash.com/photo-1461896836934-fffff?w=800&q=80',
-  long_run: 'https://images.unsplash.com/photo-1551698618-1dfe5d97d256?w=800&q=80',
-  casual: 'https://images.unsplash.com/photo-1552674605-db6ffd4facb5?w=800&q=80',
-  recovery: 'https://images.unsplash.com/photo-1476480862126-209bfaa8edc8?w=800&q=80',
-  tempo: 'https://images.unsplash.com/photo-1571008887538-b36bb32f4571?w=800&q=80',
-  default: 'https://images.unsplash.com/photo-1571008887538-b36bb32f4571?w=800&q=80',
+// Images par type de session (locales)
+const SESSION_COVERS: Record<string, string[]> = {
+  intervals: ['/fractionne-1.jpeg'],
+  long_run: ['/long-run-1.jpeg'],
+  casual: ['/easy-run-1.jpeg', '/easy-run-2.jpeg'],
+  recovery: ['/recovery-1.jpeg'],
+  tempo: ['/tempo-1.jpg'],
+  default: ['/easy-run-1.jpeg', '/easy-run-2.jpeg'],
+};
+
+// Fonction pour obtenir une image basée sur l'ID de session (consistant mais varié)
+const getSessionCover = (session: Session): string => {
+  const covers = SESSION_COVERS[session.session_type || 'default'] || SESSION_COVERS.default;
+  // Utilise l'ID de session pour choisir une image de manière consistante
+  const index = session.id.charCodeAt(0) % covers.length;
+  return covers[index];
 };
 
 export default function DashboardPage() {
@@ -113,10 +121,6 @@ export default function DashboardPage() {
 
   const formatTime = (dateStr: string) => {
     return new Date(dateStr).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
-  };
-
-  const getSessionCover = (session: Session) => {
-    return SESSION_COVERS[session.session_type || 'default'] || SESSION_COVERS.default;
   };
 
   if (loading) {
