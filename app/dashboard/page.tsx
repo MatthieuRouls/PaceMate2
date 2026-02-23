@@ -3,7 +3,6 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useAuth } from '@/components/providers/AuthProvider';
-import { useOverlay } from '@/components/providers/OverlayProvider';
 import { getUpcomingSessions, getUserTeam } from '@/lib/actions';
 import { Session, Team } from '@/lib/types';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
@@ -30,7 +29,6 @@ const SESSION_COVERS: Record<string, string> = {
 
 export default function DashboardPage() {
   const { profile } = useAuth();
-  const { openSessionPanel, openCreateWizard } = useOverlay();
   const [sessions, setSessions] = useState<Session[]>([]);
   const [loading, setLoading] = useState(true);
   const [userTeam, setUserTeam] = useState<TeamWithCount | null>(null);
@@ -196,13 +194,13 @@ export default function DashboardPage() {
                       </span>
                     </div>
 
-                    <button
-                      onClick={() => openSessionPanel(featuredSession.id)}
+                    <Link
+                      href={`/sessions/${featuredSession.id}`}
                       className="inline-flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-pink-500 to-pink-600 hover:from-pink-600 hover:to-pink-700 text-white font-bold text-lg rounded-2xl animate-glow-pulse hover:-translate-y-0.5 transition-transform"
                     >
                       Rejoindre la sortie
                       <ArrowRight className="w-5 h-5" />
-                    </button>
+                    </Link>
                   </>
                 ) : (
                   <>
@@ -210,13 +208,13 @@ export default function DashboardPage() {
                       Aucune sortie prevue
                     </h1>
                     <p className="text-silver-400 mb-6">Cree ta premiere session ou rejoins un groupe</p>
-                    <button
-                      onClick={openCreateWizard}
+                    <Link
+                      href="/sessions/create"
                       className="inline-flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-pink-500 to-pink-600 hover:from-pink-600 hover:to-pink-700 text-white font-bold text-lg rounded-2xl animate-glow-pulse hover:-translate-y-0.5 transition-transform"
                     >
                       Creer une sortie
                       <Plus className="w-5 h-5" />
-                    </button>
+                    </Link>
                   </>
                 )}
               </div>
@@ -309,7 +307,7 @@ export default function DashboardPage() {
 
             <div className="flex flex-col lg:flex-row gap-6">
               {secondarySessions[0] && (
-                <button onClick={() => openSessionPanel(secondarySessions[0].id)} className="flex-[6] group text-left">
+                <Link href={`/sessions/${secondarySessions[0].id}`} className="flex-[6] group">
                   <div className="h-full bg-white rounded-3xl overflow-hidden shadow-sm card-hover hover:shadow-xl border border-silver-100">
                     <div className="relative h-[140px] overflow-hidden">
                       <div
@@ -361,15 +359,15 @@ export default function DashboardPage() {
                       </div>
                     </div>
                   </div>
-                </button>
+                </Link>
               )}
 
               <div className="flex-[4] flex flex-col gap-4">
                 {secondarySessions.slice(1).map((session) => (
-                  <button
+                  <Link
                     key={session.id}
-                    onClick={() => openSessionPanel(session.id)}
-                    className="group bg-white rounded-2xl overflow-hidden shadow-sm card-hover hover:shadow-lg border border-silver-100 text-left"
+                    href={`/sessions/${session.id}`}
+                    className="group bg-white rounded-2xl overflow-hidden shadow-sm card-hover hover:shadow-lg border border-silver-100"
                   >
                     <div className="flex">
                       <div
@@ -389,7 +387,7 @@ export default function DashboardPage() {
                         </div>
                       </div>
                     </div>
-                  </button>
+                  </Link>
                 ))}
 
                 {secondarySessions.length < 3 && (
@@ -504,29 +502,29 @@ export default function DashboardPage() {
               <p className="text-sm text-dark-500">Rejoins une communaute</p>
             </Link>
 
-            <button onClick={openCreateWizard} className="group bg-white/70 rounded-2xl p-5 card-hover hover:bg-white hover:shadow-md text-left w-full">
+            <Link href="/sessions/create" className="group bg-white/70 rounded-2xl p-5 card-hover hover:bg-white hover:shadow-md">
               <div className="w-10 h-10 rounded-xl bg-purple-100 flex items-center justify-center mb-3">
                 <Plus className="w-5 h-5 text-purple-600" />
               </div>
               <h4 className="font-bold text-dark-800 mb-1 group-hover:text-purple-600 transition-colors">Organise un run</h4>
               <p className="text-sm text-dark-500">Cree ta propre session</p>
-            </button>
+            </Link>
           </div>
         </section>
 
       </div>
 
       {/* FAB */}
-      <button
-        onClick={openCreateWizard}
-        className="fixed bottom-6 right-6 z-40 flex items-center gap-2 px-5 py-4 bg-pink-500 hover:bg-pink-600 text-white font-bold rounded-2xl shadow-lg shadow-pink-500/30 hover:shadow-pink-500/50 transition-all duration-200"
+      <Link
+        href="/sessions/create"
+        className="fixed bottom-6 right-6 z-50 flex items-center gap-2 px-5 py-4 bg-pink-500 hover:bg-pink-600 text-white font-bold rounded-2xl shadow-lg shadow-pink-500/30 hover:shadow-pink-500/50 transition-all duration-200"
         onMouseEnter={() => setFabHovered(true)}
         onMouseLeave={() => setFabHovered(false)}
         style={{ transform: fabHovered ? 'scale(1.06) translateY(-2px)' : 'scale(1)' }}
       >
         <Plus className="w-6 h-6 transition-transform duration-200" style={{ transform: fabHovered ? 'rotate(90deg)' : 'rotate(0)' }} />
         <span className="hidden sm:inline">Creer une sortie</span>
-      </button>
+      </Link>
     </div>
   );
 }
