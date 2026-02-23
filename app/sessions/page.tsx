@@ -4,10 +4,11 @@ import { useEffect, useState, useCallback } from 'react';
 import Link from 'next/link';
 import { Session } from '@/lib/types';
 import SessionCard from '@/components/ui/SessionCard';
-import SessionDetailsDrawer from '@/components/ui/SessionDetailsDrawer';
+import SessionPanel from '@/components/overlays/SessionPanel';
+import CreateWizardModal from '@/components/overlays/CreateWizardModal';
 import { getAllUpcomingSessions } from '@/lib/actions';
 import { useAuth } from '@/components/providers/AuthProvider';
-import { Filter, MapPin, Navigation } from 'lucide-react';
+import { Filter, MapPin, Navigation, Plus } from 'lucide-react';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
 
 type FilterLevel = 'all' | 'beginner' | 'intermediate' | 'advanced';
@@ -21,10 +22,33 @@ export default function SessionsPage() {
   const [error, setError] = useState<string | null>(null);
   const [filterLevel, setFilterLevel] = useState<FilterLevel>('all');
   const [filterRadius, setFilterRadius] = useState<FilterRadius>('all');
-  const [selectedSession, setSelectedSession] = useState<Session | null>(null);
-  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const [selectedSessionId, setSelectedSessionId] = useState<string | null>(null);
+  const [isPanelOpen, setIsPanelOpen] = useState(false);
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
   const [locationSource, setLocationSource] = useState<'profile' | 'browser' | null>(null);
+
+  const openSessionPanel = (sessionId: string) => {
+    setSelectedSessionId(sessionId);
+    setIsPanelOpen(true);
+    window.history.pushState({}, '', `/sessions?session=${sessionId}`);
+  };
+
+  const closeSessionPanel = () => {
+    setIsPanelOpen(false);
+    setSelectedSessionId(null);
+    window.history.pushState({}, '', '/sessions');
+  };
+
+  const openCreateModal = () => {
+    setIsCreateModalOpen(true);
+    window.history.pushState({}, '', '/sessions?create=true');
+  };
+
+  const closeCreateModal = () => {
+    setIsCreateModalOpen(false);
+    window.history.pushState({}, '', '/sessions');
+  };
 
   // Determiner la localisation de l'utilisateur (profil ou GPS navigateur)
   useEffect(() => {
@@ -104,15 +128,13 @@ export default function SessionsPage() {
               Trouve ta prochaine sortie et rejoins la communaute
             </p>
           </div>
-          <Link
-            href="/sessions/create"
+          <button
+            onClick={openCreateModal}
             className="neu-btn-white inline-flex items-center gap-2 px-5 py-2.5 text-dark-800 text-sm font-semibold"
           >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-            </svg>
+            <Plus className="w-4 h-4" />
             Creer une sortie
-          </Link>
+          </button>
         </div>
 
         {/* Filtres */}
@@ -261,12 +283,12 @@ export default function SessionsPage() {
                       Voir toutes les sessions
                     </button>
                   )}
-                  <Link
-                    href="/sessions/create"
+                  <button
+                    onClick={openCreateModal}
                     className="neu-btn px-5 py-2.5 text-dark-800 font-medium"
                   >
                     Creer une sortie
-                  </Link>
+                  </button>
                 </div>
               </div>
             ) : (
@@ -279,10 +301,7 @@ export default function SessionsPage() {
                     <SessionCard
                       key={session.id}
                       session={session}
-                      onClick={() => {
-                        setSelectedSession(session);
-                        setIsDrawerOpen(true);
-                      }}
+                      onClick={() => openSessionPanel(session.id)}
                     />
                   ))}
                 </div>
@@ -292,14 +311,17 @@ export default function SessionsPage() {
         )}
       </div>
 
-      {/* Session Details Drawer */}
-      <SessionDetailsDrawer
-        session={selectedSession}
-        isOpen={isDrawerOpen}
-        onClose={() => {
-          setIsDrawerOpen(false);
-          setTimeout(() => setSelectedSession(null), 300);
-        }}
+      {/* Session Details Panel - Glass overlay */}
+      <SessionPanel
+        sessionId={selectedSessionId}
+        isOpen={isPanelOpen}
+        onClose={closeSessionPanel}
+      />
+
+      {/* Create Session Modal - Centered glass overlay */}
+      <CreateWizardModal
+        isOpen={isCreateModalOpen}
+        onClose={closeCreateModal}
       />
     </div>
   );

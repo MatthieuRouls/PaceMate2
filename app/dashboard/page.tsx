@@ -8,6 +8,7 @@ import { getUpcomingSessions, getUserTeam } from '@/lib/actions';
 import { Session, Team } from '@/lib/types';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
 import SessionPanel from '@/components/overlays/SessionPanel';
+import CreateWizardModal from '@/components/overlays/CreateWizardModal';
 import {
   Users, Zap, Trophy, TrendingUp, Target, Plus,
   MapPin, Clock, ChevronRight, Calendar, Activity,
@@ -41,17 +42,27 @@ export default function DashboardPage() {
   // Overlay states
   const [selectedSessionId, setSelectedSessionId] = useState<string | null>(null);
   const [isSessionPanelOpen, setIsSessionPanelOpen] = useState(false);
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
 
   const openSessionPanel = (sessionId: string) => {
     setSelectedSessionId(sessionId);
     setIsSessionPanelOpen(true);
-    // Update URL without navigation
     window.history.pushState({}, '', `/dashboard?session=${sessionId}`);
   };
 
   const closeSessionPanel = () => {
     setIsSessionPanelOpen(false);
     setSelectedSessionId(null);
+    window.history.pushState({}, '', '/dashboard');
+  };
+
+  const openCreateModal = () => {
+    setIsCreateModalOpen(true);
+    window.history.pushState({}, '', '/dashboard?create=true');
+  };
+
+  const closeCreateModal = () => {
+    setIsCreateModalOpen(false);
     window.history.pushState({}, '', '/dashboard');
   };
 
@@ -228,13 +239,13 @@ export default function DashboardPage() {
                       Aucune sortie prevue
                     </h1>
                     <p className="text-silver-400 mb-6">Cree ta premiere session ou rejoins un groupe</p>
-                    <Link
-                      href="/sessions/create"
+                    <button
+                      onClick={openCreateModal}
                       className="inline-flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-pink-500 to-pink-600 hover:from-pink-600 hover:to-pink-700 text-white font-bold text-lg rounded-2xl animate-glow-pulse hover:-translate-y-0.5 transition-transform"
                     >
                       Creer une sortie
                       <Plus className="w-5 h-5" />
-                    </Link>
+                    </button>
                   </>
                 )}
               </div>
@@ -522,35 +533,41 @@ export default function DashboardPage() {
               <p className="text-sm text-dark-500">Rejoins une communaute</p>
             </Link>
 
-            <Link href="/sessions/create" className="group bg-white/70 rounded-2xl p-5 card-hover hover:bg-white hover:shadow-md">
+            <button onClick={openCreateModal} className="group bg-white/70 rounded-2xl p-5 card-hover hover:bg-white hover:shadow-md text-left">
               <div className="w-10 h-10 rounded-xl bg-purple-100 flex items-center justify-center mb-3">
                 <Plus className="w-5 h-5 text-purple-600" />
               </div>
               <h4 className="font-bold text-dark-800 mb-1 group-hover:text-purple-600 transition-colors">Organise un run</h4>
               <p className="text-sm text-dark-500">Cree ta propre session</p>
-            </Link>
+            </button>
           </div>
         </section>
 
       </div>
 
       {/* FAB */}
-      <Link
-        href="/sessions/create"
-        className="fixed bottom-6 right-6 z-50 flex items-center gap-2 px-5 py-4 bg-pink-500 hover:bg-pink-600 text-white font-bold rounded-2xl shadow-lg shadow-pink-500/30 hover:shadow-pink-500/50 transition-all duration-200"
+      <button
+        onClick={openCreateModal}
+        className="fixed bottom-6 right-6 z-30 flex items-center gap-2 px-5 py-4 bg-pink-500 hover:bg-pink-600 text-white font-bold rounded-2xl shadow-lg shadow-pink-500/30 hover:shadow-pink-500/50 transition-all duration-200"
         onMouseEnter={() => setFabHovered(true)}
         onMouseLeave={() => setFabHovered(false)}
         style={{ transform: fabHovered ? 'scale(1.06) translateY(-2px)' : 'scale(1)' }}
       >
         <Plus className="w-6 h-6 transition-transform duration-200" style={{ transform: fabHovered ? 'rotate(90deg)' : 'rotate(0)' }} />
         <span className="hidden sm:inline">Creer une sortie</span>
-      </Link>
+      </button>
 
       {/* Session Details Panel - Glass overlay with dashboard visible behind */}
       <SessionPanel
         sessionId={selectedSessionId}
         isOpen={isSessionPanelOpen}
         onClose={closeSessionPanel}
+      />
+
+      {/* Create Session Modal - Centered glass overlay */}
+      <CreateWizardModal
+        isOpen={isCreateModalOpen}
+        onClose={closeCreateModal}
       />
     </div>
   );
