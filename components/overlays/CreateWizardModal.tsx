@@ -100,8 +100,14 @@ function getQuickPicks(): Array<{ label: string; icon: React.ReactNode; getDate:
 export default function CreateWizardModal({ isOpen, onClose, onSuccess }: CreateWizardModalProps) {
   const router = useRouter();
   const modalRef = useRef<HTMLDivElement>(null);
+  const [mounted, setMounted] = useState(false);
   const [currentStep, setCurrentStep] = useState(1);
   const totalSteps = 5;
+
+  // Ensure we only render portal on client
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const [formData, setFormData] = useState<CreateSessionData>({
     title: '',
@@ -234,7 +240,8 @@ export default function CreateWizardModal({ isOpen, onClose, onSuccess }: Create
 
   const sessionType = SESSION_TYPES.find(t => t.value === formData.session_type);
 
-  if (!isOpen || typeof window === 'undefined') return null;
+  // Don't render during SSR or before mount
+  if (!mounted || !isOpen) return null;
 
   const content = (
     <>

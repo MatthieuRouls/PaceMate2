@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, ReactNode } from 'react';
+import { useEffect, useRef, useState, ReactNode } from 'react';
 import { createPortal } from 'react-dom';
 import { X, ChevronLeft } from 'lucide-react';
 
@@ -27,6 +27,12 @@ export default function GlassOverlay({
 }: GlassOverlayProps) {
   const panelRef = useRef<HTMLDivElement>(null);
   const previousActiveElement = useRef<HTMLElement | null>(null);
+  const [mounted, setMounted] = useState(false);
+
+  // Ensure we only render portal on client
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   // Handle ESC key and focus trap
   useEffect(() => {
@@ -77,7 +83,8 @@ export default function GlassOverlay({
     };
   }, [isOpen, onClose]);
 
-  if (typeof window === 'undefined') return null;
+  // Don't render anything during SSR or before mount
+  if (!mounted) return null;
 
   const positionClasses = {
     right: `fixed top-0 right-0 h-full w-full ${width} transform transition-transform duration-300 ease-out ${isOpen ? 'translate-x-0' : 'translate-x-full'}`,
