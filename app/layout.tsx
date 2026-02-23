@@ -26,6 +26,8 @@ export default function RootLayout({
                 {children}
               </main>
               <ChatContainer />
+              {/* Portal root for glass overlays */}
+              <div id="overlay-root" />
             </ChatProvider>
           </AuthProvider>
         </ThemeProvider>

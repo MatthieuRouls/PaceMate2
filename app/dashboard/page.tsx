@@ -2,10 +2,12 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useAuth } from '@/components/providers/AuthProvider';
 import { getUpcomingSessions, getUserTeam } from '@/lib/actions';
 import { Session, Team } from '@/lib/types';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
+import SessionPanel from '@/components/overlays/SessionPanel';
 import {
   Users, Zap, Trophy, TrendingUp, Target, Plus,
   MapPin, Clock, ChevronRight, Calendar, Activity,
@@ -29,11 +31,29 @@ const SESSION_COVERS: Record<string, string> = {
 
 export default function DashboardPage() {
   const { profile } = useAuth();
+  const router = useRouter();
   const [sessions, setSessions] = useState<Session[]>([]);
   const [loading, setLoading] = useState(true);
   const [userTeam, setUserTeam] = useState<TeamWithCount | null>(null);
   const [levelBarAnimated, setLevelBarAnimated] = useState(false);
   const [fabHovered, setFabHovered] = useState(false);
+
+  // Overlay states
+  const [selectedSessionId, setSelectedSessionId] = useState<string | null>(null);
+  const [isSessionPanelOpen, setIsSessionPanelOpen] = useState(false);
+
+  const openSessionPanel = (sessionId: string) => {
+    setSelectedSessionId(sessionId);
+    setIsSessionPanelOpen(true);
+    // Update URL without navigation
+    window.history.pushState({}, '', `/dashboard?session=${sessionId}`);
+  };
+
+  const closeSessionPanel = () => {
+    setIsSessionPanelOpen(false);
+    setSelectedSessionId(null);
+    window.history.pushState({}, '', '/dashboard');
+  };
 
   const level = profile?.running_level || 1;
   const levelName = LEVEL_THRESHOLDS[level as keyof typeof LEVEL_THRESHOLDS]?.name || 'Débutant';
@@ -194,13 +214,13 @@ export default function DashboardPage() {
                       </span>
                     </div>
 
-                    <Link
-                      href={`/sessions/${featuredSession.id}`}
+                    <button
+                      onClick={() => openSessionPanel(featuredSession.id)}
                       className="inline-flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-pink-500 to-pink-600 hover:from-pink-600 hover:to-pink-700 text-white font-bold text-lg rounded-2xl animate-glow-pulse hover:-translate-y-0.5 transition-transform"
                     >
                       Rejoindre la sortie
                       <ArrowRight className="w-5 h-5" />
-                    </Link>
+                    </button>
                   </>
                 ) : (
                   <>
@@ -307,7 +327,7 @@ export default function DashboardPage() {
 
             <div className="flex flex-col lg:flex-row gap-6">
               {secondarySessions[0] && (
-                <Link href={`/sessions/${secondarySessions[0].id}`} className="flex-[6] group">
+                <button onClick={() => openSessionPanel(secondarySessions[0].id)} className="flex-[6] group text-left">
                   <div className="h-full bg-white rounded-3xl overflow-hidden shadow-sm card-hover hover:shadow-xl border border-silver-100">
                     <div className="relative h-[140px] overflow-hidden">
                       <div
@@ -359,15 +379,15 @@ export default function DashboardPage() {
                       </div>
                     </div>
                   </div>
-                </Link>
+                </button>
               )}
 
               <div className="flex-[4] flex flex-col gap-4">
                 {secondarySessions.slice(1).map((session) => (
-                  <Link
+                  <button
                     key={session.id}
-                    href={`/sessions/${session.id}`}
-                    className="group bg-white rounded-2xl overflow-hidden shadow-sm card-hover hover:shadow-lg border border-silver-100"
+                    onClick={() => openSessionPanel(session.id)}
+                    className="group bg-white rounded-2xl overflow-hidden shadow-sm card-hover hover:shadow-lg border border-silver-100 text-left"
                   >
                     <div className="flex">
                       <div
@@ -387,7 +407,7 @@ export default function DashboardPage() {
                         </div>
                       </div>
                     </div>
-                  </Link>
+                  </button>
                 ))}
 
                 {secondarySessions.length < 3 && (
@@ -525,6 +545,13 @@ export default function DashboardPage() {
         <Plus className="w-6 h-6 transition-transform duration-200" style={{ transform: fabHovered ? 'rotate(90deg)' : 'rotate(0)' }} />
         <span className="hidden sm:inline">Creer une sortie</span>
       </Link>
+
+      {/* Session Details Panel - Glass overlay with dashboard visible behind */}
+      <SessionPanel
+        sessionId={selectedSessionId}
+        isOpen={isSessionPanelOpen}
+        onClose={closeSessionPanel}
+      />
     </div>
   );
 }
