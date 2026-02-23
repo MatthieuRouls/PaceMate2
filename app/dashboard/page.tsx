@@ -159,14 +159,13 @@ export default function DashboardPage() {
               className="absolute inset-0 bg-cover bg-center"
               style={{
                 backgroundImage: `url('${featuredSession ? getSessionCover(featuredSession) : '/easy-run-1.jpeg'}')`,
-                filter: 'brightness(0.6) contrast(1.1) saturate(0.9)',
-                opacity: 0.35,
               }}
             />
+            {/* Gradient overlay for text readability */}
             <div
               className="absolute inset-0"
               style={{
-                background: 'linear-gradient(180deg, rgba(8,12,10,0.75) 0%, rgba(8,12,10,0.95) 100%)',
+                background: 'linear-gradient(180deg, rgba(8,12,10,0.45) 0%, rgba(8,12,10,0.7) 100%)',
               }}
             />
             <div className="absolute top-0 right-0 w-96 h-96 bg-pink-500/20 rounded-full blur-3xl" />
