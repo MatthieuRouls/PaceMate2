@@ -36,14 +36,14 @@ const SESSION_COVERS: Record<string, string[]> = {
   default: ['/easy-run-1.jpeg', '/easy-run-2.jpeg'],
 };
 
-// Labels pour les types de session
+// Labels pour les types de session (couleurs désaturées pour ne pas dominer les titres)
 const SESSION_TYPE_LABELS: Record<string, { label: string; color: string }> = {
-  intervals: { label: 'Fractionné', color: 'bg-orange-500' },
-  long_run: { label: 'Sortie longue', color: 'bg-purple-500' },
-  casual: { label: 'Détente', color: 'bg-neon-500' },
-  recovery: { label: 'Récupération', color: 'bg-blue-500' },
-  tempo: { label: 'Tempo', color: 'bg-pink-500' },
-  default: { label: 'Run', color: 'bg-dark-500' },
+  intervals: { label: 'Fractionné', color: 'bg-orange-400/90' },
+  long_run: { label: 'Sortie longue', color: 'bg-purple-400/90' },
+  casual: { label: 'Détente', color: 'bg-teal-500/85' },
+  recovery: { label: 'Récupération', color: 'bg-sky-400/90' },
+  tempo: { label: 'Tempo', color: 'bg-pink-400/90' },
+  default: { label: 'Run', color: 'bg-slate-400/90' },
 };
 
 // Fonction pour obtenir une image basée sur l'ID de session (consistant mais varié)
@@ -446,47 +446,47 @@ export default function DashboardPage() {
       <div className="max-w-[1280px] mx-auto px-8 pb-24">
 
         {/* ============================================ */}
-        {/* SECTION 2 — STAT BAR (Premium) */}
+        {/* SECTION 2 — STAT BAR (Floating Solid Card) */}
         {/* ============================================ */}
-        <section className="mb-14 -mt-6 relative z-20 section-reveal">
-          <div className="bg-white/90 backdrop-blur-md rounded-2xl px-10 py-6 flex flex-wrap items-center justify-center gap-x-12 gap-y-4 shadow-lg shadow-dark-900/5">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-pink-100 flex items-center justify-center">
-                <Route className="w-5 h-5 text-pink-600" />
+        <section className="mb-14 -mt-8 relative z-20 section-reveal">
+          <div className="bg-white rounded-2xl px-10 py-7 flex flex-wrap items-center justify-center gap-x-14 gap-y-5 shadow-xl shadow-black/8 border border-silver-100">
+            <div className="flex items-center gap-4">
+              <div className="w-11 h-11 rounded-xl bg-pink-50 flex items-center justify-center">
+                <Route className="w-5 h-5 text-pink-500" />
               </div>
               <div>
-                <div className="text-2xl font-black text-dark-800">
-                  {profile?.calculated_weekly_km ? Math.round(profile.calculated_weekly_km) : 0} <span className="text-base font-semibold text-dark-500">km</span>
+                <div className="text-2xl font-black text-text-primary">
+                  {profile?.calculated_weekly_km ? Math.round(profile.calculated_weekly_km) : 0} <span className="text-base font-semibold text-text-muted">km</span>
                 </div>
-                <div className="text-xs text-dark-400">cette semaine</div>
+                <div className="text-xs text-text-subtle">cette semaine</div>
               </div>
             </div>
 
-            <div className="w-px h-12 bg-silver-200 hidden md:block" />
+            <div className="w-px h-14 bg-silver-200 hidden md:block" />
 
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-neon-100 flex items-center justify-center">
-                <Calendar className="w-5 h-5 text-neon-600" />
+            <div className="flex items-center gap-4">
+              <div className="w-11 h-11 rounded-xl bg-teal-50 flex items-center justify-center">
+                <Calendar className="w-5 h-5 text-teal-600" />
               </div>
               <div>
-                <div className="text-2xl font-black text-dark-800">
-                  {sessions.length} <span className="text-base font-semibold text-dark-500">sorties</span>
+                <div className="text-2xl font-black text-text-primary">
+                  {sessions.length} <span className="text-base font-semibold text-text-muted">sorties</span>
                 </div>
-                <div className="text-xs text-dark-400">à venir</div>
+                <div className="text-xs text-text-subtle">à venir</div>
               </div>
             </div>
 
-            <div className="w-px h-12 bg-silver-200 hidden md:block" />
+            <div className="w-px h-14 bg-silver-200 hidden md:block" />
 
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-purple-100 flex items-center justify-center">
-                <Zap className="w-5 h-5 text-purple-600" />
+            <div className="flex items-center gap-4">
+              <div className="w-11 h-11 rounded-xl bg-purple-50 flex items-center justify-center">
+                <Zap className="w-5 h-5 text-purple-500" />
               </div>
               <div>
-                <div className="text-2xl font-black text-dark-800">
-                  {profile?.calculated_avg_pace || '—'} <span className="text-base font-semibold text-dark-500">/km</span>
+                <div className="text-2xl font-black text-text-primary">
+                  {profile?.calculated_avg_pace || '—'} <span className="text-base font-semibold text-text-muted">/km</span>
                 </div>
-                <div className="text-xs text-dark-400">allure moyenne</div>
+                <div className="text-xs text-text-subtle">allure moyenne</div>
               </div>
             </div>
           </div>
@@ -500,37 +500,37 @@ export default function DashboardPage() {
             <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-pink-500 to-purple-600 flex items-center justify-center">
               <Activity className="w-4 h-4 text-white" />
             </div>
-            <h2 className="text-lg font-bold text-dark-800">Ton activité récente</h2>
+            <h2 className="text-lg font-bold text-text-primary">Ton activité récente</h2>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div className="bg-white rounded-2xl p-5 border border-silver-100 card-hover hover:shadow-md">
               <div className="flex items-center gap-2 mb-3">
                 <Footprints className="w-4 h-4 text-pink-500" />
-                <span className="text-xs font-semibold text-dark-500 uppercase">Dernière sortie</span>
+                <span className="text-xs font-semibold text-text-muted uppercase">Dernière sortie</span>
               </div>
-              <p className="text-lg font-bold text-dark-800">
+              <p className="text-lg font-bold text-text-primary">
                 {profile?.calculated_weekly_km ? `${(profile.calculated_weekly_km / 2).toFixed(1)} km` : 'Aucune'}
               </p>
-              <p className="text-sm text-dark-500">Il y a 2 jours</p>
+              <p className="text-sm text-text-muted">Il y a 2 jours</p>
             </div>
 
             <div className="bg-white rounded-2xl p-5 border border-silver-100 card-hover hover:shadow-md">
               <div className="flex items-center gap-2 mb-3">
                 <TrendingUp className="w-4 h-4 text-neon-500" />
-                <span className="text-xs font-semibold text-dark-500 uppercase">Progression</span>
+                <span className="text-xs font-semibold text-text-muted uppercase">Progression</span>
               </div>
-              <p className="text-lg font-bold text-dark-800">+12%</p>
-              <p className="text-sm text-dark-500">vs semaine dernière</p>
+              <p className="text-lg font-bold text-text-primary">+12%</p>
+              <p className="text-sm text-text-muted">vs semaine dernière</p>
             </div>
 
             <div className="bg-white rounded-2xl p-5 border border-silver-100 card-hover hover:shadow-md">
               <div className="flex items-center gap-2 mb-3">
                 <Award className="w-4 h-4 text-purple-500" />
-                <span className="text-xs font-semibold text-dark-500 uppercase">Prochain objectif</span>
+                <span className="text-xs font-semibold text-text-muted uppercase">Prochain objectif</span>
               </div>
-              <p className="text-lg font-bold text-dark-800">Niveau {level + 1}</p>
-              <p className="text-sm text-dark-500">Encore {Math.max(10, 50 - (profile?.calculated_weekly_km || 0)).toFixed(0)} km</p>
+              <p className="text-lg font-bold text-text-primary">Niveau {level + 1}</p>
+              <p className="text-sm text-text-muted">Encore {Math.max(10, 50 - (profile?.calculated_weekly_km || 0)).toFixed(0)} km</p>
             </div>
           </div>
         </section>
@@ -541,7 +541,7 @@ export default function DashboardPage() {
         {secondarySessions.length > 0 && (
           <section className="mb-14 section-reveal">
             <div className="flex items-center justify-between mb-6">
-              <h2 className="text-xl font-bold text-dark-800">Courir aujourd'hui</h2>
+              <h2 className="text-xl font-bold text-text-primary">Courir aujourd'hui</h2>
               <Link href="/sessions" className="text-sm font-semibold text-neon-700 hover:text-neon-600 transition-colors flex items-center gap-1">
                 Voir tout <ChevronRight className="w-4 h-4" />
               </Link>
@@ -575,7 +575,7 @@ export default function DashboardPage() {
                       </div>
 
                       <div className="absolute bottom-3 left-4 right-4 flex items-end justify-between">
-                        <span className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white/95 backdrop-blur-sm text-dark-800 text-xs font-semibold rounded-full shadow">
+                        <span className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white/95 backdrop-blur-sm text-text-primary text-xs font-semibold rounded-full shadow">
                           <Clock className="w-3.5 h-3.5" />
                           {formatTime(secondarySessions[0].start_time)}
                         </span>
@@ -584,19 +584,19 @@ export default function DashboardPage() {
                     </div>
 
                     <div className="p-6">
-                      <h3 className="text-xl font-bold text-dark-800 mb-2 group-hover:text-pink-600 transition-colors">
+                      <h3 className="text-xl font-bold text-text-primary mb-2 group-hover:text-pink-600 transition-colors">
                         {secondarySessions[0].title}
                       </h3>
-                      <div className="flex flex-wrap gap-4 text-sm text-dark-500 mb-5">
+                      <div className="flex flex-wrap gap-4 text-sm text-text-muted mb-5">
                         {secondarySessions[0].distance_km && (
                           <span className="flex items-center gap-1.5">
-                            <Activity className="w-4 h-4 text-dark-400" />
+                            <Activity className="w-4 h-4 text-text-subtle" />
                             {secondarySessions[0].distance_km} km
                           </span>
                         )}
                         {secondarySessions[0].location_name && (
                           <span className="flex items-center gap-1.5">
-                            <MapPin className="w-4 h-4 text-dark-400" />
+                            <MapPin className="w-4 h-4 text-text-subtle" />
                             {secondarySessions[0].location_name}
                           </span>
                         )}
@@ -611,7 +611,7 @@ export default function DashboardPage() {
                               </div>
                             ))}
                           </div>
-                          <span className="text-sm text-dark-600 font-medium">{secondarySessions[0].participants_count || 2} inscrits</span>
+                          <span className="text-sm text-text-secondary font-medium">{secondarySessions[0].participants_count || 2} inscrits</span>
                         </div>
                         <span className="inline-flex items-center gap-2 px-5 py-2.5 bg-dark-800 text-white font-semibold rounded-xl group-hover:bg-pink-500 transition-colors">
                           Rejoindre <ArrowRight className="w-4 h-4" />
@@ -646,16 +646,16 @@ export default function DashboardPage() {
                       </div>
                       <div className="p-4 flex-1">
                         <div className="flex items-center justify-between mb-2">
-                          <span className="text-xs font-semibold text-dark-500">{formatDate(session.start_time)} • {formatTime(session.start_time)}</span>
-                          <ChevronRight className="w-4 h-4 text-dark-400 group-hover:text-pink-500 transition-colors" />
+                          <span className="text-xs font-semibold text-text-muted">{formatDate(session.start_time)} • {formatTime(session.start_time)}</span>
+                          <ChevronRight className="w-4 h-4 text-text-subtle group-hover:text-pink-500 transition-colors" />
                         </div>
-                        <h4 className="font-bold text-dark-800 mb-2 group-hover:text-pink-600 transition-colors">{session.title}</h4>
+                        <h4 className="font-bold text-text-primary mb-2 group-hover:text-pink-600 transition-colors">{session.title}</h4>
                         <div className="flex items-center gap-3">
                           {/* Avatar organisateur */}
                           <div className="w-6 h-6 rounded-full bg-gradient-to-br from-neon-400 to-teal-500 flex items-center justify-center text-[10px] font-bold text-white">
                             O
                           </div>
-                          <span className="text-sm text-dark-500">
+                          <span className="text-sm text-text-muted">
                             {session.distance_km && `${session.distance_km} km • `}
                             {session.participants_count || 1} coureurs
                           </span>
@@ -666,7 +666,7 @@ export default function DashboardPage() {
                 ))}
 
                 {secondarySessions.length < 3 && (
-                  <Link href="/sessions" className="flex-1 flex items-center justify-center gap-2 bg-silver-50 rounded-2xl p-5 text-dark-500 hover:text-dark-700 hover:bg-silver-100 transition-colors border-2 border-dashed border-silver-200">
+                  <Link href="/sessions" className="flex-1 flex items-center justify-center gap-2 bg-silver-50 rounded-2xl p-5 text-text-muted hover:text-dark-700 hover:bg-silver-100 transition-colors border-2 border-dashed border-silver-200">
                     <Plus className="w-5 h-5" />
                     <span className="font-semibold">Voir plus de sessions</span>
                   </Link>
@@ -682,7 +682,7 @@ export default function DashboardPage() {
         <section className="mb-14 section-reveal">
           <div className="flex items-center justify-between mb-6">
             <div className="flex items-center gap-3">
-              <h2 className="text-xl font-bold text-dark-800">Ton réseau court</h2>
+              <h2 className="text-xl font-bold text-text-primary">Ton réseau court</h2>
               <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-neon-100 text-neon-700 text-xs font-semibold rounded-full">
                 <Flame className="w-3 h-3" />
                 {friendsRunningToday} amis courent aujourd'hui
@@ -691,7 +691,7 @@ export default function DashboardPage() {
           </div>
 
           <div className="flex flex-col lg:flex-row gap-6">
-            <div className="flex-[6] bg-white/90 backdrop-blur-sm rounded-2xl overflow-hidden border border-silver-100 shadow-sm">
+            <div className="flex-[6] bg-white rounded-2xl overflow-hidden border border-silver-100 shadow-md">
               <div className="divide-y divide-silver-100">
                 {socialFeed.map((item, i) => (
                   <div key={i} className="px-5 py-4 flex items-center gap-4 hover:bg-silver-50/80 transition-colors">
@@ -701,11 +701,11 @@ export default function DashboardPage() {
                     <div className="flex-1 min-w-0">
                       <p className="text-sm text-dark-700">
                         <strong className="font-semibold">{item.user}</strong>{' '}
-                        <span className="text-dark-500">{item.action}</span>{' '}
-                        <strong className="font-semibold text-dark-800">{item.target}</strong>
+                        <span className="text-text-muted">{item.action}</span>{' '}
+                        <strong className="font-semibold text-text-primary">{item.target}</strong>
                       </p>
                       <div className="flex items-center gap-3 mt-1">
-                        <span className="text-xs text-dark-400">{item.time}</span>
+                        <span className="text-xs text-text-subtle">{item.time}</span>
                         <div className="flex items-center gap-1">
                           {item.reactions.map((reaction, j) => (
                             <span key={j} className="text-sm">{reaction}</span>
@@ -714,7 +714,7 @@ export default function DashboardPage() {
                       </div>
                     </div>
                     <button className="p-2 hover:bg-silver-100 rounded-lg transition-colors">
-                      <Heart className="w-4 h-4 text-dark-400 hover:text-pink-500 transition-colors" />
+                      <Heart className="w-4 h-4 text-text-subtle hover:text-pink-500 transition-colors" />
                     </button>
                   </div>
                 ))}
@@ -797,7 +797,7 @@ export default function DashboardPage() {
         {/* ============================================ */}
         <section className="section-reveal">
           <div className="flex items-center justify-between mb-6">
-            <h2 className="text-xl font-bold text-dark-800">Découvrir</h2>
+            <h2 className="text-xl font-bold text-text-primary">Découvrir</h2>
             <Link href="/sessions" className="text-sm font-semibold text-neon-700 hover:text-neon-600 transition-colors flex items-center gap-1">
               Explorer <ChevronRight className="w-4 h-4" />
             </Link>
@@ -810,8 +810,8 @@ export default function DashboardPage() {
                 <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-neon-400 to-teal-500 flex items-center justify-center mb-4 shadow-lg shadow-neon-500/20">
                   <MapPin className="w-6 h-6 text-white" />
                 </div>
-                <h4 className="font-bold text-dark-800 mb-1 group-hover:text-neon-700 transition-colors">Sessions proches</h4>
-                <p className="text-sm text-dark-500">Trouve des runs autour de toi aujourd'hui</p>
+                <h4 className="font-bold text-text-primary mb-1 group-hover:text-neon-700 transition-colors">Sessions proches</h4>
+                <p className="text-sm text-text-muted">Trouve des runs autour de toi aujourd'hui</p>
               </div>
             </Link>
 
@@ -821,8 +821,8 @@ export default function DashboardPage() {
                 <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-pink-500 to-purple-600 flex items-center justify-center mb-4 shadow-lg shadow-pink-500/20">
                   <Users className="w-6 h-6 text-white" />
                 </div>
-                <h4 className="font-bold text-dark-800 mb-1 group-hover:text-pink-600 transition-colors">Équipes actives</h4>
-                <p className="text-sm text-dark-500">Rejoins une communauté de coureurs</p>
+                <h4 className="font-bold text-text-primary mb-1 group-hover:text-pink-600 transition-colors">Équipes actives</h4>
+                <p className="text-sm text-text-muted">Rejoins une communauté de coureurs</p>
               </div>
             </Link>
 
@@ -832,8 +832,8 @@ export default function DashboardPage() {
                 <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-purple-500 to-indigo-600 flex items-center justify-center mb-4 shadow-lg shadow-purple-500/20">
                   <Plus className="w-6 h-6 text-white" />
                 </div>
-                <h4 className="font-bold text-dark-800 mb-1 group-hover:text-purple-600 transition-colors">Organise un run</h4>
-                <p className="text-sm text-dark-500">Crée ta propre session et invite tes amis</p>
+                <h4 className="font-bold text-text-primary mb-1 group-hover:text-purple-600 transition-colors">Organise un run</h4>
+                <p className="text-sm text-text-muted">Crée ta propre session et invite tes amis</p>
               </div>
             </button>
           </div>

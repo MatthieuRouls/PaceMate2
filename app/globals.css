@@ -2,6 +2,14 @@
 
 /* Theme customization for Tailwind v4 */
 @theme {
+  /* ============================================
+     TEXT HIERARCHY TOKENS (CRITICAL)
+     ============================================ */
+  --color-text-primary: #0F2F27;    /* Titres principaux */
+  --color-text-secondary: #184E42;  /* Textes importants */
+  --color-text-muted: #5E7F76;      /* Métadonnées */
+  --color-text-subtle: #8FA9A1;     /* Labels secondaires */
+
   /* Dark Green - #0B2E26 - Backgrounds, dark mode */
   --color-dark-50: #e8edeb;
   --color-dark-100: #c5d4cf;
@@ -14,7 +22,7 @@
   --color-dark-800: #0B2E26;
   --color-dark-900: #051a15;
 
-  /* Neon Green - #00F57A - Secondary, accents */
+  /* Neon Green - #00F57A - RESERVED FOR ACTIONS ONLY */
   --color-neon-50: #e6fff2;
   --color-neon-100: #b3ffda;
   --color-neon-200: #80ffc2;
@@ -182,13 +190,33 @@
     border: 1px solid rgba(255, 255, 255, 0.1);
   }
 
-  /* Glass pill navigation */
+  /* Glass pill navigation - ENHANCED */
   .glass-pill {
-    background: rgba(255, 255, 255, 0.5);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.6);
+    border-radius: 9999px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08), 0 1px 3px rgba(0, 0, 0, 0.04);
+  }
+
+  /* Glass capsule for navbar actions (right side) */
+  .glass-capsule {
+    background: rgba(255, 255, 255, 0.75);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
     border: 1px solid rgba(255, 255, 255, 0.4);
-    border-radius: 50px;
+    border-radius: 9999px;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+  }
+
+  /* Glass capsule on dark backgrounds (hero) */
+  .glass-capsule-dark {
+    background: rgba(255, 255, 255, 0.12);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 9999px;
   }
 
   /* Neumorphic active tab */
@@ -265,8 +293,20 @@
 
   /* Dark mode glass pill */
   .dark .glass-pill {
-    background: rgba(15, 61, 50, 0.7);
+    background: rgba(15, 61, 50, 0.85);
     border-color: rgba(0, 245, 122, 0.2);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  }
+
+  .dark .glass-capsule {
+    background: rgba(15, 61, 50, 0.75);
+    border-color: rgba(0, 245, 122, 0.15);
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.25);
+  }
+
+  .dark .glass-capsule-dark {
+    background: rgba(15, 61, 50, 0.5);
+    border-color: rgba(0, 245, 122, 0.1);
   }
 
   /* Dark mode inputs */
