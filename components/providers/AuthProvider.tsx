@@ -1,6 +1,6 @@
 'use client';
 
-import { createContext, useContext, useEffect, useState } from 'react';
+import { createContext, useContext, useEffect, useState, useRef, useCallback } from 'react';
 import { User } from '@supabase/supabase-js';
 import { supabase } from '@/lib/supabase';
 import type { Profile } from '@/lib/types';
@@ -10,9 +10,11 @@ interface AuthContextType {
   user: User | null;
   profile: Profile | null;
   loading: boolean;
+  initializing: boolean; // True during first load only
   signIn: (email: string, password: string) => Promise<{ success: boolean; error?: string }>;
   signUp: (email: string, password: string, username: string) => Promise<{ success: boolean; error?: string }>;
   signOut: () => Promise<void>;
+  refreshProfile: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -49,9 +51,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
+  const [initializing, setInitializing] = useState(true);
+
+  // Use refs to track mounted state and prevent race conditions
+  const isMountedRef = useRef(true);
+  const isInitializedRef = useRef(false);
+  const currentUserIdRef = useRef<string | null>(null);
 
   // Récupérer le profil depuis la table profiles avec retry
-  const fetchProfile = async (userId: string, retries = 3): Promise<Profile | null> => {
+  const fetchProfile = useCallback(async (userId: string, retries = 3): Promise<Profile | null> => {
     for (let i = 0; i < retries; i++) {
       try {
         const { data, error } = await supabase
@@ -62,7 +70,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
         if (error) {
           if (i < retries - 1) {
-            // Attendre avant de réessayer (backoff exponentiel)
             await new Promise(resolve => setTimeout(resolve, 300 * (i + 1)));
             continue;
           }
@@ -81,70 +88,98 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
     }
     return null;
-  };
+  }, []);
+
+  // Function to refresh profile manually
+  const refreshProfile = useCallback(async () => {
+    if (currentUserIdRef.current) {
+      const userProfile = await fetchProfile(currentUserIdRef.current);
+      if (isMountedRef.current && userProfile) {
+        setProfile(userProfile);
+      }
+    }
+  }, [fetchProfile]);
 
   // Initialiser l'état d'authentification au chargement
   useEffect(() => {
-    let isMounted = true;
-
-    // Safety timeout: force loading to false after 5 seconds
-    const safetyTimeout = setTimeout(() => {
-      if (isMounted && loading) {
-        console.warn('Auth loading timeout - forcing loading to false');
-        setLoading(false);
-      }
-    }, 5000);
+    isMountedRef.current = true;
 
     const initAuth = async () => {
-      try {
-        const { data: { session } } = await supabase.auth.getSession();
+      // Prevent double initialization
+      if (isInitializedRef.current) return;
+      isInitializedRef.current = true;
 
-        if (session?.user && isMounted) {
+      try {
+        // First, get the current session
+        const { data: { session }, error } = await supabase.auth.getSession();
+
+        if (error) {
+          console.error('Error getting session:', error);
+        }
+
+        if (session?.user && isMountedRef.current) {
+          currentUserIdRef.current = session.user.id;
           setUser(session.user);
+
           const userProfile = await fetchProfile(session.user.id);
-          if (isMounted) {
+          if (isMountedRef.current) {
             setProfile(userProfile);
           }
         }
       } catch (error) {
         console.error('Error initializing auth:', error);
       } finally {
-        if (isMounted) {
+        if (isMountedRef.current) {
+          setLoading(false);
+          setInitializing(false);
+        }
+      }
+    };
+
+    // Set up auth state change listener BEFORE initializing
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      async (event, session) => {
+        if (!isMountedRef.current) return;
+
+        // Only process auth changes after initialization is complete
+        // This prevents the listener from overwriting the initial state with stale data
+        if (event === 'INITIAL_SESSION') {
+          // Skip - we handle this in initAuth
+          return;
+        }
+
+        if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
+          if (session?.user) {
+            currentUserIdRef.current = session.user.id;
+            setUser(session.user);
+
+            const userProfile = await fetchProfile(session.user.id);
+            if (isMountedRef.current) {
+              setProfile(userProfile);
+              setLoading(false);
+            }
+          }
+        } else if (event === 'SIGNED_OUT') {
+          currentUserIdRef.current = null;
+          setUser(null);
+          setProfile(null);
           setLoading(false);
         }
       }
-    };
-
-    initAuth();
-
-    // Écouter les changements d'authentification
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
-        if (!isMounted) return;
-
-        if (session?.user) {
-          setUser(session.user);
-          const userProfile = await fetchProfile(session.user.id);
-          if (isMounted) {
-            setProfile(userProfile);
-          }
-        } else {
-          setUser(null);
-          setProfile(null);
-        }
-
-        setLoading(false);
-      }
     );
 
+    // Initialize auth
+    initAuth();
+
     return () => {
-      isMounted = false;
-      clearTimeout(safetyTimeout);
+      isMountedRef.current = false;
       subscription.unsubscribe();
     };
-  }, []);
+  }, [fetchProfile]);
 
   const signIn = async (email: string, password: string) => {
+    setLoading(true);
+
     try {
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
@@ -152,6 +187,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       });
 
       if (error) {
+        setLoading(false);
         return {
           success: false,
           error: translateError(error.message),
@@ -159,18 +195,27 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
 
       if (!data.user) {
+        setLoading(false);
         return {
           success: false,
           error: 'Erreur lors de la connexion',
         };
       }
 
-      // onAuthStateChange va mettre à jour user et profile automatiquement
-      return {
-        success: true,
-      };
+      // Manually update state to avoid race conditions
+      currentUserIdRef.current = data.user.id;
+      setUser(data.user);
+
+      const userProfile = await fetchProfile(data.user.id);
+      if (isMountedRef.current) {
+        setProfile(userProfile);
+        setLoading(false);
+      }
+
+      return { success: true };
     } catch (error) {
       console.error('SignIn error:', error);
+      setLoading(false);
       return {
         success: false,
         error: 'Une erreur est survenue lors de la connexion',
@@ -179,6 +224,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const signUp = async (email: string, password: string, username: string) => {
+    setLoading(true);
+
     try {
       const { data, error } = await supabase.auth.signUp({
         email,
@@ -191,6 +238,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       });
 
       if (error) {
+        setLoading(false);
         return {
           success: false,
           error: translateError(error.message),
@@ -198,18 +246,29 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
 
       if (!data.user) {
+        setLoading(false);
         return {
           success: false,
           error: 'Erreur lors de la création du compte',
         };
       }
 
-      // onAuthStateChange va mettre à jour user et profile automatiquement
-      return {
-        success: true,
-      };
+      // Wait a bit for the profile trigger to create the profile
+      await new Promise(resolve => setTimeout(resolve, 500));
+
+      currentUserIdRef.current = data.user.id;
+      setUser(data.user);
+
+      const userProfile = await fetchProfile(data.user.id);
+      if (isMountedRef.current) {
+        setProfile(userProfile);
+        setLoading(false);
+      }
+
+      return { success: true };
     } catch (error) {
       console.error('SignUp error:', error);
+      setLoading(false);
       return {
         success: false,
         error: 'Une erreur est survenue lors de l\'inscription',
@@ -219,7 +278,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const signOut = async () => {
     try {
-      // Forcer immédiatement la mise à jour de l'état
+      // Clear state immediately
+      currentUserIdRef.current = null;
       setUser(null);
       setProfile(null);
 
@@ -234,9 +294,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     } catch (error) {
       console.error('Erreur lors de la déconnexion:', error);
       // Même en cas d'erreur, on force la déconnexion côté client
+      currentUserIdRef.current = null;
       setUser(null);
       setProfile(null);
-      // Rediriger quand même
       window.location.href = '/';
     }
   };
@@ -245,9 +305,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     user,
     profile,
     loading,
+    initializing,
     signIn,
     signUp,
     signOut,
+    refreshProfile,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

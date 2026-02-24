@@ -4,14 +4,17 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { useState, useEffect } from 'react';
-import { Bell } from 'lucide-react';
+import { Bell, Loader2 } from 'lucide-react';
 import { useAuth } from '../providers/AuthProvider';
 import AuthDrawer from '../ui/AuthDrawer';
 import DarkModeToggle from '../ui/DarkModeToggle';
 
+// Pages protégées où on ne doit jamais montrer l'état déconnecté pendant l'initialisation
+const PROTECTED_PATHS = ['/dashboard', '/profile', '/settings', '/mes-sorties', '/friends', '/sessions/create'];
+
 export default function Navbar() {
   const pathname = usePathname();
-  const { profile, signOut, loading } = useAuth();
+  const { profile, signOut, loading, initializing } = useAuth();
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [authDrawerOpen, setAuthDrawerOpen] = useState(false);
   const [authMode, setAuthMode] = useState<'login' | 'signup'>('login');
@@ -19,6 +22,9 @@ export default function Navbar() {
 
   const isHomepage = pathname === '/';
   const isDashboard = pathname === '/dashboard';
+
+  // Check if we're on a protected page
+  const isProtectedPage = PROTECTED_PATHS.some(path => pathname?.startsWith(path));
 
   // Force light mode when not logged in (guest users)
   useEffect(() => {
@@ -81,7 +87,10 @@ export default function Navbar() {
     { href: '/teams', label: 'Équipes' },
   ];
 
-  const navItems = profile ? connectedNavItems : guestNavItems;
+  // Determine what to show based on auth state
+  // On protected pages, we assume user is logged in during initialization
+  const showAsLoggedIn = profile || (isProtectedPage && initializing);
+  const navItems = showAsLoggedIn ? connectedNavItems : guestNavItems;
 
   // Determine if we're on a dark background (hero visible)
   const onDarkBg = (isHomepage || isDashboard) && !scrolled;
@@ -130,17 +139,22 @@ export default function Navbar() {
 
         {/* Right side actions - Glass Capsule */}
         <div className={`flex items-center transition-all duration-300 ${
-          profile
+          showAsLoggedIn
             ? onDarkBg
               ? 'glass-capsule-dark px-2 py-1.5'
               : 'glass-capsule px-2 py-1.5'
             : ''
         }`}>
-          {/* Dark mode toggle - only for connected users */}
-          {profile && <DarkModeToggle />}
-
-          {profile ? (
+          {/* Show loading state on protected pages during initialization */}
+          {isProtectedPage && initializing && !profile ? (
+            <div className="flex items-center gap-2 px-3">
+              <Loader2 className={`w-5 h-5 animate-spin ${onDarkBg ? 'text-white' : 'text-text-muted'}`} />
+            </div>
+          ) : showAsLoggedIn ? (
             <>
+              {/* Dark mode toggle - only for connected users */}
+              {profile && <DarkModeToggle />}
+
               {/* Notifications */}
               <button className={`relative w-9 h-9 rounded-full flex items-center justify-center transition-colors ${
                 onDarkBg ? 'hover:bg-white/15' : 'hover:bg-text-primary/5'
@@ -155,7 +169,7 @@ export default function Navbar() {
                   onClick={() => setDropdownOpen(!dropdownOpen)}
                   className="flex items-center gap-2 hover:opacity-80 transition-opacity pl-2"
                 >
-                  {profile.avatar_url ? (
+                  {profile?.avatar_url ? (
                     <img
                       src={profile.avatar_url}
                       alt={profile.username}
@@ -163,11 +177,11 @@ export default function Navbar() {
                     />
                   ) : (
                     <div className="w-8 h-8 rounded-full bg-gradient-to-br from-pink-500 to-purple-500 flex items-center justify-center text-white text-xs font-semibold ring-2 ring-white/20">
-                      {profile.username.substring(0, 2).toUpperCase()}
+                      {profile?.username?.substring(0, 2).toUpperCase() || '..'}
                     </div>
                   )}
                   <span className={`hidden lg:block text-sm font-medium transition-colors ${onDarkBg ? 'text-white' : 'text-text-primary'}`}>
-                    {profile.username}
+                    {profile?.username || 'Chargement...'}
                   </span>
                   <svg
                     className={`hidden lg:block w-4 h-4 transition-all ${onDarkBg ? 'text-white/70' : 'text-text-muted'} ${dropdownOpen ? 'rotate-180' : ''}`}
@@ -179,7 +193,7 @@ export default function Navbar() {
                   </svg>
                 </button>
 
-                {dropdownOpen && (
+                {dropdownOpen && profile && (
                   <>
                     <div
                       className="fixed inset-0 z-40"
