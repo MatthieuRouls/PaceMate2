@@ -6,13 +6,17 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from '@/components/providers/AuthProvider';
 import { getUpcomingSessions, getUserTeam } from '@/lib/actions';
 import { Session, Team } from '@/lib/types';
+
+interface SessionWithParticipation extends Session {
+  is_participant?: boolean;
+}
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
 import SessionPanel from '@/components/overlays/SessionPanel';
 import CreateWizardModal from '@/components/overlays/CreateWizardModal';
 import {
   Users, Zap, Trophy, TrendingUp, Target, Plus,
   MapPin, Clock, ChevronRight, Calendar, Activity,
-  ArrowRight, Footprints
+  ArrowRight, Footprints, CheckCircle
 } from 'lucide-react';
 import { LEVEL_THRESHOLDS } from '@/lib/constants';
 
@@ -41,7 +45,7 @@ const getSessionCover = (session: Session): string => {
 export default function DashboardPage() {
   const { profile } = useAuth();
   const router = useRouter();
-  const [sessions, setSessions] = useState<Session[]>([]);
+  const [sessions, setSessions] = useState<SessionWithParticipation[]>([]);
   const [loading, setLoading] = useState(true);
   const [userTeam, setUserTeam] = useState<TeamWithCount | null>(null);
   const [levelBarAnimated, setLevelBarAnimated] = useState(false);
@@ -228,13 +232,23 @@ export default function DashboardPage() {
                       </span>
                     </div>
 
-                    <button
-                      onClick={() => openSessionPanel(featuredSession.id)}
-                      className="inline-flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-pink-500 to-pink-600 hover:from-pink-600 hover:to-pink-700 text-white font-bold text-lg rounded-2xl animate-glow-pulse hover:-translate-y-0.5 transition-transform"
-                    >
-                      Rejoindre la sortie
-                      <ArrowRight className="w-5 h-5" />
-                    </button>
+                    {featuredSession.is_participant ? (
+                      <button
+                        onClick={() => openSessionPanel(featuredSession.id)}
+                        className="inline-flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-neon-500 to-neon-600 hover:from-neon-600 hover:to-neon-700 text-white font-bold text-lg rounded-2xl hover:-translate-y-0.5 transition-transform"
+                      >
+                        <CheckCircle className="w-5 h-5" />
+                        Inscrit — Voir les détails
+                      </button>
+                    ) : (
+                      <button
+                        onClick={() => openSessionPanel(featuredSession.id)}
+                        className="inline-flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-pink-500 to-pink-600 hover:from-pink-600 hover:to-pink-700 text-white font-bold text-lg rounded-2xl animate-glow-pulse hover:-translate-y-0.5 transition-transform"
+                      >
+                        Rejoindre la sortie
+                        <ArrowRight className="w-5 h-5" />
+                      </button>
+                    )}
                   </>
                 ) : (
                   <>

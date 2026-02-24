@@ -1012,6 +1012,7 @@ export async function rateSession(
 export async function getUpcomingSessions(limit: number = 3) {
   try {
     const supabase = await getServerSupabaseClient();
+    const user = await getCurrentUser();
 
     // Récupérer les sessions avec le créateur en une seule requête (JOIN)
     const { data: sessions, error } = await supabase
@@ -1037,20 +1038,25 @@ export async function getUpcomingSessions(limit: number = 3) {
     const sessionIds = sessions.map(s => s.id);
     const { data: allParticipants } = await supabase
       .from('session_participants')
-      .select('session_id')
+      .select('session_id, user_id')
       .in('session_id', sessionIds)
       .eq('status', 'confirmed');
 
-    // Compter les participants par session
+    // Compter les participants par session et vérifier si l'utilisateur est inscrit
     const participantCounts: Record<string, number> = {};
+    const userParticipations: Record<string, boolean> = {};
     (allParticipants || []).forEach(p => {
       participantCounts[p.session_id] = (participantCounts[p.session_id] || 0) + 1;
+      if (user && p.user_id === user.id) {
+        userParticipations[p.session_id] = true;
+      }
     });
 
-    // Ajouter les counts aux sessions
+    // Ajouter les counts et le statut de participation aux sessions
     const sessionsWithDetails = sessions.map(session => ({
       ...session,
       participants_count: participantCounts[session.id] || 0,
+      is_participant: userParticipations[session.id] || false,
     }));
 
     return sessionsWithDetails;
