@@ -253,10 +253,10 @@ export default function DashboardPage() {
         <div className="absolute bottom-0 left-1/4 w-80 h-80 bg-neon-500/10 rounded-full blur-3xl" />
 
         {/* Inner Container - Centered Content */}
-        <div className="relative z-10 max-w-[1280px] mx-auto px-8 lg:px-8 md:px-5 py-12 min-h-[320px]">
-          <div className="flex flex-col lg:flex-row gap-8">
-            {/* Left — Next Run (70%) */}
-            <div className="flex-[7]">
+        <div className="relative z-10 max-w-[1280px] mx-auto px-8 lg:px-8 md:px-5 py-12 pb-16 min-h-[320px]">
+          <div>
+            {/* Next Run */}
+            <div>
               <span className="inline-flex items-center gap-2 text-xs font-semibold text-silver-400 uppercase tracking-wider mb-3">
                 <Footprints className="w-4 h-4" />
                 Ton prochain run
@@ -365,6 +365,49 @@ export default function DashboardPage() {
                     )}
                   </div>
 
+                  {/* Level inline chip — near CTA */}
+                  <div className="mt-5 inline-flex items-center gap-3 px-4 py-3 bg-white/10 backdrop-blur-sm rounded-2xl border border-white/10 max-w-sm">
+                    <div className="relative flex-shrink-0">
+                      <div className={`w-10 h-10 rounded-xl flex items-center justify-center text-lg font-black text-white bg-gradient-to-br ${levelGradient}`}>
+                        {level}
+                      </div>
+                      {level >= 7 && (
+                        <div className="absolute -top-1 -right-1 w-4 h-4 bg-yellow-400 rounded-full flex items-center justify-center">
+                          <Zap className="w-2 h-2 text-yellow-900" />
+                        </div>
+                      )}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm font-bold text-white">Niveau {level}</span>
+                        <span className="text-xs text-silver-400">— {levelName}</span>
+                      </div>
+                      <div className="h-1.5 bg-white/15 rounded-full overflow-hidden mt-1.5 w-full">
+                        <div
+                          className="h-full bg-gradient-to-r from-pink-500 to-neon-500 rounded-full"
+                          style={{
+                            width: levelBarAnimated ? `${level >= 9 ? 100 : Math.min(95, level * 11)}%` : '0%',
+                            transition: 'width 1.1s ease-out 0.3s',
+                          }}
+                        />
+                      </div>
+                      <div className="flex items-center justify-between mt-1">
+                        <span className="text-[11px] text-silver-400">Encore {Math.max(10, 50 - (profile?.calculated_weekly_km || 0)).toFixed(0)} km pour niv. {level + 1}</span>
+                        {profile?.strava_connected ? (
+                          <span className="text-[10px] text-neon-400 flex items-center gap-0.5">
+                            <TrendingUp className="w-2.5 h-2.5" />
+                            Strava
+                          </span>
+                        ) : (
+                          <Link href="/settings" className="text-[10px] text-silver-500 hover:text-white transition-colors flex items-center gap-0.5">
+                            <Target className="w-2.5 h-2.5" />
+                            Sync
+                          </Link>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+
                   {/* Urgence douce */}
                   {!featuredSession.is_participant && featuredSession.max_participants && (
                     <p className="mt-4 text-sm text-silver-500">
@@ -389,67 +432,16 @@ export default function DashboardPage() {
                 </>
               )}
             </div>
-
-            {/* Right — Level Card (30%) */}
-            <div className="flex-[3] flex items-start justify-end">
-              <div className="bg-dark-900/60 backdrop-blur-sm rounded-2xl p-5 w-full max-w-[220px] border border-white/5">
-                <div className="flex items-center gap-2 mb-4">
-                  <Trophy className="w-4 h-4 text-silver-500" />
-                  <span className="text-[11px] font-semibold text-silver-500 uppercase tracking-wider">Niveau</span>
-                </div>
-
-                <div className="flex items-center gap-4 mb-4">
-                  <div className="relative">
-                    <div className={`w-14 h-14 rounded-xl flex items-center justify-center text-2xl font-black text-white shadow-lg bg-gradient-to-br ${levelGradient}`}>
-                      {level}
-                    </div>
-                    {level >= 7 && (
-                      <div className="absolute -top-1 -right-1 w-5 h-5 bg-yellow-400 rounded-full flex items-center justify-center">
-                        <Zap className="w-2.5 h-2.5 text-yellow-900" />
-                      </div>
-                    )}
-                  </div>
-                  <div>
-                    <div className="text-base font-bold text-white">{levelName}</div>
-                    <div className="text-xs text-silver-500">
-                      {profile?.strava_connected ? (
-                        <span className="flex items-center gap-1 text-neon-400">
-                          <TrendingUp className="w-3 h-3" />
-                          Strava sync
-                        </span>
-                      ) : (
-                        <Link href="/settings" className="flex items-center gap-1 hover:text-white transition-colors">
-                          <Target className="w-3 h-3" />
-                          Connecter
-                        </Link>
-                      )}
-                    </div>
-                  </div>
-                </div>
-
-                <div className="h-1.5 bg-dark-600 rounded-full overflow-hidden">
-                  <div
-                    className="h-full bg-gradient-to-r from-pink-500 to-neon-500 rounded-full"
-                    style={{
-                      width: levelBarAnimated ? `${level >= 9 ? 100 : Math.min(95, level * 11)}%` : '0%',
-                      transition: 'width 1.1s ease-out 0.3s',
-                    }}
-                  />
-                </div>
-              </div>
-            </div>
           </div>
         </div>
       </section>
 
-      {/* Centered sections container */}
-      <div className="max-w-[1280px] mx-auto px-8 pb-24">
-
-        {/* ============================================ */}
-        {/* SECTION 2 — STAT BAR (Floating Solid Card) */}
-        {/* ============================================ */}
-        <section className="mb-14 -mt-8 relative z-20 section-reveal">
-          <div className="bg-white rounded-2xl px-10 py-7 flex flex-wrap items-center justify-center gap-x-14 gap-y-5 shadow-xl shadow-black/8 border border-silver-100">
+      {/* ============================================ */}
+      {/* SECTION 2 — STAT BAR (Floating Solid Card, Contained) */}
+      {/* ============================================ */}
+      <div className="relative z-20 -mt-10 mb-0 px-4 sm:px-8">
+        <section className="max-w-[900px] mx-auto section-reveal">
+          <div className="bg-white rounded-2xl px-7 sm:px-10 py-5 sm:py-6 flex flex-wrap items-center justify-center gap-x-10 gap-y-5 shadow-xl shadow-black/10 border border-silver-200">
             <div className="flex items-center gap-4">
               <div className="w-11 h-11 rounded-xl bg-pink-50 flex items-center justify-center">
                 <Route className="w-5 h-5 text-pink-500" />
@@ -491,6 +483,10 @@ export default function DashboardPage() {
             </div>
           </div>
         </section>
+      </div>
+
+      {/* Centered sections container */}
+      <div className="max-w-[1280px] mx-auto px-8 pb-24 pt-14">
 
         {/* ============================================ */}
         {/* SECTION 2.5 — ACTIVITÉ RÉCENTE (Personnalisation) */}
