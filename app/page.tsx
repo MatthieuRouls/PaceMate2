@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useRef, useCallback } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useAuth } from '@/components/providers/AuthProvider';
@@ -17,14 +17,17 @@ function MatchingMotif({
   className = '',
   animated = true,
   scale = 1,
-  glowIntensity = 'normal'
+  glowIntensity = 'normal',
+  delayedStart = false,
 }: {
   className?: string;
   animated?: boolean;
   scale?: number;
   glowIntensity?: 'subtle' | 'normal' | 'strong';
+  delayedStart?: boolean;
 }) {
   const glowOpacity = glowIntensity === 'subtle' ? 0.3 : glowIntensity === 'strong' ? 0.7 : 0.5;
+  const delayClass = delayedStart ? 'animation-delay-800' : '';
 
   return (
     <svg
@@ -57,7 +60,7 @@ function MatchingMotif({
         strokeWidth="2.5"
         fill="none"
         strokeLinecap="round"
-        className={animated ? 'animate-trajectory-draw' : ''}
+        className={animated ? `animate-trajectory-draw ${delayClass}` : ''}
       />
 
       {/* Trajectory 2 - Arc from top-right */}
@@ -67,7 +70,7 @@ function MatchingMotif({
         strokeWidth="2.5"
         fill="none"
         strokeLinecap="round"
-        className={animated ? 'animate-trajectory-draw-reverse' : ''}
+        className={animated ? `animate-trajectory-draw-reverse ${delayClass}` : ''}
       />
 
       {/* Match point with glow */}
@@ -78,14 +81,14 @@ function MatchingMotif({
         fill="#ec4899"
         filter="url(#matchGlow)"
         opacity={glowOpacity}
-        className={animated ? 'animate-match-pulse' : ''}
+        className={animated ? `animate-match-pulse-delayed ${delayClass}` : ''}
       />
       <circle
         cx="100"
         cy="60"
         r="4"
         fill="#ec4899"
-        className={animated ? 'animate-match-pulse' : ''}
+        className={animated ? `animate-match-pulse-delayed ${delayClass}` : ''}
       />
     </svg>
   );
@@ -150,10 +153,146 @@ function TrajectoryBackground({ className = '' }: { className?: string }) {
   );
 }
 
+// How It Works - Animated matching SVG
+function HowItWorksMatchSVG({ isVisible }: { isVisible: boolean }) {
+  return (
+    <svg viewBox="0 0 800 100" className="w-full h-24 mt-8">
+      <defs>
+        <linearGradient id="stepLine1" x1="0%" y1="0%" x2="100%" y2="0%">
+          <stop offset="0%" stopColor="#10b981" stopOpacity="0.3" />
+          <stop offset="100%" stopColor="#10b981" stopOpacity="0.8" />
+        </linearGradient>
+        <linearGradient id="stepLine2" x1="100%" y1="0%" x2="0%" y2="0%">
+          <stop offset="0%" stopColor="#14b8a6" stopOpacity="0.3" />
+          <stop offset="100%" stopColor="#14b8a6" stopOpacity="0.8" />
+        </linearGradient>
+        <filter id="matchGlowLarge" x="-100%" y="-100%" width="300%" height="300%">
+          <feGaussianBlur stdDeviation="6" result="blur" />
+          <feMerge>
+            <feMergeNode in="blur" />
+            <feMergeNode in="SourceGraphic" />
+          </feMerge>
+        </filter>
+      </defs>
+
+      {/* Step 1 indicator */}
+      <circle
+        cx="130"
+        cy="50"
+        r="8"
+        fill="#10b981"
+        className={`transition-all duration-700 ${isVisible ? 'opacity-100' : 'opacity-0'}`}
+        style={{ transitionDelay: '0.2s' }}
+      />
+
+      {/* Trajectory from Step 1 to center */}
+      <path
+        d="M 145 50 Q 270 30, 400 50"
+        stroke="url(#stepLine1)"
+        strokeWidth="3"
+        fill="none"
+        strokeLinecap="round"
+        className={`transition-all duration-1000 ${isVisible ? 'stroke-dashoffset-0' : ''}`}
+        style={{
+          strokeDasharray: 300,
+          strokeDashoffset: isVisible ? 0 : 300,
+          transitionDelay: '0.4s',
+          transitionTimingFunction: 'cubic-bezier(0.22, 1, 0.36, 1)'
+        }}
+      />
+
+      {/* Step 3 indicator */}
+      <circle
+        cx="670"
+        cy="50"
+        r="8"
+        fill="#14b8a6"
+        className={`transition-all duration-700 ${isVisible ? 'opacity-100' : 'opacity-0'}`}
+        style={{ transitionDelay: '0.3s' }}
+      />
+
+      {/* Trajectory from Step 3 to center */}
+      <path
+        d="M 655 50 Q 530 30, 400 50"
+        stroke="url(#stepLine2)"
+        strokeWidth="3"
+        fill="none"
+        strokeLinecap="round"
+        className={`transition-all duration-1000`}
+        style={{
+          strokeDasharray: 300,
+          strokeDashoffset: isVisible ? 0 : -300,
+          transitionDelay: '0.5s',
+          transitionTimingFunction: 'cubic-bezier(0.22, 1, 0.36, 1)'
+        }}
+      />
+
+      {/* Match point at center (Step 2) */}
+      <circle
+        cx="400"
+        cy="50"
+        r="16"
+        fill="#ec4899"
+        filter="url(#matchGlowLarge)"
+        className={`transition-all duration-500 ${isVisible ? 'opacity-60 scale-100' : 'opacity-0 scale-0'}`}
+        style={{
+          transitionDelay: '1s',
+          transformOrigin: '400px 50px',
+          transitionTimingFunction: 'cubic-bezier(0.22, 1, 0.36, 1)'
+        }}
+      />
+      <circle
+        cx="400"
+        cy="50"
+        r="10"
+        fill="#ec4899"
+        className={`transition-all duration-500 ${isVisible ? 'opacity-100 scale-100' : 'opacity-0 scale-0'} ${isVisible ? 'animate-match-pulse' : ''}`}
+        style={{
+          transitionDelay: '1.1s',
+          transformOrigin: '400px 50px',
+          transitionTimingFunction: 'cubic-bezier(0.22, 1, 0.36, 1)'
+        }}
+      />
+    </svg>
+  );
+}
+
 export default function Home() {
   const { profile } = useAuth();
   const [isVisible, setIsVisible] = useState<Record<string, boolean>>({});
+  const [heroLoaded, setHeroLoaded] = useState(false);
+  const [scrollY, setScrollY] = useState(0);
+  const [testimonialOffset, setTestimonialOffset] = useState(0);
   const sectionRefs = useRef<Record<string, HTMLElement | null>>({});
+  const heroRef = useRef<HTMLElement | null>(null);
+  const testimonialsRef = useRef<HTMLElement | null>(null);
+
+  // Hero load animation
+  useEffect(() => {
+    const timer = setTimeout(() => setHeroLoaded(true), 100);
+    return () => clearTimeout(timer);
+  }, []);
+
+  // Scroll handler for hero fade and parallax
+  const handleScroll = useCallback(() => {
+    const currentScrollY = window.scrollY;
+    setScrollY(currentScrollY);
+
+    // Testimonials parallax
+    if (testimonialsRef.current) {
+      const rect = testimonialsRef.current.getBoundingClientRect();
+      const viewportHeight = window.innerHeight;
+      if (rect.top < viewportHeight && rect.bottom > 0) {
+        const progress = (viewportHeight - rect.top) / (viewportHeight + rect.height);
+        setTestimonialOffset((progress - 0.5) * 80); // ±40px
+      }
+    }
+  }, []);
+
+  useEffect(() => {
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [handleScroll]);
 
   // Scroll reveal observer
   useEffect(() => {
@@ -178,6 +317,11 @@ export default function Home() {
   const setRef = (id: string) => (el: HTMLElement | null) => {
     sectionRefs.current[id] = el;
   };
+
+  // Calculate hero fade based on scroll
+  const heroOpacity = Math.max(0, 1 - scrollY / 600);
+  const heroBlur = Math.min(6, scrollY / 100);
+  const heroScale = 1 + Math.min(0.08, scrollY / 5000);
 
   // Stats placeholders (en prod, viendraient de l'API)
   const stats = {
@@ -209,61 +353,199 @@ export default function Home() {
     },
   ];
 
+  // Avatar gradients for trust section
+  const avatarGradients = [
+    'from-pink-400 to-purple-500',
+    'from-neon-400 to-teal-500',
+    'from-orange-400 to-red-500',
+    'from-blue-400 to-indigo-500',
+    'from-yellow-400 to-orange-500',
+  ];
+
   return (
     <div className="min-h-screen bg-white overflow-x-hidden">
       {/* ============================================ */}
       {/* GLOBAL STYLES & ANIMATIONS */}
       {/* ============================================ */}
       <style jsx global>{`
+        /* Easing global */
+        :root {
+          --ease-out-expo: cubic-bezier(0.22, 1, 0.36, 1);
+        }
+
+        /* Animation delays */
+        .animation-delay-200 { animation-delay: 0.2s; }
+        .animation-delay-400 { animation-delay: 0.4s; }
+        .animation-delay-600 { animation-delay: 0.6s; }
+        .animation-delay-800 { animation-delay: 0.8s; }
+        .animation-delay-1000 { animation-delay: 1s; }
+
+        /* Trajectory draw animations */
         @keyframes trajectoryDraw {
           0% { stroke-dashoffset: 150; opacity: 0; }
-          50% { opacity: 1; }
+          30% { opacity: 1; }
           100% { stroke-dashoffset: 0; opacity: 1; }
         }
         @keyframes trajectoryDrawReverse {
           0% { stroke-dashoffset: -150; opacity: 0; }
-          50% { opacity: 1; }
+          30% { opacity: 1; }
           100% { stroke-dashoffset: 0; opacity: 1; }
-        }
-        @keyframes matchPulse {
-          0%, 100% { transform: scale(1); opacity: 0.8; }
-          50% { transform: scale(1.3); opacity: 1; }
-        }
-        @keyframes fadeInUp {
-          from { opacity: 0; transform: translateY(24px); }
-          to { opacity: 1; transform: translateY(0); }
-        }
-        @keyframes gentleFloat {
-          0%, 100% { transform: translateY(0); }
-          50% { transform: translateY(-8px); }
         }
         .animate-trajectory-draw {
           stroke-dasharray: 150;
-          animation: trajectoryDraw 1.5s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+          animation: trajectoryDraw 1.4s var(--ease-out-expo) forwards;
         }
         .animate-trajectory-draw-reverse {
           stroke-dasharray: 150;
-          animation: trajectoryDrawReverse 1.5s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+          animation: trajectoryDrawReverse 1.4s var(--ease-out-expo) forwards;
+        }
+
+        /* Match pulse animations */
+        @keyframes matchPulse {
+          0%, 100% { transform: scale(1); opacity: 0.8; }
+          50% { transform: scale(1.25); opacity: 1; }
+        }
+        @keyframes matchPulseDelayed {
+          0%, 60% { transform: scale(0); opacity: 0; }
+          70% { transform: scale(1.3); opacity: 1; }
+          100% { transform: scale(1); opacity: 0.9; }
         }
         .animate-match-pulse {
           transform-origin: center;
           animation: matchPulse 2.4s ease-in-out infinite;
         }
+        .animate-match-pulse-delayed {
+          transform-origin: center;
+          animation: matchPulseDelayed 1.6s var(--ease-out-expo) forwards, matchPulse 2.4s ease-in-out 1.6s infinite;
+        }
+
+        /* Fade animations */
+        @keyframes fadeInUp {
+          from { opacity: 0; transform: translateY(28px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes fadeInLeft {
+          from { opacity: 0; transform: translateX(-40px); }
+          to { opacity: 1; transform: translateX(0); }
+        }
+        @keyframes fadeInRight {
+          from { opacity: 0; transform: translateX(40px); }
+          to { opacity: 1; transform: translateX(0); }
+        }
+        @keyframes scaleIn {
+          from { opacity: 0; transform: scale(0.95) translateY(20px); }
+          to { opacity: 1; transform: scale(1) translateY(0); }
+        }
         .animate-fade-in-up {
-          animation: fadeInUp 0.6s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+          animation: fadeInUp 0.7s var(--ease-out-expo) forwards;
+        }
+        .animate-fade-in-left {
+          animation: fadeInLeft 0.7s var(--ease-out-expo) forwards;
+        }
+        .animate-fade-in-right {
+          animation: fadeInRight 0.7s var(--ease-out-expo) forwards;
+        }
+        .animate-scale-in {
+          animation: scaleIn 0.6s var(--ease-out-expo) forwards;
+        }
+
+        /* Float animation */
+        @keyframes gentleFloat {
+          0%, 100% { transform: translateY(0); }
+          50% { transform: translateY(-8px); }
         }
         .animate-gentle-float {
           animation: gentleFloat 4s ease-in-out infinite;
         }
+
+        /* Hero background scale */
+        @keyframes heroZoom {
+          from { transform: scale(1); }
+          to { transform: scale(1.08); }
+        }
+        .animate-hero-zoom {
+          animation: heroZoom 20s ease-out forwards;
+        }
+
+        /* Section reveal */
         .section-reveal {
           opacity: 0;
-          transform: translateY(32px);
-          transition: opacity 0.7s cubic-bezier(0.22, 1, 0.36, 1), transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+          transform: translateY(40px);
+          transition: opacity 0.7s var(--ease-out-expo), transform 0.7s var(--ease-out-expo);
         }
         .section-reveal.visible {
           opacity: 1;
           transform: translateY(0);
         }
+
+        /* Stagger children */
+        .stagger-children > * {
+          opacity: 0;
+          transform: translateY(20px);
+          transition: opacity 0.5s var(--ease-out-expo), transform 0.5s var(--ease-out-expo);
+        }
+        .stagger-children.visible > *:nth-child(1) { transition-delay: 0.05s; opacity: 1; transform: translateY(0); }
+        .stagger-children.visible > *:nth-child(2) { transition-delay: 0.1s; opacity: 1; transform: translateY(0); }
+        .stagger-children.visible > *:nth-child(3) { transition-delay: 0.15s; opacity: 1; transform: translateY(0); }
+        .stagger-children.visible > *:nth-child(4) { transition-delay: 0.2s; opacity: 1; transform: translateY(0); }
+        .stagger-children.visible > *:nth-child(5) { transition-delay: 0.25s; opacity: 1; transform: translateY(0); }
+
+        /* Avatar cascade */
+        .avatar-cascade > * {
+          opacity: 0;
+          transform: translateY(20px) scale(0.8);
+          transition: opacity 0.4s var(--ease-out-expo), transform 0.4s var(--ease-out-expo);
+        }
+        .avatar-cascade.visible > *:nth-child(1) { transition-delay: 0.06s; opacity: 1; transform: translateY(0) scale(1); }
+        .avatar-cascade.visible > *:nth-child(2) { transition-delay: 0.12s; opacity: 1; transform: translateY(0) scale(1); }
+        .avatar-cascade.visible > *:nth-child(3) { transition-delay: 0.18s; opacity: 1; transform: translateY(0) scale(1); }
+        .avatar-cascade.visible > *:nth-child(4) { transition-delay: 0.24s; opacity: 1; transform: translateY(0) scale(1); }
+        .avatar-cascade.visible > *:nth-child(5) { transition-delay: 0.30s; opacity: 1; transform: translateY(0) scale(1); }
+
+        /* Benefits cards float */
+        .benefit-card {
+          opacity: 0;
+          transform: translateY(40px) scale(0.96);
+          transition: opacity 0.6s var(--ease-out-expo), transform 0.6s var(--ease-out-expo), box-shadow 0.3s ease;
+        }
+        .benefits-visible .benefit-card:nth-child(1) { transition-delay: 0.1s; opacity: 1; transform: translateY(0) scale(1); }
+        .benefits-visible .benefit-card:nth-child(2) { transition-delay: 0.2s; opacity: 1; transform: translateY(0) scale(1); }
+        .benefits-visible .benefit-card:nth-child(3) { transition-delay: 0.3s; opacity: 1; transform: translateY(0) scale(1); }
+
+        /* Product lateral reveal */
+        .product-text {
+          opacity: 0;
+          transform: translateX(-40px);
+          transition: opacity 0.7s var(--ease-out-expo), transform 0.7s var(--ease-out-expo);
+        }
+        .product-visible .product-text {
+          opacity: 1;
+          transform: translateX(0);
+        }
+        .product-screenshot {
+          opacity: 0;
+          transform: translateX(40px);
+          transition: opacity 0.7s var(--ease-out-expo), transform 0.7s var(--ease-out-expo);
+          transition-delay: 0.15s;
+        }
+        .product-visible .product-screenshot {
+          opacity: 1;
+          transform: translateX(0);
+        }
+
+        /* Final CTA climax */
+        .cta-climax {
+          opacity: 0;
+          transform: scale(0.95);
+          transition: opacity 0.6s var(--ease-out-expo), transform 0.6s var(--ease-out-expo);
+          transition-delay: 0.5s;
+        }
+        .cta-visible .cta-climax {
+          opacity: 1;
+          transform: scale(1);
+        }
+
+        /* Hover trajectory underline */
         .hover-trajectory {
           position: relative;
           overflow: hidden;
@@ -276,7 +558,7 @@ export default function Home() {
           width: 0;
           height: 2px;
           background: linear-gradient(90deg, transparent, #ec4899, transparent);
-          transition: width 0.3s cubic-bezier(0.22, 1, 0.36, 1), left 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+          transition: width 0.3s var(--ease-out-expo), left 0.3s var(--ease-out-expo);
         }
         .hover-trajectory:hover::before {
           width: 100%;
@@ -285,33 +567,50 @@ export default function Home() {
       `}</style>
 
       {/* ============================================ */}
-      {/* SECTION 1 — HERO MATCHING (FULL-BLEED) */}
+      {/* SECTION 1 — HERO MATCHING (FULL-BLEED, ~110vh) */}
       {/* ============================================ */}
-      <section className="relative min-h-screen w-full pt-20 flex items-center justify-center overflow-hidden">
-        {/* Background Image */}
-        <div className="absolute inset-0 z-0">
-          <Image
-            src="/Accueil.jpeg"
-            alt="Runners finding their pace"
-            fill
-            priority
-            className="object-cover"
-            quality={100}
-          />
+      <section
+        ref={heroRef as any}
+        className="relative w-full pt-20 flex items-center justify-center overflow-hidden"
+        style={{ minHeight: '110vh' }}
+      >
+        {/* Background Image with zoom and scroll fade */}
+        <div
+          className="absolute inset-0 z-0"
+          style={{
+            opacity: heroOpacity,
+            filter: `blur(${heroBlur}px)`,
+            transform: `translateY(${scrollY * 0.15}px)`,
+            transition: 'filter 0.1s ease-out',
+          }}
+        >
+          <div className={`absolute inset-0 ${heroLoaded ? 'animate-hero-zoom' : ''}`}>
+            <Image
+              src="/Accueil.jpeg"
+              alt="Runners finding their pace"
+              fill
+              priority
+              className="object-cover"
+              quality={100}
+            />
+          </div>
           {/* Gradient overlay - dark for contrast */}
           <div
             className="absolute inset-0"
             style={{
-              background: 'linear-gradient(180deg, rgba(8,12,10,0.65) 0%, rgba(8,12,10,0.8) 100%)',
+              background: 'linear-gradient(180deg, rgba(8,12,10,0.6) 0%, rgba(8,12,10,0.8) 100%)',
             }}
           />
         </div>
 
         {/* Matching Motif - Large, centered above text */}
-        <div className="absolute top-32 left-1/2 -translate-x-1/2 z-10">
+        <div
+          className={`absolute top-32 left-1/2 -translate-x-1/2 z-10 transition-all duration-1000 ${heroLoaded ? 'opacity-90' : 'opacity-0'}`}
+          style={{ transitionDelay: '0.3s' }}
+        >
           <MatchingMotif
-            className="w-[280px] md:w-[360px] h-auto opacity-90"
-            animated={true}
+            className="w-[280px] md:w-[360px] h-auto"
+            animated={heroLoaded}
             scale={1}
             glowIntensity="strong"
           />
@@ -322,8 +621,17 @@ export default function Home() {
         <div className="absolute bottom-1/4 left-1/4 w-[300px] h-[300px] bg-neon-500/10 rounded-full blur-3xl" />
 
         {/* Hero Content */}
-        <div className="relative z-20 text-center px-6 max-w-4xl mx-auto">
-          <h1 className="mb-6 animate-fade-in-up" style={{ animationDelay: '0.2s', animationFillMode: 'backwards' }}>
+        <div
+          className="relative z-20 text-center px-6 max-w-4xl mx-auto"
+          style={{
+            opacity: heroOpacity,
+            transform: `translateY(${scrollY * 0.1}px)`,
+          }}
+        >
+          <h1
+            className={`mb-6 ${heroLoaded ? 'animate-fade-in-up' : 'opacity-0'}`}
+            style={{ animationDelay: '0.5s', animationFillMode: 'backwards' }}
+          >
             <span className="block text-5xl md:text-7xl lg:text-8xl font-black text-white leading-tight">
               Find your <span className="text-neon-400">pace</span>.
             </span>
@@ -333,16 +641,16 @@ export default function Home() {
           </h1>
 
           <p
-            className="text-lg md:text-xl lg:text-2xl text-silver-300 mb-10 max-w-2xl mx-auto font-light animate-fade-in-up"
-            style={{ animationDelay: '0.4s', animationFillMode: 'backwards' }}
+            className={`text-lg md:text-xl lg:text-2xl text-silver-300 mb-10 max-w-2xl mx-auto font-light ${heroLoaded ? 'animate-fade-in-up' : 'opacity-0'}`}
+            style={{ animationDelay: '0.7s', animationFillMode: 'backwards' }}
           >
             PaceMate connecte les coureurs compatibles près de toi, au bon rythme.
           </p>
 
           {/* CTAs */}
           <div
-            className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-10 animate-fade-in-up"
-            style={{ animationDelay: '0.6s', animationFillMode: 'backwards' }}
+            className={`flex flex-col sm:flex-row items-center justify-center gap-4 mb-10 ${heroLoaded ? 'animate-fade-in-up' : 'opacity-0'}`}
+            style={{ animationDelay: '0.9s', animationFillMode: 'backwards' }}
           >
             <Link
               href="/auth/signup"
@@ -360,8 +668,8 @@ export default function Home() {
 
           {/* Micro-crédibilité */}
           <div
-            className="flex flex-wrap items-center justify-center gap-6 text-sm text-silver-400 animate-fade-in-up"
-            style={{ animationDelay: '0.8s', animationFillMode: 'backwards' }}
+            className={`flex flex-wrap items-center justify-center gap-6 text-sm text-silver-400 ${heroLoaded ? 'animate-fade-in-up' : 'opacity-0'}`}
+            style={{ animationDelay: '1.1s', animationFillMode: 'backwards' }}
           >
             <span className="flex items-center gap-2">
               <span className="w-2 h-2 rounded-full bg-neon-500 animate-pulse" />
@@ -375,7 +683,13 @@ export default function Home() {
         </div>
 
         {/* Scroll indicator */}
-        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-20 animate-gentle-float">
+        <div
+          className={`absolute bottom-8 left-1/2 -translate-x-1/2 z-20 ${heroLoaded ? 'animate-gentle-float' : 'opacity-0'}`}
+          style={{
+            opacity: heroOpacity,
+            transitionDelay: '1.4s',
+          }}
+        >
           <div className="flex flex-col items-center gap-2 text-white/60">
             <span className="text-xs font-medium tracking-widest uppercase">Découvrir</span>
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -386,20 +700,19 @@ export default function Home() {
       </section>
 
       {/* ============================================ */}
-      {/* SECTION 2 — TRUST BAR */}
+      {/* SECTION 2 — TRUST BAR (~20vh) */}
       {/* ============================================ */}
-      <section className="py-6 px-4 bg-dark-800 border-y border-dark-700">
-        <div className="max-w-5xl mx-auto flex flex-wrap items-center justify-center gap-8">
-          {/* Avatars empilés */}
+      <section
+        id="trust"
+        ref={setRef('trust')}
+        className="py-10 px-4 bg-dark-800 border-y border-dark-700 flex items-center"
+        style={{ minHeight: '20vh' }}
+      >
+        <div className={`max-w-5xl mx-auto flex flex-wrap items-center justify-center gap-8 ${isVisible['trust'] ? 'visible' : ''}`}>
+          {/* Avatars empilés avec cascade */}
           <div className="flex items-center gap-3">
-            <div className="flex -space-x-3">
-              {[
-                'from-pink-400 to-purple-500',
-                'from-neon-400 to-teal-500',
-                'from-orange-400 to-red-500',
-                'from-blue-400 to-indigo-500',
-                'from-yellow-400 to-orange-500',
-              ].map((gradient, i) => (
+            <div className={`flex -space-x-3 avatar-cascade ${isVisible['trust'] ? 'visible' : ''}`}>
+              {avatarGradients.map((gradient, i) => (
                 <div
                   key={i}
                   className={`w-10 h-10 rounded-full bg-gradient-to-br ${gradient} border-2 border-dark-800 flex items-center justify-center text-xs font-bold text-white`}
@@ -408,20 +721,29 @@ export default function Home() {
                 </div>
               ))}
             </div>
-            <span className="text-silver-300 text-sm font-medium">
+            <span
+              className={`text-silver-300 text-sm font-medium transition-all duration-500 ${isVisible['trust'] ? 'opacity-100' : 'opacity-0'}`}
+              style={{ transitionDelay: '0.4s' }}
+            >
               Rejoint par <span className="text-white font-bold">+{stats.runners.toLocaleString()}</span> coureurs
             </span>
           </div>
 
           <div className="hidden md:block w-px h-8 bg-dark-600" />
 
-          <span className="text-silver-400 text-sm">
+          <span
+            className={`text-silver-400 text-sm transition-all duration-500 ${isVisible['trust'] ? 'opacity-100' : 'opacity-0'}`}
+            style={{ transitionDelay: '0.5s' }}
+          >
             Déjà actif dans <span className="text-neon-400 font-semibold">{stats.cities} villes</span>
           </span>
 
           <div className="hidden md:block w-px h-8 bg-dark-600" />
 
-          <span className="text-silver-400 text-sm flex items-center gap-2">
+          <span
+            className={`text-silver-400 text-sm flex items-center gap-2 transition-all duration-500 ${isVisible['trust'] ? 'opacity-100' : 'opacity-0'}`}
+            style={{ transitionDelay: '0.6s' }}
+          >
             <span className="w-2 h-2 rounded-full bg-pink-500 animate-pulse" />
             <span className="text-pink-400 font-semibold">{stats.matchesThisWeek}</span> matchs cette semaine
           </span>
@@ -429,19 +751,20 @@ export default function Home() {
       </section>
 
       {/* ============================================ */}
-      {/* SECTION 3 — PRODUIT EN ACTION */}
+      {/* SECTION 3 — PRODUIT EN ACTION (~100vh) */}
       {/* ============================================ */}
       <section
         id="product"
         ref={setRef('product')}
-        className={`py-24 px-4 sm:px-6 lg:px-8 bg-silver-50 relative section-reveal ${isVisible['product'] ? 'visible' : ''}`}
+        className={`px-4 sm:px-6 lg:px-8 bg-silver-50 relative flex items-center ${isVisible['product'] ? 'product-visible' : ''}`}
+        style={{ minHeight: '100vh', paddingTop: '8rem', paddingBottom: '8rem' }}
       >
         <TrajectoryBackground className="opacity-50" />
 
-        <div className="max-w-6xl mx-auto relative z-10">
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
+        <div className="max-w-6xl mx-auto relative z-10 w-full">
+          <div className="grid lg:grid-cols-2 gap-16 items-center">
             {/* Left - Copy */}
-            <div>
+            <div className="product-text">
               <span className="inline-flex items-center gap-2 text-xs font-semibold text-neon-700 uppercase tracking-wider mb-4">
                 <MiniMatchMotif className="w-12 h-8" />
                 Le concept
@@ -455,35 +778,25 @@ export default function Home() {
               </p>
 
               <div className="flex flex-col gap-4">
-                <div className="flex items-start gap-3">
-                  <div className="w-6 h-6 rounded-full bg-neon-100 flex items-center justify-center flex-shrink-0 mt-0.5">
-                    <svg className="w-3.5 h-3.5 text-neon-700" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                    </svg>
+                {[
+                  'Algo de matching par allure et disponibilités',
+                  'Sessions près de chez toi, créées par la communauté',
+                  'Synchronisation Strava pour un matching précis',
+                ].map((text, i) => (
+                  <div key={i} className="flex items-start gap-3">
+                    <div className="w-6 h-6 rounded-full bg-neon-100 flex items-center justify-center flex-shrink-0 mt-0.5">
+                      <svg className="w-3.5 h-3.5 text-neon-700" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                      </svg>
+                    </div>
+                    <p className="text-dark-600">{text}</p>
                   </div>
-                  <p className="text-dark-600">Algo de matching par allure et disponibilités</p>
-                </div>
-                <div className="flex items-start gap-3">
-                  <div className="w-6 h-6 rounded-full bg-neon-100 flex items-center justify-center flex-shrink-0 mt-0.5">
-                    <svg className="w-3.5 h-3.5 text-neon-700" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                    </svg>
-                  </div>
-                  <p className="text-dark-600">Sessions près de chez toi, créées par la communauté</p>
-                </div>
-                <div className="flex items-start gap-3">
-                  <div className="w-6 h-6 rounded-full bg-neon-100 flex items-center justify-center flex-shrink-0 mt-0.5">
-                    <svg className="w-3.5 h-3.5 text-neon-700" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                    </svg>
-                  </div>
-                  <p className="text-dark-600">Synchronisation Strava pour un matching précis</p>
-                </div>
+                ))}
               </div>
             </div>
 
             {/* Right - UI Screenshots mockup */}
-            <div className="relative">
+            <div className="relative product-screenshot">
               {/* Main screenshot card */}
               <div className="relative bg-white rounded-3xl shadow-2xl shadow-dark-800/10 p-2 border border-silver-200">
                 <div className="bg-gradient-to-br from-dark-800 to-dark-900 rounded-2xl p-6 aspect-[4/3] flex flex-col">
@@ -534,14 +847,15 @@ export default function Home() {
       </section>
 
       {/* ============================================ */}
-      {/* SECTION 4 — COMMENT ÇA MARCHE (MATCHING FLOW) */}
+      {/* SECTION 4 — COMMENT ÇA MARCHE (~110vh) */}
       {/* ============================================ */}
       <section
         id="how-it-works"
         ref={setRef('how-it-works')}
-        className={`py-24 px-4 sm:px-6 lg:px-8 bg-white relative section-reveal ${isVisible['how-it-works'] ? 'visible' : ''}`}
+        className={`px-4 sm:px-6 lg:px-8 bg-white relative flex flex-col items-center justify-center section-reveal ${isVisible['how-it-works'] ? 'visible' : ''}`}
+        style={{ minHeight: '110vh', paddingTop: '8rem', paddingBottom: '8rem' }}
       >
-        <div className="max-w-5xl mx-auto">
+        <div className="max-w-5xl mx-auto w-full">
           <div className="text-center mb-16">
             <span className="inline-flex items-center gap-2 text-xs font-semibold text-neon-700 uppercase tracking-wider mb-4">
               Simple comme 1-2-3
@@ -555,7 +869,7 @@ export default function Home() {
           </div>
 
           {/* Steps */}
-          <div className="grid md:grid-cols-3 gap-8">
+          <div className={`grid md:grid-cols-3 gap-8 stagger-children ${isVisible['how-it-works'] ? 'visible' : ''}`}>
             {/* Step 1 */}
             <div className="relative text-center group">
               <div className="relative inline-block mb-6">
@@ -608,37 +922,28 @@ export default function Home() {
             </div>
           </div>
 
-          {/* Connecting line visual */}
-          <div className="hidden md:block mt-8">
-            <svg className="w-full h-8" viewBox="0 0 800 30" preserveAspectRatio="none">
-              <path
-                d="M 100 15 Q 250 15, 400 15 T 700 15"
-                stroke="#10b981"
-                strokeWidth="2"
-                strokeDasharray="8 4"
-                fill="none"
-                opacity="0.3"
-              />
-              <circle cx="100" cy="15" r="4" fill="#10b981" opacity="0.5" />
-              <circle cx="400" cy="15" r="6" fill="#ec4899" />
-              <circle cx="700" cy="15" r="4" fill="#10b981" opacity="0.5" />
-            </svg>
+          {/* Animated matching visualization */}
+          <div className="hidden md:block">
+            <HowItWorksMatchSVG isVisible={isVisible['how-it-works']} />
           </div>
         </div>
       </section>
 
       {/* ============================================ */}
-      {/* SECTION 5 — 3 PILIERS (BÉNÉFICES) */}
+      {/* SECTION 5 — 3 PILIERS / BÉNÉFICES (~100vh) */}
       {/* ============================================ */}
       <section
         id="benefits"
         ref={setRef('benefits')}
-        className={`py-24 px-4 sm:px-6 lg:px-8 bg-silver-50 relative section-reveal ${isVisible['benefits'] ? 'visible' : ''}`}
+        className={`px-4 sm:px-6 lg:px-8 bg-silver-50 relative flex items-center ${isVisible['benefits'] ? 'benefits-visible' : ''}`}
+        style={{ minHeight: '100vh', paddingTop: '8rem', paddingBottom: '8rem' }}
       >
         <TrajectoryBackground className="opacity-30" />
 
-        <div className="max-w-5xl mx-auto relative z-10">
-          <div className="text-center mb-16">
+        <div className="max-w-5xl mx-auto relative z-10 w-full">
+          <div
+            className={`text-center mb-16 transition-all duration-700 ${isVisible['benefits'] ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}
+          >
             <h2 className="text-4xl md:text-5xl font-black text-dark-800 mb-4">
               Pourquoi <span className="text-pink-500">PaceMate</span> ?
             </h2>
@@ -649,7 +954,7 @@ export default function Home() {
 
           <div className="grid md:grid-cols-3 gap-8">
             {/* Pilier 1 */}
-            <div className="bg-white rounded-2xl p-8 border border-silver-200 hover:shadow-xl hover:border-neon-200 transition-all group">
+            <div className="benefit-card bg-white rounded-2xl p-8 border border-silver-200 hover:shadow-xl hover:border-neon-200 transition-all group">
               <div className="relative mb-6">
                 <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-neon-400 to-teal-500 flex items-center justify-center">
                   <svg className="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -667,7 +972,7 @@ export default function Home() {
             </div>
 
             {/* Pilier 2 */}
-            <div className="bg-white rounded-2xl p-8 border border-silver-200 hover:shadow-xl hover:border-pink-200 transition-all group">
+            <div className="benefit-card bg-white rounded-2xl p-8 border border-silver-200 hover:shadow-xl hover:border-pink-200 transition-all group">
               <div className="relative mb-6">
                 <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-pink-500 to-purple-600 flex items-center justify-center">
                   <svg className="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -686,7 +991,7 @@ export default function Home() {
             </div>
 
             {/* Pilier 3 */}
-            <div className="bg-white rounded-2xl p-8 border border-silver-200 hover:shadow-xl hover:border-neon-200 transition-all group">
+            <div className="benefit-card bg-white rounded-2xl p-8 border border-silver-200 hover:shadow-xl hover:border-neon-200 transition-all group">
               <div className="relative mb-6">
                 <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-orange-400 to-red-500 flex items-center justify-center">
                   <svg className="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -707,14 +1012,18 @@ export default function Home() {
       </section>
 
       {/* ============================================ */}
-      {/* SECTION 6 — COMMUNITY / TESTIMONIALS */}
+      {/* SECTION 6 — COMMUNITY / TESTIMONIALS (~100vh) */}
       {/* ============================================ */}
       <section
         id="community"
-        ref={setRef('community')}
-        className={`py-24 px-4 sm:px-6 lg:px-8 bg-white relative section-reveal ${isVisible['community'] ? 'visible' : ''}`}
+        ref={(el) => {
+          setRef('community')(el);
+          testimonialsRef.current = el;
+        }}
+        className={`px-4 sm:px-6 lg:px-8 bg-white relative flex items-center section-reveal ${isVisible['community'] ? 'visible' : ''}`}
+        style={{ minHeight: '100vh', paddingTop: '8rem', paddingBottom: '8rem' }}
       >
-        <div className="max-w-5xl mx-auto">
+        <div className="max-w-5xl mx-auto w-full">
           <div className="text-center mb-16">
             <span className="inline-flex items-center gap-2 text-xs font-semibold text-pink-600 uppercase tracking-wider mb-4">
               <span className="w-2 h-2 rounded-full bg-pink-500 animate-pulse" />
@@ -725,12 +1034,15 @@ export default function Home() {
             </h2>
           </div>
 
-          {/* Testimonials grid */}
-          <div className="grid md:grid-cols-3 gap-6 mb-12">
+          {/* Testimonials grid with horizontal parallax */}
+          <div className="grid md:grid-cols-3 gap-6 mb-16">
             {testimonials.map((testimonial, i) => (
               <div
                 key={i}
-                className="bg-silver-50 rounded-2xl p-6 border border-silver-200 hover:shadow-lg transition-shadow"
+                className="bg-silver-50 rounded-2xl p-6 border border-silver-200 hover:shadow-lg transition-all duration-300"
+                style={{
+                  transform: `translateX(${i === 1 ? 0 : (i === 0 ? -testimonialOffset : testimonialOffset) * 0.5}px)`,
+                }}
               >
                 <div className="flex items-center gap-3 mb-4">
                   <div className={`w-12 h-12 rounded-full bg-gradient-to-br ${testimonial.avatar} flex items-center justify-center text-white font-bold`}>
@@ -767,21 +1079,28 @@ export default function Home() {
       </section>
 
       {/* ============================================ */}
-      {/* SECTION 7 — FINAL CTA (BLOC SIGNATURE) */}
+      {/* SECTION 7 — FINAL CTA / CLIMAX (~110vh) */}
       {/* ============================================ */}
       <section
         id="final-cta"
         ref={setRef('final-cta')}
-        className={`py-32 px-4 sm:px-6 lg:px-8 bg-dark-800 relative overflow-hidden section-reveal ${isVisible['final-cta'] ? 'visible' : ''}`}
+        className={`px-4 sm:px-6 lg:px-8 bg-dark-800 relative overflow-hidden flex items-center justify-center ${isVisible['final-cta'] ? 'cta-visible' : ''}`}
+        style={{ minHeight: '110vh' }}
       >
-        {/* Large matching motif background */}
+        {/* Large matching motif background - animated on reveal */}
         <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-          <MatchingMotif
-            className="w-[600px] md:w-[900px] h-auto opacity-20"
-            animated={false}
-            scale={1.5}
-            glowIntensity="subtle"
-          />
+          <div
+            className={`transition-all duration-1000 ${isVisible['final-cta'] ? 'opacity-25 scale-100' : 'opacity-0 scale-75'}`}
+            style={{ transitionDelay: '0.2s' }}
+          >
+            <MatchingMotif
+              className="w-[600px] md:w-[900px] h-auto"
+              animated={isVisible['final-cta']}
+              scale={1.5}
+              glowIntensity="normal"
+              delayedStart={true}
+            />
+          </div>
         </div>
 
         {/* Glow effects */}
@@ -790,32 +1109,46 @@ export default function Home() {
 
         <div className="max-w-3xl mx-auto text-center relative z-10">
           {/* Match point pulse */}
-          <div className="inline-flex items-center justify-center mb-8">
+          <div
+            className={`inline-flex items-center justify-center mb-8 transition-all duration-500 ${isVisible['final-cta'] ? 'opacity-100 scale-100' : 'opacity-0 scale-0'}`}
+            style={{ transitionDelay: '0.3s' }}
+          >
             <div className="relative">
               <div className="w-4 h-4 rounded-full bg-pink-500 animate-match-pulse" />
               <div className="absolute inset-0 w-4 h-4 rounded-full bg-pink-500/50 animate-ping" />
             </div>
           </div>
 
-          <h2 className="text-4xl md:text-6xl font-black text-white mb-6 leading-tight">
+          <h2
+            className={`text-4xl md:text-6xl font-black text-white mb-6 leading-tight transition-all duration-700 ${isVisible['final-cta'] ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}
+            style={{ transitionDelay: '0.4s' }}
+          >
             Ton prochain run<br />
             <span className="text-pink-500">t'attend déjà</span>.
           </h2>
-          <p className="text-xl text-silver-300 mb-10 max-w-xl mx-auto">
+          <p
+            className={`text-xl text-silver-300 mb-10 max-w-xl mx-auto transition-all duration-700 ${isVisible['final-cta'] ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}
+            style={{ transitionDelay: '0.5s' }}
+          >
             Rejoins la communauté PaceMate et trouve ton <span className="text-neon-400">pace</span>. Trouve ton <span className="text-pink-400">mate</span>.
           </p>
 
-          <Link
-            href="/auth/signup"
-            className="inline-flex items-center gap-3 px-10 py-5 bg-pink-500 hover:bg-pink-600 text-white font-bold text-xl rounded-2xl transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-pink-500/25"
-          >
-            Créer mon compte
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
-            </svg>
-          </Link>
+          <div className="cta-climax">
+            <Link
+              href="/auth/signup"
+              className="inline-flex items-center gap-3 px-10 py-5 bg-pink-500 hover:bg-pink-600 text-white font-bold text-xl rounded-2xl transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-pink-500/25"
+            >
+              Créer mon compte
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+              </svg>
+            </Link>
+          </div>
 
-          <p className="text-silver-500 text-sm mt-6">
+          <p
+            className={`text-silver-500 text-sm mt-6 transition-all duration-700 ${isVisible['final-cta'] ? 'opacity-100' : 'opacity-0'}`}
+            style={{ transitionDelay: '0.8s' }}
+          >
             Gratuit. Sans engagement. Prêt en 30 secondes.
           </p>
         </div>
