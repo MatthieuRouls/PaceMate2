@@ -289,12 +289,17 @@ export default function TeamsPage() {
     <>
       {/* Global styles for animations */}
       <style jsx global>{`
-        /* Section reveal animation */
+        /* Section reveal - visible by default, animate on scroll */
         .section-reveal {
-          opacity: 0;
-          transform: translateY(40px);
+          opacity: 1;
+          transform: translateY(0);
           transition: opacity 0.6s cubic-bezier(0.22, 1, 0.36, 1),
                       transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+
+        .section-reveal.animate-in {
+          opacity: 0;
+          transform: translateY(40px);
         }
 
         .section-reveal.revealed {
@@ -318,65 +323,60 @@ export default function TeamsPage() {
           }
         }
 
-        /* Staggered avatar reveal */
-        .avatar-stagger {
-          opacity: 0;
-          transform: translateY(20px) scale(0.9);
-          transition: opacity 0.4s cubic-bezier(0.22, 1, 0.36, 1),
-                      transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+        /* Brutalist team name */
+        .team-name-brutal {
+          font-size: clamp(3rem, 12vw, 7rem);
+          font-weight: 900;
+          text-transform: uppercase;
+          letter-spacing: -0.05em;
+          line-height: 0.85;
+          margin-left: -0.04em;
         }
 
-        .revealed .avatar-stagger {
+        /* Staggered avatar reveal - visible by default */
+        .avatar-stagger {
           opacity: 1;
           transform: translateY(0) scale(1);
-        }
-
-        .revealed .avatar-stagger:nth-child(1) { transition-delay: 0ms; }
-        .revealed .avatar-stagger:nth-child(2) { transition-delay: 50ms; }
-        .revealed .avatar-stagger:nth-child(3) { transition-delay: 100ms; }
-        .revealed .avatar-stagger:nth-child(4) { transition-delay: 150ms; }
-        .revealed .avatar-stagger:nth-child(5) { transition-delay: 200ms; }
-        .revealed .avatar-stagger:nth-child(6) { transition-delay: 250ms; }
-        .revealed .avatar-stagger:nth-child(7) { transition-delay: 300ms; }
-        .revealed .avatar-stagger:nth-child(8) { transition-delay: 350ms; }
-        .revealed .avatar-stagger:nth-child(9) { transition-delay: 400ms; }
-        .revealed .avatar-stagger:nth-child(10) { transition-delay: 450ms; }
-
-        /* Activity feed animation */
-        .activity-item {
-          opacity: 0;
-          transform: translateX(-20px);
           transition: opacity 0.4s cubic-bezier(0.22, 1, 0.36, 1),
                       transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
         }
 
-        .revealed .activity-item {
+        .avatar-stagger:nth-child(1) { transition-delay: 0ms; }
+        .avatar-stagger:nth-child(2) { transition-delay: 50ms; }
+        .avatar-stagger:nth-child(3) { transition-delay: 100ms; }
+        .avatar-stagger:nth-child(4) { transition-delay: 150ms; }
+        .avatar-stagger:nth-child(5) { transition-delay: 200ms; }
+        .avatar-stagger:nth-child(6) { transition-delay: 250ms; }
+        .avatar-stagger:nth-child(7) { transition-delay: 300ms; }
+        .avatar-stagger:nth-child(8) { transition-delay: 350ms; }
+        .avatar-stagger:nth-child(9) { transition-delay: 400ms; }
+        .avatar-stagger:nth-child(10) { transition-delay: 450ms; }
+
+        /* Activity feed animation - visible by default */
+        .activity-item {
           opacity: 1;
           transform: translateX(0);
+          transition: opacity 0.4s cubic-bezier(0.22, 1, 0.36, 1),
+                      transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
         }
 
-        .revealed .activity-item:nth-child(1) { transition-delay: 0ms; }
-        .revealed .activity-item:nth-child(2) { transition-delay: 80ms; }
-        .revealed .activity-item:nth-child(3) { transition-delay: 160ms; }
-        .revealed .activity-item:nth-child(4) { transition-delay: 240ms; }
-        .revealed .activity-item:nth-child(5) { transition-delay: 320ms; }
+        .activity-item:nth-child(1) { transition-delay: 0ms; }
+        .activity-item:nth-child(2) { transition-delay: 80ms; }
+        .activity-item:nth-child(3) { transition-delay: 160ms; }
+        .activity-item:nth-child(4) { transition-delay: 240ms; }
+        .activity-item:nth-child(5) { transition-delay: 320ms; }
 
-        /* Stats cards float animation */
+        /* Stats cards - visible by default */
         .stat-card {
-          opacity: 0;
-          transform: translateY(30px) scale(0.95);
+          opacity: 1;
+          transform: translateY(0) scale(1);
           transition: opacity 0.5s cubic-bezier(0.22, 1, 0.36, 1),
                       transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
         }
 
-        .revealed .stat-card {
-          opacity: 1;
-          transform: translateY(0) scale(1);
-        }
-
-        .revealed .stat-card:nth-child(1) { transition-delay: 0ms; }
-        .revealed .stat-card:nth-child(2) { transition-delay: 100ms; }
-        .revealed .stat-card:nth-child(3) { transition-delay: 200ms; }
+        .stat-card:nth-child(1) { transition-delay: 0ms; }
+        .stat-card:nth-child(2) { transition-delay: 100ms; }
+        .stat-card:nth-child(3) { transition-delay: 200ms; }
 
         .stat-card:hover {
           transform: translateY(-4px) scale(1.02);
@@ -451,38 +451,41 @@ export default function TeamsPage() {
                 {/* SECTION 1: HERO BANNER */}
                 <div
                   ref={heroRef}
-                  className="section-reveal hero-banner relative overflow-hidden"
-                  style={{ minHeight: '380px' }}
+                  className="hero-banner relative overflow-hidden"
+                  style={{ minHeight: '420px' }}
                 >
                   {/* Background with overlay */}
                   <div className="absolute inset-0">
                     {/* Placeholder gradient background (will be replaced with team photo) */}
-                    <div className="absolute inset-0 bg-gradient-to-br from-dark-800 via-neon-800 to-dark-900" />
-                    {/* Dark overlay for text readability */}
-                    <div className="absolute inset-0 bg-gradient-to-t from-dark-900/90 via-dark-900/50 to-transparent" />
-                    {/* Decorative running silhouettes */}
-                    <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-dark-900 to-transparent" />
+                    <div className="absolute inset-0 bg-gradient-to-br from-dark-800 via-dark-900 to-black" />
+                    {/* Subtle texture overlay */}
+                    <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_70%,rgba(185,255,102,0.08),transparent_50%)]" />
                   </div>
 
-                  {/* Content */}
-                  <div className="relative max-w-4xl mx-auto px-6 py-12 flex flex-col justify-end" style={{ minHeight: '380px' }}>
-                    {/* Team badge */}
-                    <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-white/10 backdrop-blur-sm rounded-full text-sm text-white/80 mb-4 w-fit">
-                      <Users className="w-4 h-4" />
-                      <span>{userTeam.members_count || 1} membre{(userTeam.members_count || 1) > 1 ? 's' : ''}</span>
-                      <span className="w-1 h-1 rounded-full bg-neon-500" />
-                      <span className="text-neon-400">Recrute</span>
-                    </div>
-
-                    {/* Team name */}
-                    <h1 className="text-4xl md:text-5xl font-black text-white mb-2">
+                  {/* Content - flush left */}
+                  <div className="relative w-full px-4 sm:px-6 lg:px-8 py-12 flex flex-col justify-end" style={{ minHeight: '420px' }}>
+                    {/* Team name - BRUTAL STYLE */}
+                    <h1 className="team-name-brutal text-white mb-4">
                       {userTeam.name}
                     </h1>
 
-                    {/* Team description/slogan */}
-                    <p className="text-lg text-white/70 mb-6 max-w-xl">
-                      {userTeam.description || 'On court ensemble, on progresse ensemble.'}
-                    </p>
+                    {/* Team info row */}
+                    <div className="flex flex-wrap items-center gap-4 mb-6">
+                      {/* Team badge */}
+                      <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-white/10 backdrop-blur-sm rounded-full text-sm text-white/80">
+                        <Users className="w-4 h-4" />
+                        <span>{userTeam.members_count || 1} membre{(userTeam.members_count || 1) > 1 ? 's' : ''}</span>
+                        <span className="w-1 h-1 rounded-full bg-neon-500" />
+                        <span className="text-neon-400">Recrute</span>
+                      </div>
+
+                      {/* Team description/slogan */}
+                      {userTeam.description && (
+                        <p className="text-white/50 text-sm max-w-md">
+                          {userTeam.description}
+                        </p>
+                      )}
+                    </div>
 
                     {/* Avatar stack + CTAs */}
                     <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
