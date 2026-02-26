@@ -110,17 +110,24 @@ export function removeFlag(userFlags: number, flag: number): number {
 
 /**
  * Types of safety events that can be logged
+ * Events used for trust score calculation are marked with [TRUST]
  */
 export type SafetyEventType =
-  | 'report'           // User was reported
-  | 'no_show'          // User didn't show up
-  | 'check_in_fail'    // Failed to check in
-  | 'suspension'       // User was suspended
-  | 'unsuspension'     // User was unsuspended
-  | 'verification'     // Verification status changed
-  | 'trust_change'     // Trust score/tier changed
-  | 'flag_added'       // Safety flag was added
-  | 'flag_removed';    // Safety flag was removed
+  // Trust-affecting events (used in recalculate)
+  | 'session_completed'   // [TRUST +1] User completed a session
+  | 'no_show'             // [TRUST -5] User didn't show up
+  | 'check_in_fail'       // [TRUST -10] Failed to check in
+  | 'report_confirmed'    // [TRUST -15] Report against user was confirmed
+  | 'report_rejected'     // Report against user was rejected (no penalty)
+  | 'account_warning'     // [TRUST -20] Official warning issued
+  // Non-trust events
+  | 'report'              // User was reported (pending investigation)
+  | 'suspension'          // User was suspended
+  | 'unsuspension'        // User was unsuspended
+  | 'verification'        // Verification status changed
+  | 'trust_change'        // Trust score/tier changed (logged after recalculate)
+  | 'flag_added'          // Safety flag was added
+  | 'flag_removed';       // Safety flag was removed
 
 /**
  * Severity levels for safety events
@@ -137,10 +144,12 @@ export interface SafetyEvent {
   user_id: string;
   type: SafetyEventType;
   severity: SafetyEventSeverity;
+  weight: number; // Trust score impact (positive or negative)
   description?: string;
   metadata?: Record<string, unknown>;
   created_by?: string; // Admin/system user who created the event
   created_at: string;
+  expires_at?: string; // When this event stops affecting trust score
 }
 
 /**
@@ -150,10 +159,28 @@ export interface CreateSafetyEventInput {
   user_id: string;
   type: SafetyEventType;
   severity: SafetyEventSeverity;
+  weight?: number; // Auto-calculated if not provided
   description?: string;
   metadata?: Record<string, unknown>;
   created_by?: string;
+  expires_at?: string; // Auto-set for negative events if not provided
 }
+
+/**
+ * Default weights for trust-affecting events
+ */
+export const EventWeights = {
+  session_completed: 1,    // +1 per completed session (capped at 30 total)
+  no_show: -5,             // -5 per no-show
+  check_in_fail: -10,      // -10 per failed check-in
+  report_confirmed: -15,   // -15 per confirmed report
+  account_warning: -20,    // -20 per official warning
+} as const;
+
+/**
+ * Expiration period for negative events (6 months in milliseconds)
+ */
+export const NEGATIVE_EVENT_EXPIRATION_MS = 6 * 30 * 24 * 60 * 60 * 1000;
 
 // ============================================
 // SESSION SAFETY SETTINGS

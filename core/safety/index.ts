@@ -58,6 +58,10 @@ export {
   // Validation result helpers
   validationSuccess,
   validationFailure,
+
+  // Event weights and expiration
+  EventWeights,
+  NEGATIVE_EVENT_EXPIRATION_MS,
 } from './types';
 
 // Safety Guard
@@ -67,12 +71,16 @@ export {
   resetSafetyGuard,
 } from './safety-guard';
 
-// Trust Engine (placeholder)
+// Trust Engine
 export {
   TrustEngine,
+  getTrustEngine,
+  resetTrustEngine,
   TrustScoreWeights,
   TrustTierThresholds,
 } from './trust-engine';
+
+export type { TrustCalculationResult } from './trust-engine';
 
 // Verification Service (placeholder)
 export {

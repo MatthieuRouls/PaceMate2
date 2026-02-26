@@ -217,6 +217,7 @@ export class ReportingService {
       user_id: input.user_id,
       type: input.type,
       severity: input.severity,
+      weight: input.weight ?? 0,
       description: input.description,
       metadata: input.metadata,
       created_by: input.created_by,
