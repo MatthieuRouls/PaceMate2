@@ -114,20 +114,22 @@ export function removeFlag(userFlags: number, flag: number): number {
  */
 export type SafetyEventType =
   // Trust-affecting events (used in recalculate)
-  | 'session_completed'   // [TRUST +1] User completed a session
-  | 'no_show'             // [TRUST -5] User didn't show up
-  | 'check_in_fail'       // [TRUST -10] Failed to check in
-  | 'report_confirmed'    // [TRUST -15] Report against user was confirmed
-  | 'report_rejected'     // Report against user was rejected (no penalty)
-  | 'account_warning'     // [TRUST -20] Official warning issued
+  | 'session_completed'       // [TRUST +1] User completed a session
+  | 'no_show'                 // [TRUST -5] User didn't show up
+  | 'check_in_fail'           // [TRUST -10] Failed to check in
+  | 'report_confirmed'        // [TRUST -15] Report against user was confirmed
+  | 'report_rejected'         // Report against user was rejected (no penalty)
+  | 'account_warning'         // [TRUST -20] Official warning issued
+  | 'verification_advanced'   // [TRUST +10] Advanced verification completed
   // Non-trust events
-  | 'report'              // User was reported (pending investigation)
-  | 'suspension'          // User was suspended
-  | 'unsuspension'        // User was unsuspended
-  | 'verification'        // Verification status changed
-  | 'trust_change'        // Trust score/tier changed (logged after recalculate)
-  | 'flag_added'          // Safety flag was added
-  | 'flag_removed';       // Safety flag was removed
+  | 'report'                  // User was reported (pending investigation)
+  | 'suspension'              // User was suspended
+  | 'unsuspension'            // User was unsuspended
+  | 'verification'            // Verification status changed (basic)
+  | 'verification_rejected'   // Verification attempt was rejected
+  | 'trust_change'            // Trust score/tier changed (logged after recalculate)
+  | 'flag_added'              // Safety flag was added
+  | 'flag_removed';           // Safety flag was removed
 
 /**
  * Severity levels for safety events
@@ -170,11 +172,12 @@ export interface CreateSafetyEventInput {
  * Default weights for trust-affecting events
  */
 export const EventWeights = {
-  session_completed: 1,    // +1 per completed session (capped at 30 total)
-  no_show: -5,             // -5 per no-show
-  check_in_fail: -10,      // -10 per failed check-in
-  report_confirmed: -15,   // -15 per confirmed report
-  account_warning: -20,    // -20 per official warning
+  session_completed: 1,       // +1 per completed session (capped at 30 total)
+  no_show: -5,                // -5 per no-show
+  check_in_fail: -10,         // -10 per failed check-in
+  report_confirmed: -15,      // -15 per confirmed report
+  account_warning: -20,       // -20 per official warning
+  verification_advanced: 10,  // +10 for advanced verification (one-time)
 } as const;
 
 /**

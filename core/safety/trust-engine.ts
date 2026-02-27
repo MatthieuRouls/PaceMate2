@@ -547,6 +547,8 @@ export class TrustEngine {
         return EventWeights.report_confirmed;
       case 'account_warning':
         return EventWeights.account_warning;
+      case 'verification_advanced':
+        return EventWeights.verification_advanced;
       default:
         return 0;
     }
@@ -558,6 +560,8 @@ export class TrustEngine {
   private getEventSeverity(type: SafetyEventType): 1 | 2 | 3 | 4 | 5 {
     switch (type) {
       case 'session_completed':
+        return 1;
+      case 'verification_advanced':
         return 1;
       case 'no_show':
         return 2;

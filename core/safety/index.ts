@@ -82,7 +82,7 @@ export {
 
 export type { TrustCalculationResult } from './trust-engine';
 
-// Verification Service (placeholder)
+// Verification Service (basic - placeholder)
 export {
   VerificationService,
   VerificationConfig,
@@ -91,6 +91,37 @@ export {
   type PhoneVerificationConfirmResult,
   type PhotoVerificationResult,
 } from './verification.service';
+
+// Advanced Verification Service
+export {
+  VerificationAdvancedService,
+  getVerificationAdvancedService,
+  resetVerificationAdvancedService,
+} from './verification-advanced.service';
+
+// Advanced Verification Types
+export type {
+  UserVerification,
+  VerificationLevelExtended,
+  VerificationStatus,
+  VerificationProvider,
+  VerificationMetadata,
+  StartVerificationInput,
+  StartVerificationResult,
+  SubmitVerificationInput,
+  VerificationProcessResult,
+  PublicVerificationStatus,
+  LivenessCheckResult,
+  FaceMatchResult,
+  AntiAbuseCheckResult,
+  EncryptedMedia,
+  VerificationErrorCodeType,
+} from './verification.types';
+
+export {
+  VerificationErrorCode,
+  VerificationThresholds,
+} from './verification.types';
 
 // Reporting Service (placeholder)
 export {
