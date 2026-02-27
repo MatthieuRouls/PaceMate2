@@ -132,3 +132,44 @@ export {
   type ReportResult,
   type Report,
 } from './reporting.service';
+
+// Live Run Safety Service
+export {
+  LiveRunService,
+  getLiveRunService,
+  resetLiveRunService,
+} from './live-run.service';
+
+// Live Run Types
+export type {
+  RunSession,
+  RunSessionStatus,
+  RunParticipant,
+  RunLocationPoint,
+  RecordLocationInput,
+  TrustedContact,
+  CreateTrustedContactInput,
+  UpdateTrustedContactInput,
+  EmergencyAlert,
+  EmergencyReason,
+  TriggerEmergencyInput,
+  EmergencyNotification,
+  AnomalyDetectionResult,
+  StartRunSessionInput,
+  StartRunSessionResult,
+  EndRunSessionInput,
+  EndRunSessionResult,
+  RunSessionStats,
+  GeoPoint,
+  SafetyMonitoringConfig,
+  PlannedRoute,
+  LiveTrackingMessage,
+  LiveTrackingEventType,
+  LiveRunErrorCodeType,
+} from './live-run.types';
+
+export {
+  LiveRunConfig,
+  LiveRunErrorCode,
+  DEFAULT_SAFETY_MONITORING,
+} from './live-run.types';
