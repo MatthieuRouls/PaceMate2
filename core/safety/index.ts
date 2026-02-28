@@ -173,3 +173,38 @@ export {
   LiveRunErrorCode,
   DEFAULT_SAFETY_MONITORING,
 } from './live-run.types';
+
+// Feedback Service
+export {
+  FeedbackService,
+  getFeedbackService,
+  resetFeedbackService,
+} from './feedback.service';
+
+// Feedback Types
+export type {
+  SafetyFeedback,
+  CreateFeedbackInput,
+  PublicFeedbackView,
+  FeedbackRating,
+  FeedbackFlag,
+  SilentReport,
+  CreateSilentReportInput,
+  UserModerationRecord,
+  ModerationQueueItem,
+  ModerationActionInput,
+  ModerationActionResult,
+  ModerationStatus,
+  TrustImpactResult,
+  TrustImpactAction,
+  AuditLogEntry,
+  AuditLogType,
+  FeedbackErrorCodeType,
+} from './feedback.types';
+
+export {
+  TrustImpactThresholds,
+  FeedbackErrorCode,
+  FeedbackConfig,
+  MODERATION_TRIGGER_FLAGS,
+} from './feedback.types';
