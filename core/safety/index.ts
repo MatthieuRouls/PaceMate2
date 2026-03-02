@@ -348,3 +348,57 @@ export {
   resetSafetyCronService,
   CronConfig,
 } from './safety-cron.service';
+
+// Identity Verification Service
+export {
+  IdentityVerificationService,
+  getIdentityVerificationService,
+  resetIdentityVerificationService,
+} from './identity-verification.service';
+
+// Identity Verification Types
+export type {
+  IdentityVerification,
+  VerificationLevelNumber,
+  VerificationLevelName,
+  IdDocumentType,
+  AdminReviewReason as IdentityAdminReviewReason,
+  LevelRequirementsCheck,
+  RequirementStatus,
+  StartVerificationInput as IdentityStartVerificationInput,
+  StartVerificationResult as IdentityStartVerificationResult,
+  VerificationStep as IdentityVerificationStep,
+  SubmitDocumentInput,
+  EncryptedDocument,
+  SubmitSelfieInput,
+  VerificationStepResult as IdentityVerificationStepResult,
+  AdminVerificationReview,
+  RiskIndicator as IdentityRiskIndicator,
+  AdminReviewAction as IdentityAdminReviewAction,
+  AdminReviewResult as IdentityAdminReviewResult,
+  SessionConstraintCheck,
+  SessionType,
+  RevalidationRequirement,
+  RevalidationReason,
+  RevalidationResult,
+  MultiAccountCheck,
+  SimilarAccountMatch,
+  MultiAccountFactor,
+  PublicVerificationStatus as IdentityPublicVerificationStatus,
+  VerificationBadge,
+  IdentityVerificationErrorCode,
+  EncryptionResult,
+} from './identity-verification.types';
+
+export {
+  VerificationLevelMap,
+  VerificationLevelRequirements,
+  VerificationThresholds as IdentityVerificationThresholds,
+  VerificationConfig as IdentityVerificationConfig,
+  SessionLevelRequirements,
+  PublicBadgeLabels,
+  IdentityVerificationErrorMessages,
+  encryptDocument,
+  decryptDocument,
+  createDefaultVerification,
+} from './identity-verification.types';
