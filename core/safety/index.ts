@@ -208,3 +208,36 @@ export {
   FeedbackConfig,
   MODERATION_TRIGGER_FLAGS,
 } from './feedback.types';
+
+// Reputation Service
+export {
+  ReputationService,
+  getReputationService,
+  resetReputationService,
+} from './reputation.service';
+
+// Reputation Types
+export type {
+  TrustProfile,
+  TrustStatus,
+  TrustIndicator,
+  TrustBadge,
+  PublicTrustProfile,
+  RecalculationTrigger,
+  RecalculationInput,
+  RecalculationResult,
+  ScoreBreakdown,
+  PublicTrustResponse,
+  AdminTrustResponse,
+  TrustHistoryEntry,
+  ReputationErrorCodeType,
+} from './reputation.types';
+
+export {
+  ScoreWeights,
+  StatusThresholds,
+  TimeDecayConfig,
+  ReputationConfig,
+  ReputationErrorCode,
+  DEFAULT_TRUST_PROFILE,
+} from './reputation.types';
