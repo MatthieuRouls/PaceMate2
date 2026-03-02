@@ -241,3 +241,40 @@ export {
   ReputationErrorCode,
   DEFAULT_TRUST_PROFILE,
 } from './reputation.types';
+
+// Matching & Risk Evaluation Service
+export {
+  RiskEvaluationService,
+  getRiskEvaluationService,
+  resetRiskEvaluationService,
+} from './matching.service';
+
+// Matching Types
+export type {
+  JoinRiskEvaluation,
+  JoinDecision,
+  RiskLevel,
+  ReviewTrigger,
+  RiskEvaluationInput,
+  RiskEvaluationResult,
+  PublicJoinResponse,
+  IncidentData,
+  SessionContext,
+  RiskBreakdown,
+  AdminEvaluationView,
+  InternalReviewRequest,
+  HighRiskAttemptLog,
+  MatchingErrorCode,
+} from './matching.types';
+
+export {
+  RiskThresholds,
+  RiskWeights,
+  IncidentWeights,
+  ContextualRiskFactors,
+  ReviewConfig,
+  NeutralMessages,
+  MatchingErrorMessages,
+  DEFAULT_INCIDENT_DATA,
+  DEFAULT_SESSION_CONTEXT,
+} from './matching.types';
