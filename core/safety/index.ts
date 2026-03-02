@@ -278,3 +278,73 @@ export {
   DEFAULT_INCIDENT_DATA,
   DEFAULT_SESSION_CONTEXT,
 } from './matching.types';
+
+// Safety State Service
+export {
+  SafetyStateService,
+  getSafetyStateService,
+  resetSafetyStateService,
+} from './safety-state.service';
+
+// Safety State Types
+export type {
+  SafetyState,
+  SafetyStateTransition,
+  SafetyStateHistory,
+  StateChangeReason,
+  UserSafetyProfile,
+  StateCapabilitySet,
+  SafeModeSettings,
+  SafeModeCustomFilter,
+  TransitionEvaluationInput,
+  TransitionEvaluationResult,
+  ApplyTransitionInput,
+  ApplyTransitionResult,
+  CronJobResult,
+  CronJobError,
+  CronJobSummary,
+  DailyEvaluationInput,
+  RecentFeedbackSummary,
+  RecentIncidentSummary,
+  RecentRiskSummary,
+  PublicUserSafetyStatus,
+  AdminSafetyView,
+  SafetyMetrics,
+  AdminRecommendation,
+  AdminTransitionInput,
+  SafetyStateErrorCode,
+} from './safety-state.types';
+
+export {
+  StateTransitionRules,
+  StateCapabilities,
+  DEFAULT_SAFE_MODE_SETTINGS,
+  SAFE_MODE_FILTERS,
+  SafetyStateMessages,
+  SafetyStateErrorMessages,
+  DEFAULT_USER_SAFETY_PROFILE,
+  createDefaultSafetyProfile,
+} from './safety-state.types';
+
+// Safe Mode Service
+export {
+  SafeModeService,
+  getSafeModeService,
+  resetSafeModeService,
+} from './safe-mode.service';
+
+export type {
+  SessionForFiltering,
+  UserForFiltering,
+  SafeModeFilterResult,
+  SessionFilterResult,
+  UserFilterResult,
+} from './safe-mode.service';
+
+// Safety Cron Service
+export {
+  SafetyCronService,
+  getSafetyCronService,
+  resetSafetyCronService,
+  CronConfig,
+} from './safety-cron.service';
