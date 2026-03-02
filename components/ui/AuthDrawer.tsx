@@ -59,8 +59,10 @@ export default function AuthDrawer({ isOpen, onClose, mode, onSwitchMode }: Auth
 
         if (result.success) {
           setError('');
-          alert('Compte cree ! Verifiez votre email pour confirmer votre inscription.');
           onClose();
+          // Rediriger vers le dashboard après inscription réussie
+          await new Promise(resolve => setTimeout(resolve, 500));
+          router.push('/dashboard');
         } else {
           setError(result.error || 'Erreur lors de l\'inscription');
         }

@@ -253,13 +253,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         };
       }
 
-      // Wait a bit for the profile trigger to create the profile
-      await new Promise(resolve => setTimeout(resolve, 500));
-
+      // Wait for the profile trigger to create the profile
+      // Then retry fetching the profile with increasing delays
       currentUserIdRef.current = data.user.id;
       setUser(data.user);
 
-      const userProfile = await fetchProfile(data.user.id);
+      // Essayer plusieurs fois de récupérer le profil (la création peut prendre du temps)
+      let userProfile = null;
+      for (let attempt = 0; attempt < 5; attempt++) {
+        await new Promise(resolve => setTimeout(resolve, 500 + (attempt * 300)));
+        userProfile = await fetchProfile(data.user.id);
+        if (userProfile) break;
+      }
+
       if (isMountedRef.current) {
         setProfile(userProfile);
         setLoading(false);
