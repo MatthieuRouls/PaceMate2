@@ -1290,24 +1290,16 @@ export async function deleteAccount(): Promise<{ success: boolean; error?: strin
     const user = await getCurrentUser();
     if (!user) return { success: false, error: 'Non authentifie' };
 
-    const supabase = await getServerSupabaseClient();
-
-    // 1. Supprimer le profil (les participations, messages, etc. seront supprimés en cascade)
-    const { error: profileError } = await supabase
-      .from('profiles')
-      .delete()
-      .eq('id', user.id);
-
-    if (profileError) {
-      console.error('Error deleting profile:', profileError);
-      return { success: false, error: 'Erreur lors de la suppression du profil' };
+    if (!process.env.SUPABASE_SERVICE_ROLE_KEY) {
+      console.error('SUPABASE_SERVICE_ROLE_KEY is not set');
+      return { success: false, error: 'Configuration serveur manquante' };
     }
 
-    // 2. Supprimer l'utilisateur auth via admin API
+    // 1. Supprimer l'utilisateur auth via admin API (cascade supprime le profil via trigger)
     const { createClient } = await import('@supabase/supabase-js');
     const adminClient = createClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.SUPABASE_SERVICE_ROLE_KEY!
+      process.env.SUPABASE_SERVICE_ROLE_KEY
     );
     const { error: authError } = await adminClient.auth.admin.deleteUser(user.id);
     if (authError) {
@@ -1318,7 +1310,7 @@ export async function deleteAccount(): Promise<{ success: boolean; error?: strin
     return { success: true };
   } catch (error) {
     console.error('Error in deleteAccount:', error);
-    return { success: false, error: 'Erreur inattendue' };
+    return { success: false, error: `Erreur inattendue: ${error instanceof Error ? error.message : String(error)}` };
   }
 }
 
