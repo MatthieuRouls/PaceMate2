@@ -1295,12 +1295,16 @@ export async function deleteAccount(): Promise<{ success: boolean; error?: strin
       return { success: false, error: 'Configuration serveur manquante' };
     }
 
-    // 1. Supprimer l'utilisateur auth via admin API (cascade supprime le profil via trigger)
     const { createClient } = await import('@supabase/supabase-js');
     const adminClient = createClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
       process.env.SUPABASE_SERVICE_ROLE_KEY
     );
+
+    // 1. Supprimer le profil explicitement (pas de CASCADE automatique)
+    await adminClient.from('profiles').delete().eq('id', user.id);
+
+    // 2. Supprimer l'utilisateur auth
     const { error: authError } = await adminClient.auth.admin.deleteUser(user.id);
     if (authError) {
       console.error('Error deleting auth user:', authError);
