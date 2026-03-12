@@ -60,9 +60,9 @@ export default function AuthDrawer({ isOpen, onClose, mode, onSwitchMode }: Auth
         if (result.success) {
           setError('');
           onClose();
-          // Rediriger vers le dashboard après inscription réussie
+          // Rediriger vers l'onboarding après inscription réussie
           await new Promise(resolve => setTimeout(resolve, 500));
-          router.push('/dashboard');
+          router.push('/onboarding');
         } else {
           setError(result.error || 'Erreur lors de l\'inscription');
         }
