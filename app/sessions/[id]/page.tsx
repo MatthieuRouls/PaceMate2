@@ -278,9 +278,17 @@ export default function SessionDetailsPage() {
               {/* Creator Badge */}
               {session.creator && (
                 <div className="inline-flex items-center gap-3 px-4 py-2.5 rounded-lg bg-neon-50">
-                  <div className="w-11 h-11 rounded-full bg-neon-400 flex items-center justify-center text-white font-bold">
-                    {getInitials(session.creator.username)}
-                  </div>
+                  {session.creator.avatar_url ? (
+                    <img
+                      src={session.creator.avatar_url}
+                      alt={session.creator.username}
+                      className="w-11 h-11 rounded-full object-cover"
+                    />
+                  ) : (
+                    <div className="w-11 h-11 rounded-full bg-neon-400 flex items-center justify-center text-white font-bold">
+                      {getInitials(session.creator.username)}
+                    </div>
+                  )}
                   <div>
                     <p className="text-xs text-neon-700 font-medium uppercase tracking-wider">Organise par</p>
                     <p className="text-dark-800 font-semibold">{session.creator.username}</p>
@@ -408,9 +416,17 @@ export default function SessionDetailsPage() {
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
                   {session.participants.map((participant) => (
                     <div key={participant.id} className="flex items-center gap-3 p-3 rounded-lg bg-silver-100">
-                      <div className="w-9 h-9 rounded-full bg-neon-400 flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
-                        {getInitials(participant.username)}
-                      </div>
+                      {participant.avatar_url ? (
+                        <img
+                          src={participant.avatar_url}
+                          alt={participant.username}
+                          className="w-9 h-9 rounded-full object-cover flex-shrink-0"
+                        />
+                      ) : (
+                        <div className="w-9 h-9 rounded-full bg-neon-400 flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
+                          {getInitials(participant.username)}
+                        </div>
+                      )}
                       <span className="text-sm font-medium text-dark-800 truncate">
                         {participant.username}
                       </span>

@@ -252,17 +252,27 @@ export default function MessagesPage() {
                       isSelected ? 'bg-neon-50 dark:bg-neon-900/20' : ''
                     }`}
                   >
-                    <div className={`w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0 ${
-                      conv.type === 'direct' ? 'bg-neon-400' :
-                      conv.type === 'team' ? 'bg-pink-400' :
-                      'bg-dark-600'
-                    }`}>
-                      {conv.type === 'direct' && conv.other_participant ? (
-                        <span className="text-white font-bold">
-                          {conv.other_participant.username.substring(0, 2).toUpperCase()}
-                        </span>
+                    <div className="w-12 h-12 rounded-full flex-shrink-0 overflow-hidden">
+                      {conv.type === 'direct' && conv.other_participant?.avatar_url ? (
+                        <img
+                          src={conv.other_participant.avatar_url}
+                          alt={conv.other_participant.username}
+                          className="w-full h-full object-cover"
+                        />
                       ) : (
-                        <Icon className="w-5 h-5 text-white" />
+                        <div className={`w-full h-full flex items-center justify-center ${
+                          conv.type === 'direct' ? 'bg-neon-400' :
+                          conv.type === 'team' ? 'bg-pink-400' :
+                          'bg-dark-600'
+                        }`}>
+                          {conv.type === 'direct' && conv.other_participant ? (
+                            <span className="text-white font-bold">
+                              {conv.other_participant.username.substring(0, 2).toUpperCase()}
+                            </span>
+                          ) : (
+                            <Icon className="w-5 h-5 text-white" />
+                          )}
+                        </div>
                       )}
                     </div>
 
@@ -324,20 +334,30 @@ export default function MessagesPage() {
                   <ArrowLeft className="w-5 h-5 text-dark-800" />
                 </button>
 
-                <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
-                  selectedConversation.type === 'direct' ? 'bg-neon-400' :
-                  selectedConversation.type === 'team' ? 'bg-pink-400' :
-                  'bg-dark-600'
-                }`}>
-                  {selectedConversation.type === 'direct' && selectedConversation.other_participant ? (
-                    <span className="text-white font-bold text-sm">
-                      {selectedConversation.other_participant.username.substring(0, 2).toUpperCase()}
-                    </span>
+                <div className="w-10 h-10 rounded-full overflow-hidden flex-shrink-0">
+                  {selectedConversation.type === 'direct' && selectedConversation.other_participant?.avatar_url ? (
+                    <img
+                      src={selectedConversation.other_participant.avatar_url}
+                      alt={selectedConversation.other_participant.username}
+                      className="w-full h-full object-cover"
+                    />
                   ) : (
-                    (() => {
-                      const Icon = getConversationIcon(selectedConversation);
-                      return <Icon className="w-5 h-5 text-white" />;
-                    })()
+                    <div className={`w-full h-full flex items-center justify-center ${
+                      selectedConversation.type === 'direct' ? 'bg-neon-400' :
+                      selectedConversation.type === 'team' ? 'bg-pink-400' :
+                      'bg-dark-600'
+                    }`}>
+                      {selectedConversation.type === 'direct' && selectedConversation.other_participant ? (
+                        <span className="text-white font-bold text-sm">
+                          {selectedConversation.other_participant.username.substring(0, 2).toUpperCase()}
+                        </span>
+                      ) : (
+                        (() => {
+                          const Icon = getConversationIcon(selectedConversation);
+                          return <Icon className="w-5 h-5 text-white" />;
+                        })()
+                      )}
+                    </div>
                   )}
                 </div>
 
@@ -383,10 +403,18 @@ export default function MessagesPage() {
                         className={`flex items-end gap-2 ${isOwn ? 'flex-row-reverse' : ''}`}
                       >
                         {!isOwn && (
-                          <div className={`w-8 h-8 rounded-full bg-neon-400 flex items-center justify-center text-white text-xs font-bold flex-shrink-0 ${
-                            showAvatar ? 'visible' : 'invisible'
-                          }`}>
-                            {message.sender?.username?.substring(0, 2).toUpperCase() || '??'}
+                          <div className={`w-8 h-8 rounded-full flex-shrink-0 overflow-hidden ${showAvatar ? 'visible' : 'invisible'}`}>
+                            {message.sender?.avatar_url ? (
+                              <img
+                                src={message.sender.avatar_url}
+                                alt={message.sender.username || ''}
+                                className="w-full h-full object-cover"
+                              />
+                            ) : (
+                              <div className="w-full h-full bg-neon-400 flex items-center justify-center text-white text-xs font-bold">
+                                {message.sender?.username?.substring(0, 2).toUpperCase() || '??'}
+                              </div>
+                            )}
                           </div>
                         )}
 

@@ -139,11 +139,19 @@ export default function SessionCard({ session, onClick, showJoinButton = true }:
           <div className="flex items-center gap-3">
             <div className="flex -space-x-2">
               {session.creator && (
-                <div className="w-9 h-9 rounded-full bg-neon-400 flex items-center justify-center border-2 border-white">
-                  <span className="text-white text-xs font-bold">
-                    {session.creator.username.substring(0, 2).toUpperCase()}
-                  </span>
-                </div>
+                session.creator.avatar_url ? (
+                  <img
+                    src={session.creator.avatar_url}
+                    alt={session.creator.username}
+                    className="w-9 h-9 rounded-full object-cover border-2 border-white"
+                  />
+                ) : (
+                  <div className="w-9 h-9 rounded-full bg-neon-400 flex items-center justify-center border-2 border-white">
+                    <span className="text-white text-xs font-bold">
+                      {session.creator.username.substring(0, 2).toUpperCase()}
+                    </span>
+                  </div>
+                )
               )}
               {Array.from({ length: Math.min(2, (session.participants_count || 1) - 1) }).map((_, i) => (
                 <div

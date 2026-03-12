@@ -382,9 +382,17 @@ function FriendCard({
   return (
     <div className="flex items-center justify-between p-4 bg-silver-50 dark:bg-dark-600 rounded-lg">
       <div className="flex items-center gap-4">
-        <div className="w-12 h-12 rounded-full bg-neon-400 flex items-center justify-center text-white font-bold">
-          {profile.username.substring(0, 2).toUpperCase()}
-        </div>
+        {profile.avatar_url ? (
+          <img
+            src={profile.avatar_url}
+            alt={profile.username}
+            className="w-12 h-12 rounded-full object-cover"
+          />
+        ) : (
+          <div className="w-12 h-12 rounded-full bg-neon-400 flex items-center justify-center text-white font-bold">
+            {profile.username.substring(0, 2).toUpperCase()}
+          </div>
+        )}
         <div>
           <div className="font-semibold text-dark-800">{profile.username}</div>
           <div className="text-sm text-dark-500">Niveau {profile.running_level}</div>
@@ -430,9 +438,17 @@ function RequestCard({
   return (
     <div className="flex items-center justify-between p-4 bg-silver-50 dark:bg-dark-600 rounded-lg">
       <div className="flex items-center gap-4">
-        <div className="w-12 h-12 rounded-full bg-pink-400 flex items-center justify-center text-white font-bold">
-          {profile?.username?.substring(0, 2).toUpperCase() || '??'}
-        </div>
+        {profile?.avatar_url ? (
+          <img
+            src={profile.avatar_url}
+            alt={profile.username}
+            className="w-12 h-12 rounded-full object-cover"
+          />
+        ) : (
+          <div className="w-12 h-12 rounded-full bg-pink-400 flex items-center justify-center text-white font-bold">
+            {profile?.username?.substring(0, 2).toUpperCase() || '??'}
+          </div>
+        )}
         <div>
           <div className="font-semibold text-dark-800">{profile?.username || 'Utilisateur'}</div>
           <div className="text-sm text-dark-500">
@@ -486,9 +502,17 @@ function SearchResultCard({
   return (
     <div className="flex items-center justify-between p-4 bg-silver-50 dark:bg-dark-600 rounded-lg">
       <div className="flex items-center gap-4">
-        <div className="w-12 h-12 rounded-full bg-neon-400 flex items-center justify-center text-white font-bold">
-          {profile.username.substring(0, 2).toUpperCase()}
-        </div>
+        {profile.avatar_url ? (
+          <img
+            src={profile.avatar_url}
+            alt={profile.username}
+            className="w-12 h-12 rounded-full object-cover"
+          />
+        ) : (
+          <div className="w-12 h-12 rounded-full bg-neon-400 flex items-center justify-center text-white font-bold">
+            {profile.username.substring(0, 2).toUpperCase()}
+          </div>
+        )}
         <div>
           <div className="font-semibold text-dark-800">{profile.username}</div>
           <div className="text-sm text-dark-500">Niveau {profile.running_level}</div>
