@@ -1304,8 +1304,16 @@ export async function deleteAccount(): Promise<{ success: boolean; error?: strin
     }
 
     // 2. Supprimer l'utilisateur auth via admin API
-    // Note: Ceci nécessite que le service role key soit configuré
-    // Pour l'instant, on supprime juste le profil et on déconnecte
+    const { createClient } = await import('@supabase/supabase-js');
+    const adminClient = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.SUPABASE_SERVICE_ROLE_KEY!
+    );
+    const { error: authError } = await adminClient.auth.admin.deleteUser(user.id);
+    if (authError) {
+      console.error('Error deleting auth user:', authError);
+      return { success: false, error: 'Erreur lors de la suppression du compte' };
+    }
 
     return { success: true };
   } catch (error) {
