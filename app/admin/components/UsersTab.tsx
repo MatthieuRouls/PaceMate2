@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   getAllProfiles, updateAdminProfile, deleteProfile,
   suspendUser, unsuspendUser, grantAdminRole, revokeAdminRole,
@@ -250,8 +250,8 @@ export default function UsersTab({ onRefreshStats }: { onRefreshStats?: () => vo
                   const isExpanded = expandedId === profile.id;
 
                   return (
-                    <>
-                      <tr key={profile.id} className={`${isEditing ? 'bg-purple-50' : profile.is_suspended ? 'bg-red-50/40' : 'hover:bg-gray-50'} transition-colors`}>
+                    <React.Fragment key={profile.id}>
+                      <tr className={`${isEditing ? 'bg-purple-50' : profile.is_suspended ? 'bg-red-50/40' : 'hover:bg-gray-50'} transition-colors`}>
                         {/* User */}
                         <td className="px-4 py-3">
                           <div className="flex items-center gap-3">
@@ -564,7 +564,7 @@ export default function UsersTab({ onRefreshStats }: { onRefreshStats?: () => vo
                           </td>
                         </tr>
                       )}
-                    </>
+                    </React.Fragment>
                   );
                 })}
               </tbody>
