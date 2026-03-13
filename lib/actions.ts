@@ -2,6 +2,7 @@
 
 import { getCurrentUser, getServerSupabaseClient } from './supabase-auth';
 import { updateStatsOnRunComplete } from './stats-actions';
+import type { Session } from './types';
 
 export interface CreateSessionData {
   title: string;
@@ -1859,5 +1860,188 @@ export async function disconnectStrava(): Promise<{ success: boolean; error?: st
   } catch (error) {
     console.error('Error disconnecting Strava:', error);
     return { success: false, error: 'Erreur inattendue' };
+  }
+}
+
+// ============================================
+// DISCOVERY ACTIONS
+// ============================================
+
+/**
+ * Session enriched with discovery metadata: score, flags, host trust level.
+ * Returned by getDiscoverySessions() for the /sessions discovery page.
+ */
+export interface DiscoverySession extends Session {
+  score: number;
+  isStartingSoon: boolean;  // starts within 2 h
+  isFillingUp: boolean;     // 70–99 % full
+  hasCoRunner: boolean;     // creator is someone user has run with
+  isTeamRun: boolean;       // creator belongs to user's team
+  hostTrustLevel: 'phone' | 'reliable' | 'basic';
+}
+
+/**
+ * Fetches all upcoming sessions enriched with personalised scoring.
+ * Scoring components:
+ *   distanceScore  (0–20): proximity to user
+ *   paceScore      (0–20): pace match with user's avg pace
+ *   participantScore (5–30): sweet-spot 2–4 runners
+ *   hostTrustScore (0–10): phone verification
+ *   coRunnerBonus  (+15):  host is a known running partner
+ *   teamRunBonus   (+10):  host is in user's team
+ */
+export async function getDiscoverySessions(options?: {
+  userLat?: number;
+  userLng?: number;
+}): Promise<DiscoverySession[]> {
+  try {
+    const supabase = await getServerSupabaseClient();
+    const user = await getCurrentUser();
+    const now = new Date();
+
+    // 1. Sessions + creator profile
+    const { data: sessions, error } = await supabase
+      .from('sessions')
+      .select(`
+        *,
+        creator:profiles!sessions_creator_id_fkey(
+          id, username, avatar_url, running_level, phone_verified, team_id
+        )
+      `)
+      .gte('start_time', now.toISOString())
+      .order('start_time', { ascending: true });
+
+    if (error || !sessions?.length) return [];
+
+    // 2. Confirmed participant counts
+    const sessionIds = sessions.map((s) => s.id);
+    const { data: allParticipants } = await supabase
+      .from('session_participants')
+      .select('session_id')
+      .in('session_id', sessionIds)
+      .eq('status', 'confirmed');
+
+    const participantCounts: Record<string, number> = {};
+    (allParticipants || []).forEach((p) => {
+      participantCounts[p.session_id] = (participantCounts[p.session_id] || 0) + 1;
+    });
+
+    // 3. User context for scoring (only if authenticated)
+    let userAvgPace: string | null = null;
+    let userTeamId: string | null = null;
+    const coRunnerIds = new Set<string>();
+
+    if (user) {
+      const [profileRes, connectionsRes] = await Promise.all([
+        supabase
+          .from('profiles')
+          .select('calculated_avg_pace, team_id')
+          .eq('id', user.id)
+          .single(),
+        supabase
+          .from('runner_connections')
+          .select('other_user_id')
+          .eq('user_id', user.id),
+      ]);
+      if (profileRes.data) {
+        userAvgPace = profileRes.data.calculated_avg_pace ?? null;
+        userTeamId = profileRes.data.team_id ?? null;
+      }
+      (connectionsRes.data || []).forEach((c) => coRunnerIds.add(c.other_user_id));
+    }
+
+    const parsePaceSec = (pace: string): number => {
+      const [min, sec] = pace.split(':');
+      return parseInt(min) * 60 + parseInt(sec || '0');
+    };
+
+    const userPaceSec = userAvgPace ? parsePaceSec(userAvgPace) : null;
+    const userLat = options?.userLat;
+    const userLng = options?.userLng;
+
+    // 4. Enrich + score each session
+    const enriched: DiscoverySession[] = sessions.map((session) => {
+      const count = participantCounts[session.id] || 0;
+      const fillPct = count / Math.max(session.max_participants, 1);
+      const hoursUntil =
+        (new Date(session.start_time).getTime() - now.getTime()) / 3_600_000;
+
+      let distance_from_user: number | undefined;
+      if (
+        userLat != null &&
+        userLng != null &&
+        session.latitude != null &&
+        session.longitude != null
+      ) {
+        distance_from_user =
+          Math.round(
+            haversineDistance(userLat, userLng, session.latitude, session.longitude) * 10,
+          ) / 10;
+      }
+
+      // Distance score (0–20)
+      let distanceScore = userLat == null ? 10 : 0; // neutral if no location
+      if (distance_from_user != null) {
+        if (distance_from_user < 5) distanceScore = 20;
+        else if (distance_from_user < 10) distanceScore = 15;
+        else if (distance_from_user < 25) distanceScore = 10;
+        else if (distance_from_user < 50) distanceScore = 5;
+      }
+
+      // Pace score (0–20)
+      let paceScore = 0;
+      if (userPaceSec && session.target_pace) {
+        const diff = Math.abs(userPaceSec - parsePaceSec(session.target_pace));
+        if (diff < 30) paceScore = 20;
+        else if (diff < 60) paceScore = 15;
+        else if (diff < 90) paceScore = 10;
+        else if (diff < 120) paceScore = 5;
+      }
+
+      // Participant score — sweet-spot 2–4
+      const participantScore =
+        count === 0 ? 10
+        : count <= 4 ? 30
+        : count <= 7 ? 20
+        : 5;
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const creator = session.creator as any;
+      let hostTrustLevel: 'phone' | 'reliable' | 'basic' = 'basic';
+      let hostTrustScore = 0;
+      if (creator?.phone_verified) {
+        hostTrustLevel = 'phone';
+        hostTrustScore = 10;
+      }
+
+      const isCoRunner = coRunnerIds.has(session.creator_id);
+      const isTeamRun = !!(userTeamId && creator?.team_id === userTeamId);
+
+      const score =
+        distanceScore +
+        paceScore +
+        participantScore +
+        hostTrustScore +
+        (isCoRunner ? 15 : 0) +
+        (isTeamRun ? 10 : 0);
+
+      return {
+        ...session,
+        participants_count: count,
+        distance_from_user,
+        score,
+        isStartingSoon: hoursUntil >= 0 && hoursUntil < 2,
+        isFillingUp: fillPct >= 0.7 && fillPct < 1,
+        hasCoRunner: isCoRunner,
+        isTeamRun,
+        hostTrustLevel,
+      } as DiscoverySession;
+    });
+
+    // Highest score first
+    return enriched.sort((a, b) => b.score - a.score);
+  } catch (error) {
+    console.error('Error in getDiscoverySessions:', error);
+    return [];
   }
 }
