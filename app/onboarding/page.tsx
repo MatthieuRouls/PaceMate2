@@ -35,14 +35,28 @@ export default function OnboardingPage() {
       }
     }
 
-    // Update profile
+    // Update profile — tous les champs collectés pendant l'onboarding
+    const updatePayload: Record<string, string | boolean | null> = {
+      username: data.firstName,
+      avatar_url: avatarUrl,
+      home_city: data.city,
+      safety_enhanced_mode: data.safetyEnhancedMode,
+    };
+
+    if (data.phoneNumber) {
+      updatePayload.phone_number = data.phoneNumber;
+      updatePayload.phone_verified = data.phoneVerified;
+    }
+
+    if (data.trustedContactName) {
+      updatePayload.trusted_contact_name = data.trustedContactName;
+      updatePayload.trusted_contact_phone = data.trustedContactPhone;
+      updatePayload.trusted_contact_relation = data.trustedContactRelation;
+    }
+
     await supabase
       .from('profiles')
-      .update({
-        username: data.firstName,
-        avatar_url: avatarUrl,
-        home_city: data.city,
-      })
+      .update(updatePayload)
       .eq('id', user.id);
 
     await refreshProfile();

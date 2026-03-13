@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { Phone, Check } from 'lucide-react';
 import { StepProps } from './onboarding.types';
+import { supabase } from '@/lib/supabase';
 
 export default function StepPhone({
   data,
@@ -14,7 +15,9 @@ export default function StepPhone({
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [otpSent, setOtpSent] = useState(false);
   const [sendingOtp, setSendingOtp] = useState(false);
+  const [verifyingOtp, setVerifyingOtp] = useState(false);
   const [countdown, setCountdown] = useState(0);
+  const [providerDisabled, setProviderDisabled] = useState(false);
   const otpInputRefs = useRef<(HTMLInputElement | null)[]>([]);
 
   useEffect(() => {
@@ -25,13 +28,33 @@ export default function StepPhone({
   }, [countdown]);
 
   const handleSendOtp = async () => {
-    if (!data.phoneNumber || data.phoneNumber.length < 10) {
+    const cleaned = data.phoneNumber.replace(/\s/g, '');
+    if (!cleaned || cleaned.length < 10) {
       setErrors({ phoneNumber: 'Numéro de téléphone requis' });
       return;
     }
+
     setSendingOtp(true);
-    await new Promise((resolve) => setTimeout(resolve, 1500));
+    setErrors({});
+    setProviderDisabled(false);
+
+    const { error } = await supabase.auth.updateUser({ phone: cleaned });
+
     setSendingOtp(false);
+
+    if (error) {
+      if (
+        error.message.toLowerCase().includes('not enabled') ||
+        error.message.toLowerCase().includes('phone') ||
+        error.message.toLowerCase().includes('provider')
+      ) {
+        setProviderDisabled(true);
+      } else {
+        setErrors({ phoneNumber: error.message });
+      }
+      return;
+    }
+
     setOtpSent(true);
     setCountdown(60);
     updateData({ otpCode: '' });
@@ -42,6 +65,24 @@ export default function StepPhone({
       setErrors({ otpCode: 'Code à 6 chiffres requis' });
       return;
     }
+
+    setVerifyingOtp(true);
+    setErrors({});
+
+    const cleaned = data.phoneNumber.replace(/\s/g, '');
+    const { error } = await supabase.auth.verifyOtp({
+      phone: cleaned,
+      token: data.otpCode,
+      type: 'phone_change',
+    });
+
+    setVerifyingOtp(false);
+
+    if (error) {
+      setErrors({ otpCode: 'Code incorrect ou expiré. Réessaie.' });
+      return;
+    }
+
     updateData({ phoneVerified: true });
     onNext();
   };
@@ -79,9 +120,17 @@ export default function StepPhone({
             <Check className="w-4 h-4 text-white" />
           </div>
           <div>
-            <p className="font-semibold text-dark-800 text-sm">Numéro vérifié</p>
+            <p className="font-semibold text-dark-800 text-sm">Numéro vérifié ✓</p>
             <p className="text-xs text-dark-500">{data.phoneNumber}</p>
           </div>
+        </div>
+      )}
+
+      {/* Provider disabled notice */}
+      {providerDisabled && (
+        <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-lg text-sm text-yellow-800">
+          <p className="font-semibold mb-1">Provider SMS non configuré</p>
+          <p>Active le provider Phone dans le dashboard Supabase (Auth → Providers → Phone) et configure Twilio pour activer la vérification SMS.</p>
         </div>
       )}
 
@@ -116,7 +165,7 @@ export default function StepPhone({
                 <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                 <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
               </svg>
-            ) : 'Envoyer le code'}
+            ) : 'Envoyer le code SMS'}
           </button>
         </div>
       )}
@@ -147,17 +196,23 @@ export default function StepPhone({
           {errors.otpCode && <p className="text-xs text-pink-600 text-center">{errors.otpCode}</p>}
           <button
             onClick={handleVerifyOtp}
-            disabled={data.otpCode.length !== 6 || isLoading}
+            disabled={data.otpCode.length !== 6 || verifyingOtp || isLoading}
             className="w-full py-3 rounded-lg bg-dark-800 text-neon-500 font-semibold text-sm
-              hover:bg-dark-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              hover:bg-dark-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed
+              flex items-center justify-center gap-2"
           >
-            Vérifier
+            {verifyingOtp ? (
+              <svg className="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+              </svg>
+            ) : 'Vérifier'}
           </button>
           <p className="text-xs text-center text-dark-400">
             {countdown > 0 ? (
               <>Renvoyer dans {countdown}s</>
             ) : (
-              <button onClick={handleSendOtp} className="text-neon-700 hover:underline">
+              <button onClick={handleSendOtp} disabled={sendingOtp} className="text-neon-700 hover:underline disabled:opacity-50">
                 Renvoyer le code
               </button>
             )}

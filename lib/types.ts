@@ -14,6 +14,18 @@ export interface Profile {
   home_city?: string;
   created_at?: string;
 
+  // Phone verification
+  phone_number?: string;
+  phone_verified?: boolean;
+
+  // Safety
+  safety_enhanced_mode?: boolean;
+
+  // Trusted contact
+  trusted_contact_name?: string;
+  trusted_contact_phone?: string;
+  trusted_contact_relation?: string;
+
   // Strava integration
   strava_connected?: boolean;
   strava_athlete_id?: number;
@@ -26,6 +38,35 @@ export interface Profile {
   // Relations (populated via joins)
   team?: Team;
   completed_sessions_count?: number;
+}
+
+// ============================================
+// IDENTITY VERIFICATION
+// ============================================
+
+export type IdentityVerificationLevel = 0 | 1 | 2 | 3;
+export type IdentityVerificationLevelName = 'basic' | 'phone_verified' | 'id_verified' | 'trusted';
+export type IdDocumentType = 'passport' | 'national_id' | 'drivers_license' | 'residence_permit';
+
+export interface IdentityVerificationRecord {
+  id: string;
+  user_id: string;
+  level: IdentityVerificationLevel;
+  level_name: IdentityVerificationLevelName;
+  phone_verified: boolean;
+  phone_verified_at?: string;
+  id_verified: boolean;
+  id_verified_at?: string;
+  id_document_type?: IdDocumentType;
+  id_document_country?: string;
+  selfie_match_passed: boolean;
+  selfie_verified_at?: string;
+  admin_review_required: boolean;
+  admin_review_reason?: string;
+  verification_attempts: number;
+  flagged_for_fraud: boolean;
+  created_at: string;
+  updated_at: string;
 }
 
 export interface Session {

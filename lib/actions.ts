@@ -1238,6 +1238,12 @@ export async function updateProfile(data: {
   username?: string;
   bio?: string;
   avatar_url?: string;
+  phone_number?: string;
+  phone_verified?: boolean;
+  safety_enhanced_mode?: boolean;
+  trusted_contact_name?: string;
+  trusted_contact_phone?: string;
+  trusted_contact_relation?: string;
 }) {
   try {
     const user = await getCurrentUser();
@@ -1245,10 +1251,16 @@ export async function updateProfile(data: {
 
     const supabase = await getServerSupabaseClient();
 
-    const updateData: Record<string, string> = {};
+    const updateData: Record<string, string | boolean | null> = {};
     if (data.username !== undefined) updateData.username = data.username.trim();
     if (data.bio !== undefined) updateData.bio = data.bio.trim();
     if (data.avatar_url !== undefined) updateData.avatar_url = data.avatar_url;
+    if (data.phone_number !== undefined) updateData.phone_number = data.phone_number;
+    if (data.phone_verified !== undefined) updateData.phone_verified = data.phone_verified;
+    if (data.safety_enhanced_mode !== undefined) updateData.safety_enhanced_mode = data.safety_enhanced_mode;
+    if (data.trusted_contact_name !== undefined) updateData.trusted_contact_name = data.trusted_contact_name;
+    if (data.trusted_contact_phone !== undefined) updateData.trusted_contact_phone = data.trusted_contact_phone;
+    if (data.trusted_contact_relation !== undefined) updateData.trusted_contact_relation = data.trusted_contact_relation;
 
     if (Object.keys(updateData).length === 0) {
       return { success: false, error: 'Aucune donnee a mettre a jour' };
@@ -1256,10 +1268,10 @@ export async function updateProfile(data: {
 
     // Validation username
     if (updateData.username !== undefined) {
-      if (updateData.username.length < 2) {
+      if ((updateData.username as string).length < 2) {
         return { success: false, error: 'Le nom doit faire au moins 2 caracteres' };
       }
-      if (updateData.username.length > 30) {
+      if ((updateData.username as string).length > 30) {
         return { success: false, error: 'Le nom ne peut pas depasser 30 caracteres' };
       }
     }
@@ -1278,6 +1290,112 @@ export async function updateProfile(data: {
   } catch (error) {
     console.error('Error in updateProfile:', error);
     return { success: false, error: 'Erreur inattendue' };
+  }
+}
+
+/**
+ * Envoyer un OTP SMS de vérification de téléphone via Supabase Phone Auth
+ */
+export async function sendPhoneOtp(phoneNumber: string): Promise<{ success: boolean; error?: string }> {
+  try {
+    const { createClient: createSupabaseClient } = await import('@supabase/supabase-js');
+    const supabase = createSupabaseClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+    );
+
+    const { error } = await supabase.auth.updateUser({ phone: phoneNumber });
+
+    if (error) {
+      console.error('Error sending phone OTP:', error);
+      if (error.message.includes('not enabled') || error.message.includes('Phone provider')) {
+        return { success: false, error: 'phone_provider_disabled' };
+      }
+      return { success: false, error: error.message };
+    }
+
+    return { success: true };
+  } catch (error) {
+    console.error('Error in sendPhoneOtp:', error);
+    return { success: false, error: 'Erreur inattendue' };
+  }
+}
+
+/**
+ * Vérifier le code OTP et marquer le téléphone comme vérifié
+ */
+export async function verifyPhoneOtp(
+  phoneNumber: string,
+  token: string
+): Promise<{ success: boolean; error?: string }> {
+  try {
+    const { createClient: createSupabaseClient } = await import('@supabase/supabase-js');
+    const supabase = createSupabaseClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+    );
+
+    const { error } = await supabase.auth.verifyOtp({
+      phone: phoneNumber,
+      token,
+      type: 'phone_change',
+    });
+
+    if (error) {
+      console.error('Error verifying phone OTP:', error);
+      return { success: false, error: 'Code incorrect ou expiré' };
+    }
+
+    // Marquer comme vérifié dans le profil
+    const serverSupabase = await getServerSupabaseClient();
+    const user = await getCurrentUser();
+    if (user) {
+      await serverSupabase
+        .from('profiles')
+        .update({ phone_number: phoneNumber, phone_verified: true })
+        .eq('id', user.id);
+    }
+
+    return { success: true };
+  } catch (error) {
+    console.error('Error in verifyPhoneOtp:', error);
+    return { success: false, error: 'Erreur inattendue' };
+  }
+}
+
+/**
+ * Récupérer le statut de vérification d'identité de l'utilisateur connecté
+ */
+export async function getIdentityVerification(): Promise<{
+  data: {
+    level: number;
+    level_name: string;
+    id_verified: boolean;
+    selfie_match_passed: boolean;
+    admin_review_required: boolean;
+    phone_verified: boolean;
+  } | null;
+  error?: string;
+}> {
+  try {
+    const user = await getCurrentUser();
+    if (!user) return { data: null, error: 'Non authentifie' };
+
+    const supabase = await getServerSupabaseClient();
+    const { data, error } = await supabase
+      .from('identity_verifications')
+      .select('level, level_name, id_verified, selfie_match_passed, admin_review_required, phone_verified')
+      .eq('user_id', user.id)
+      .single();
+
+    if (error && error.code !== 'PGRST116') {
+      return { data: null, error: error.message };
+    }
+
+    return { data: data || null };
+  } catch (error) {
+    console.error('Error in getIdentityVerification:', error);
+    return { data: null, error: 'Erreur inattendue' };
   }
 }
 
