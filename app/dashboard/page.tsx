@@ -21,6 +21,7 @@ import {
   Award, Route, Sparkles
 } from 'lucide-react';
 import { LEVEL_THRESHOLDS } from '@/lib/constants';
+import RunningStatsSection from '@/components/ui/RunningStatsSection';
 
 interface TeamWithCount extends Team {
   members_count: number;
@@ -833,6 +834,17 @@ export default function DashboardPage() {
               </div>
             </button>
           </div>
+        </section>
+
+        {/* ============================================ */}
+        {/* SECTION 6 — TA VIE DE COUREUR (Stats) */}
+        {/* ============================================ */}
+        <section className="section-reveal mt-14">
+          <div className="flex items-center gap-2 mb-6">
+            <Activity className="w-5 h-5 text-[#C8FF00]" />
+            <h2 className="text-xl font-bold text-white">Ta vie de coureur</h2>
+          </div>
+          <RunningStatsSection />
         </section>
 
       </div>

@@ -1,6 +1,7 @@
 'use server';
 
 import { getCurrentUser, getServerSupabaseClient } from './supabase-auth';
+import { updateStatsOnRunComplete } from './stats-actions';
 
 export interface CreateSessionData {
   title: string;
@@ -1162,6 +1163,11 @@ export async function completeRun(
         console.warn('Could not save peer feedbacks (table may not exist yet):', feedbackErr);
       }
     }
+
+    // Non-blocking stats update (badges, connections, reliability score, etc.)
+    updateStatsOnRunComplete(sessionId).catch((err) =>
+      console.error('[completeRun] stats update error:', err)
+    );
 
     return {
       success: true,

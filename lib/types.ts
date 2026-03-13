@@ -35,9 +35,75 @@ export interface Profile {
   calculated_longest_run?: number;
   calculated_total_runs?: number;
 
+  // Running stats (persisted, updated on run completion)
+  runs_completed?: number;
+  runs_hosted?: number;
+  total_run_time_minutes?: number;
+  people_met?: number;
+  reliability_score?: number;
+  active_weeks?: number;
+  team_runs_contributed?: number;
+
   // Relations (populated via joins)
   team?: Team;
   completed_sessions_count?: number;
+}
+
+// ============================================
+// RUNNING STATISTICS
+// ============================================
+
+export type BadgeType =
+  | 'first_run'
+  | 'community_builder'
+  | 'reliable_runner'
+  | 'social_runner'
+  | 'team_player';
+
+export interface UserBadge {
+  id: string;
+  user_id: string;
+  badge_type: BadgeType;
+  earned_at: string;
+}
+
+export interface RunnerConnection {
+  id: string;
+  user_id: string;
+  other_user_id: string;
+  runs_together: number;
+  last_run_date: string;
+  created_at: string;
+  // Populated via join
+  other_user?: Pick<Profile, 'id' | 'username' | 'avatar_url'>;
+}
+
+export interface RunnerStats {
+  // Personal
+  runsCompleted: number;
+  runsHosted: number;
+  totalKm: number;
+  totalRunTimeMinutes: number;
+  peopleMet: number;
+  reliabilityScore: number;   // 0-100
+  activeWeeks: number;
+  // Team
+  teamStats: {
+    teamName: string;
+    runsCompleted: number;
+    totalKm: number;
+    activeMembers: number;
+  } | null;
+  // Social
+  recentConnections: Array<{
+    userId: string;
+    username: string;
+    avatarUrl?: string;
+    runsTogether: number;
+  }>;
+  // Badges (earned + progress)
+  badges: UserBadge[];
+  badgeProgress: Record<BadgeType, { current: number; target: number }>;
 }
 
 // ============================================
