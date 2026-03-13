@@ -5,7 +5,6 @@
  */
 
 export { default as OnboardingFlow } from './OnboardingFlow';
-export { default as StepAccount } from './StepAccount';
 export { default as StepProfile } from './StepProfile';
 export { default as StepPhone } from './StepPhone';
 export { default as StepSafety } from './StepSafety';

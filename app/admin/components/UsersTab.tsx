@@ -10,8 +10,20 @@ import LoadingSpinner from '@/components/ui/LoadingSpinner';
 import {
   RefreshCw, Search, Edit2, Trash2, X, Save, ChevronDown, ChevronUp,
   Shield, ShieldCheck, Phone, Ban, CheckCircle, Crown, Eye,
-  UserX, RotateCcw,
+  UserX, RotateCcw, MapPin,
 } from 'lucide-react';
+
+interface IdentityVerification {
+  user_id: string;
+  id_verified: boolean;
+  level: number;
+  level_name?: string;
+  selfie_match_score?: number;
+  admin_review_required?: boolean;
+  id_document_type?: string;
+  id_verified_at?: string;
+  verification_attempts?: number;
+}
 
 interface AdminProfile {
   id: string;
@@ -28,10 +40,14 @@ interface AdminProfile {
   phone_verified?: boolean;
   safety_enhanced_mode?: boolean;
   trusted_contact_name?: string;
+  trusted_contact_phone?: string;
+  trusted_contact_relation?: string;
   is_admin?: boolean;
   is_suspended?: boolean;
   suspension_reason?: string;
+  home_city?: string;
   team?: { id: string; name: string };
+  identity_verification?: IdentityVerification | null;
 }
 
 const LEVEL_LABELS: Record<number, string> = {
@@ -42,7 +58,7 @@ export default function UsersTab({ onRefreshStats }: { onRefreshStats?: () => vo
   const [profiles, setProfiles] = useState<AdminProfile[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
-  const [filter, setFilter] = useState<'all' | 'verified' | 'suspended' | 'admin'>('all');
+  const [filter, setFilter] = useState<'all' | 'phone_verified' | 'id_verified' | 'pending_review' | 'suspended' | 'admin'>('all');
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editForm, setEditForm] = useState<Partial<AdminProfile>>({});
   const [expandedId, setExpandedId] = useState<string | null>(null);
@@ -73,7 +89,9 @@ export default function UsersTab({ onRefreshStats }: { onRefreshStats?: () => vo
   };
 
   const filtered = profiles.filter((p) => {
-    if (filter === 'verified') return p.phone_verified;
+    if (filter === 'phone_verified') return p.phone_verified;
+    if (filter === 'id_verified') return p.identity_verification?.id_verified;
+    if (filter === 'pending_review') return p.identity_verification?.admin_review_required;
     if (filter === 'suspended') return p.is_suspended;
     if (filter === 'admin') return p.is_admin;
     return true;
@@ -188,19 +206,22 @@ export default function UsersTab({ onRefreshStats }: { onRefreshStats?: () => vo
             Chercher
           </button>
         </form>
-        <div className="flex gap-1">
-          {(['all', 'verified', 'suspended', 'admin'] as const).map((f) => (
+        <div className="flex flex-wrap gap-1">
+          {([
+            { id: 'all', label: 'Tous', count: profiles.length },
+            { id: 'phone_verified', label: '📱 Tél.', count: profiles.filter((p) => p.phone_verified).length },
+            { id: 'id_verified', label: '🪪 ID ✓', count: profiles.filter((p) => p.identity_verification?.id_verified).length },
+            { id: 'pending_review', label: '⏳ Révision', count: profiles.filter((p) => p.identity_verification?.admin_review_required).length },
+            { id: 'suspended', label: '🚫 Suspendus', count: profiles.filter((p) => p.is_suspended).length },
+            { id: 'admin', label: '👑 Admins', count: profiles.filter((p) => p.is_admin).length },
+          ] as const).map(({ id, label, count }) => (
             <button
-              key={f}
-              onClick={() => setFilter(f)}
-              className={`px-3 py-2 text-xs font-semibold rounded-lg transition-colors ${filter === f ? 'bg-purple-100 text-purple-700' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}
+              key={id}
+              onClick={() => setFilter(id as typeof filter)}
+              className={`px-3 py-2 text-xs font-semibold rounded-lg transition-colors ${filter === id ? 'bg-purple-100 text-purple-700' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}
             >
-              {f === 'all' ? 'Tous' : f === 'verified' ? '📱 Vérifiés' : f === 'suspended' ? '🚫 Suspendus' : '👑 Admins'}
-              <span className="ml-1 text-gray-400">
-                ({f === 'all' ? profiles.length : profiles.filter((p) =>
-                  f === 'verified' ? p.phone_verified : f === 'suspended' ? p.is_suspended : p.is_admin
-                ).length})
-              </span>
+              {label}
+              <span className="ml-1 text-gray-400">({count})</span>
             </button>
           ))}
         </div>
@@ -252,8 +273,8 @@ export default function UsersTab({ onRefreshStats }: { onRefreshStats?: () => vo
                               ) : (
                                 <div className="flex items-center gap-1.5">
                                   <span className="font-semibold text-gray-900">{profile.username}</span>
-                                  {profile.is_admin && <Crown className="w-3.5 h-3.5 text-yellow-500" title="Admin" />}
-                                  {profile.is_suspended && <Ban className="w-3.5 h-3.5 text-red-500" title="Suspendu" />}
+                                  {profile.is_admin && <span title="Admin"><Crown className="w-3.5 h-3.5 text-yellow-500" /></span>}
+                                  {profile.is_suspended && <span title="Suspendu"><Ban className="w-3.5 h-3.5 text-red-500" /></span>}
                                 </div>
                               )}
                               <p className="text-xs text-gray-400">{profile.email || 'no email'}</p>
@@ -309,23 +330,48 @@ export default function UsersTab({ onRefreshStats }: { onRefreshStats?: () => vo
                         {/* Status badges */}
                         <td className="px-4 py-3">
                           <div className="flex flex-wrap gap-1">
+                            {/* Phone */}
                             {profile.phone_verified ? (
-                              <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded text-xs bg-green-100 text-green-700 font-medium">
-                                <Phone className="w-3 h-3" /> SMS
+                              <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded text-xs bg-green-100 text-green-700 font-medium" title="Téléphone vérifié">
+                                <Phone className="w-3 h-3" /> SMS ✓
+                              </span>
+                            ) : profile.phone_number ? (
+                              <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded text-xs bg-yellow-100 text-yellow-700" title="Numéro enregistré, non vérifié">
+                                <Phone className="w-3 h-3" /> SMS ?
                               </span>
                             ) : (
-                              <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded text-xs bg-gray-100 text-gray-500">
+                              <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded text-xs bg-gray-100 text-gray-400" title="Pas de téléphone">
                                 <Phone className="w-3 h-3" /> —
                               </span>
                             )}
-                            {profile.safety_enhanced_mode && (
-                              <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded text-xs bg-blue-100 text-blue-700 font-medium">
-                                <Shield className="w-3 h-3" /> Safety
+                            {/* Identity */}
+                            {profile.identity_verification?.id_verified ? (
+                              <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded text-xs bg-purple-100 text-purple-700 font-medium" title="Identité vérifiée">
+                                <ShieldCheck className="w-3 h-3" /> ID ✓
+                              </span>
+                            ) : profile.identity_verification?.admin_review_required ? (
+                              <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded text-xs bg-orange-100 text-orange-700 font-medium" title="En attente de révision admin">
+                                <ShieldCheck className="w-3 h-3" /> ID ⏳
+                              </span>
+                            ) : profile.identity_verification ? (
+                              <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded text-xs bg-red-100 text-red-600" title="Vérification échouée">
+                                <ShieldCheck className="w-3 h-3" /> ID ✗
+                              </span>
+                            ) : (
+                              <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded text-xs bg-gray-100 text-gray-400" title="Identité non soumise">
+                                <ShieldCheck className="w-3 h-3" /> —
                               </span>
                             )}
+                            {/* Safety mode */}
+                            {profile.safety_enhanced_mode && (
+                              <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded text-xs bg-blue-100 text-blue-700 font-medium" title="Mode sécurité activé">
+                                <Shield className="w-3 h-3" /> 🛡️
+                              </span>
+                            )}
+                            {/* Trusted contact */}
                             {profile.trusted_contact_name && (
-                              <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded text-xs bg-indigo-100 text-indigo-700 font-medium">
-                                👤 Contact
+                              <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded text-xs bg-indigo-100 text-indigo-700 font-medium" title={`Contact: ${profile.trusted_contact_name}`}>
+                                👤
                               </span>
                             )}
                           </div>
@@ -378,23 +424,64 @@ export default function UsersTab({ onRefreshStats }: { onRefreshStats?: () => vo
                       {isExpanded && (
                         <tr key={`${profile.id}-expanded`} className="bg-gray-50 border-b border-gray-200">
                           <td colSpan={6} className="px-4 py-4">
-                            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
-                              <div>
-                                <p className="text-xs text-gray-500 mb-1">Téléphone</p>
-                                <p className="text-sm font-medium">{profile.phone_number || '—'}</p>
-                                {profile.phone_verified && <span className="text-xs text-green-600">✓ Vérifié</span>}
+                            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mb-4">
+                              {/* Phone */}
+                              <div className="bg-white rounded-lg p-3 border border-gray-200">
+                                <p className="text-xs text-gray-500 mb-1 font-semibold uppercase tracking-wide">Téléphone</p>
+                                <p className="text-sm font-medium">{profile.phone_number || <span className="text-gray-400">Non renseigné</span>}</p>
+                                {profile.phone_verified
+                                  ? <span className="inline-flex items-center gap-1 text-xs text-green-600 font-semibold mt-1"><CheckCircle className="w-3 h-3" /> Vérifié</span>
+                                  : profile.phone_number
+                                    ? <span className="text-xs text-yellow-600 mt-1">Non vérifié</span>
+                                    : null
+                                }
                               </div>
-                              <div>
-                                <p className="text-xs text-gray-500 mb-1">Contact de confiance</p>
-                                <p className="text-sm font-medium">{profile.trusted_contact_name || '—'}</p>
+
+                              {/* Identity */}
+                              <div className="bg-white rounded-lg p-3 border border-gray-200">
+                                <p className="text-xs text-gray-500 mb-1 font-semibold uppercase tracking-wide">Identité</p>
+                                {profile.identity_verification ? (
+                                  <>
+                                    {profile.identity_verification.id_verified ? (
+                                      <span className="inline-flex items-center gap-1 text-xs text-green-600 font-semibold"><ShieldCheck className="w-3 h-3" /> Vérifiée (Niv. {profile.identity_verification.level})</span>
+                                    ) : profile.identity_verification.admin_review_required ? (
+                                      <span className="inline-flex items-center gap-1 text-xs text-orange-600 font-semibold"><ShieldCheck className="w-3 h-3" /> En révision</span>
+                                    ) : (
+                                      <span className="inline-flex items-center gap-1 text-xs text-red-600"><ShieldCheck className="w-3 h-3" /> Échouée</span>
+                                    )}
+                                    {profile.identity_verification.selfie_match_score != null && (
+                                      <p className="text-xs text-gray-500 mt-1">Score IA : {profile.identity_verification.selfie_match_score}/100</p>
+                                    )}
+                                    {profile.identity_verification.id_document_type && (
+                                      <p className="text-xs text-gray-500">Doc : {profile.identity_verification.id_document_type}</p>
+                                    )}
+                                    <p className="text-xs text-gray-400">{profile.identity_verification.verification_attempts} tentative(s)</p>
+                                  </>
+                                ) : (
+                                  <span className="text-xs text-gray-400">Non soumise</span>
+                                )}
                               </div>
-                              <div>
-                                <p className="text-xs text-gray-500 mb-1">Inscrit le</p>
-                                <p className="text-sm">{new Date(profile.created_at).toLocaleDateString('fr-FR')}</p>
+
+                              {/* Trusted contact */}
+                              <div className="bg-white rounded-lg p-3 border border-gray-200">
+                                <p className="text-xs text-gray-500 mb-1 font-semibold uppercase tracking-wide">Contact de confiance</p>
+                                {profile.trusted_contact_name ? (
+                                  <>
+                                    <p className="text-sm font-medium">{profile.trusted_contact_name}</p>
+                                    {profile.trusted_contact_phone && <p className="text-xs text-gray-500">{profile.trusted_contact_phone}</p>}
+                                    {profile.trusted_contact_relation && <p className="text-xs text-gray-400 capitalize">{profile.trusted_contact_relation}</p>}
+                                  </>
+                                ) : (
+                                  <span className="text-xs text-gray-400">Non renseigné</span>
+                                )}
                               </div>
-                              <div>
-                                <p className="text-xs text-gray-500 mb-1">Bio</p>
-                                <p className="text-sm text-gray-600 truncate max-w-xs">{profile.bio || '—'}</p>
+
+                              {/* Profile info */}
+                              <div className="bg-white rounded-lg p-3 border border-gray-200">
+                                <p className="text-xs text-gray-500 mb-1 font-semibold uppercase tracking-wide">Profil</p>
+                                <p className="text-xs text-gray-600">📍 {profile.home_city || '—'}</p>
+                                <p className="text-xs text-gray-600">📅 Inscrit le {new Date(profile.created_at).toLocaleDateString('fr-FR')}</p>
+                                <p className="text-xs text-gray-500 mt-1 truncate max-w-[180px]">{profile.bio || <span className="text-gray-400">Pas de bio</span>}</p>
                               </div>
                             </div>
 

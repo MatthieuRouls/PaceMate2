@@ -144,7 +144,19 @@ export async function getAllProfiles(search?: string) {
     const { data: profiles, error } = await query;
     if (error) throw error;
 
-    return { success: true, profiles };
+    // Fetch identity verifications separately (FK is to auth.users, not profiles)
+    const { data: identities } = await supabase
+      .from('identity_verifications')
+      .select('user_id, id_verified, level, level_name, selfie_match_score, admin_review_required, id_document_type, id_verified_at, verification_attempts');
+
+    const identityMap = new Map((identities || []).map((i) => [i.user_id, i]));
+
+    const profilesWithIdentity = (profiles || []).map((p) => ({
+      ...p,
+      identity_verification: identityMap.get(p.id) || null,
+    }));
+
+    return { success: true, profiles: profilesWithIdentity };
   } catch (error) {
     console.error('Error fetching profiles:', error);
     return { success: false, error: 'Erreur récupération profils' };

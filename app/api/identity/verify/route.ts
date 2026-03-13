@@ -71,7 +71,7 @@ export async function POST(req: NextRequest) {
     const attemptsToday = lastAttemptDay === today ? (existing?.verification_attempts || 0) : 0;
 
     if (attemptsToday >= 3) {
-      return NextResponse.json({ error: 'Trop de tentatives aujourd'hui. Réessaie demain.' }, { status: 429 });
+      return NextResponse.json({ error: "Trop de tentatives aujourd'hui. Réessaie demain." }, { status: 429 });
     }
 
     // ── Claude Vision : comparaison faciale ───────────────
