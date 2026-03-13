@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
+import { useConfirmModal } from './ConfirmModal';
 import {
   getAllProfiles, updateAdminProfile, deleteProfile,
   suspendUser, unsuspendUser, grantAdminRole, revokeAdminRole,
@@ -67,6 +68,7 @@ export default function UsersTab({ onRefreshStats }: { onRefreshStats?: () => vo
   const [suspendModal, setSuspendModal] = useState<{ id: string; username: string } | null>(null);
   const [suspendReason, setSuspendReason] = useState('');
   const [forcePhoneModal, setForcePhoneModal] = useState<{ id: string; username: string } | null>(null);
+  const { confirm, ConfirmModalNode } = useConfirmModal();
   const [forcePhone, setForcePhone] = useState('');
 
   useEffect(() => { loadProfiles(); }, []);
@@ -107,7 +109,7 @@ export default function UsersTab({ onRefreshStats }: { onRefreshStats?: () => vo
   };
 
   const handleDelete = async (id: string, username: string) => {
-    if (!confirm(`Supprimer "${username}" ? Action irréversible.`)) return;
+    if (!await confirm({ title: `Supprimer "${username}"`, message: 'Cette action est irréversible. Le compte et toutes ses données seront définitivement supprimés.', confirmLabel: 'Supprimer', variant: 'danger' })) return;
     setSubmitting(true);
     const result = await deleteProfile(id);
     setSubmitting(false);
@@ -135,7 +137,10 @@ export default function UsersTab({ onRefreshStats }: { onRefreshStats?: () => vo
   };
 
   const handleToggleAdmin = async (id: string, isAdmin: boolean) => {
-    if (!confirm(isAdmin ? 'Retirer les droits admin ?' : 'Accorder les droits admin ?')) return;
+    if (!await confirm(isAdmin
+      ? { title: 'Retirer les droits admin', message: "Cet utilisateur ne pourra plus accéder au panneau d'administration.", confirmLabel: 'Retirer', variant: 'warning' }
+      : { title: 'Accorder les droits admin', message: "Cet utilisateur aura accès à toutes les fonctions d'administration.", confirmLabel: 'Accorder', variant: 'info' }
+    )) return;
     setSubmitting(true);
     const result = isAdmin ? await revokeAdminRole(id) : await grantAdminRole(id);
     setSubmitting(false);
@@ -155,7 +160,7 @@ export default function UsersTab({ onRefreshStats }: { onRefreshStats?: () => vo
   };
 
   const handleForceIdentity = async (id: string, username: string) => {
-    if (!confirm(`Marquer l'identité de "${username}" comme vérifiée (bypass IA) ?`)) return;
+    if (!await confirm({ title: `Forcer l'identité — ${username}`, message: "L'identité sera marquée comme vérifiée (niveau 2) sans passer par la vérification IA. À utiliser pour les tests uniquement.", confirmLabel: 'Forcer', variant: 'warning' })) return;
     setSubmitting(true);
     const result = await forceIdentityVerified(id);
     setSubmitting(false);
@@ -164,7 +169,7 @@ export default function UsersTab({ onRefreshStats }: { onRefreshStats?: () => vo
   };
 
   const handleResetIdentity = async (id: string, username: string) => {
-    if (!confirm(`Réinitialiser la vérification d'identité de "${username}" ?`)) return;
+    if (!await confirm({ title: `Réinitialiser l'identité — ${username}`, message: 'La vérification sera supprimée. L\'utilisateur devra recommencer le processus depuis le début.', confirmLabel: 'Réinitialiser', variant: 'warning' })) return;
     setSubmitting(true);
     const result = await resetIdentityVerification(id);
     setSubmitting(false);
@@ -174,6 +179,7 @@ export default function UsersTab({ onRefreshStats }: { onRefreshStats?: () => vo
 
   return (
     <div className="space-y-4">
+      {ConfirmModalNode}
       {/* Toast */}
       {toast && (
         <div className={`fixed top-6 right-6 z-50 px-4 py-3 rounded-xl shadow-lg text-sm font-semibold text-white transition-all ${toast.ok ? 'bg-green-600' : 'bg-red-600'}`}>

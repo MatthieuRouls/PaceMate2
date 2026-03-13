@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useConfirmModal } from './ConfirmModal';
 import { getFeatureFlags, updateFeatureFlag } from '@/lib/admin-actions';
 import { RefreshCw, ToggleLeft, ToggleRight, AlertTriangle, Info } from 'lucide-react';
 
@@ -41,6 +42,7 @@ export default function FeatureFlagsTab() {
   const [saving, setSaving] = useState<string | null>(null);
   const [toast, setToast] = useState<{ msg: string; ok: boolean } | null>(null);
   const [numericEdits, setNumericEdits] = useState<Record<string, string>>({});
+  const { confirm, ConfirmModalNode } = useConfirmModal();
 
   useEffect(() => { loadFlags(); }, []);
 
@@ -69,10 +71,10 @@ export default function FeatureFlagsTab() {
     const warning = FLAG_WARNINGS[flag.key];
 
     if (warning && !current) {
-      if (!confirm(`${warning}\n\nConfirmer l'activation ?`)) return;
+      if (!await confirm({ title: `Activer "${flag.key}"`, message: warning, confirmLabel: 'Activer quand même', variant: 'warning' })) return;
     }
     if (warning && current) {
-      if (!confirm(`Désactiver "${flag.key}" ?`)) return;
+      if (!await confirm({ title: `Désactiver "${flag.key}"`, message: `Le flag "${flag.key}" sera désactivé immédiatement.`, confirmLabel: 'Désactiver', variant: 'warning' })) return;
     }
 
     setSaving(flag.key);
@@ -113,6 +115,7 @@ export default function FeatureFlagsTab() {
 
   return (
     <div className="space-y-6">
+      {ConfirmModalNode}
       {/* Toast */}
       {toast && (
         <div className={`fixed top-6 right-6 z-50 px-4 py-3 rounded-xl shadow-lg text-sm font-semibold text-white transition-all ${toast.ok ? 'bg-green-600' : 'bg-red-600'}`}>

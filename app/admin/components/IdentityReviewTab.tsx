@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useConfirmModal } from './ConfirmModal';
 import {
   getAllIdentityVerifications,
   approveIdentityVerification,
@@ -61,6 +62,7 @@ export default function IdentityReviewTab() {
   const [rejectModal, setRejectModal] = useState<{ id: string; userId: string; username: string } | null>(null);
   const [rejectReason, setRejectReason] = useState('');
   const [toast, setToast] = useState<{ msg: string; ok: boolean } | null>(null);
+  const { confirm, ConfirmModalNode } = useConfirmModal();
 
   useEffect(() => { loadVerifications(); }, []);
 
@@ -88,7 +90,7 @@ export default function IdentityReviewTab() {
   const pendingCount = verifications.filter((v) => v.admin_review_required && !v.id_verified).length;
 
   const handleApprove = async (v: IdentityVerification) => {
-    if (!confirm(`Approuver l'identité de ${v.user?.username} ?`)) return;
+    if (!await confirm({ title: `Approuver — ${v.user?.username}`, message: "L'identité sera marquée comme vérifiée (niveau 2). L'utilisateur recevra le badge vérifié.", confirmLabel: 'Approuver', variant: 'info' })) return;
     setSubmitting(v.id);
     const result = await approveIdentityVerification(v.id, v.user_id);
     setSubmitting(null);
@@ -108,7 +110,7 @@ export default function IdentityReviewTab() {
   };
 
   const handleForce = async (v: IdentityVerification) => {
-    if (!confirm(`Forcer l'identité de ${v.user?.username} au niveau 2 (bypass IA) ?`)) return;
+    if (!await confirm({ title: `Forcer l'identité — ${v.user?.username}`, message: 'Bypass IA : marque l\'identité comme vérifiée sans analyse des documents. À utiliser pour les tests uniquement.', confirmLabel: 'Forcer', variant: 'warning' })) return;
     setSubmitting(v.id);
     const result = await forceIdentityVerified(v.user_id);
     setSubmitting(null);
@@ -117,7 +119,7 @@ export default function IdentityReviewTab() {
   };
 
   const handleReset = async (v: IdentityVerification) => {
-    if (!confirm(`Réinitialiser la vérification de ${v.user?.username} ?`)) return;
+    if (!await confirm({ title: `Réinitialiser — ${v.user?.username}`, message: 'La vérification sera supprimée. L\'utilisateur devra recommencer depuis le début.', confirmLabel: 'Réinitialiser', variant: 'warning' })) return;
     setSubmitting(v.id);
     const result = await resetIdentityVerification(v.user_id);
     setSubmitting(null);
@@ -137,6 +139,7 @@ export default function IdentityReviewTab() {
 
   return (
     <div className="space-y-5">
+      {ConfirmModalNode}
       {/* Toast */}
       {toast && (
         <div className={`fixed top-6 right-6 z-50 px-4 py-3 rounded-xl shadow-lg text-sm font-semibold text-white ${toast.ok ? 'bg-green-600' : 'bg-red-600'}`}>

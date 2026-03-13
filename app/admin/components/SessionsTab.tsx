@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useConfirmModal } from './ConfirmModal';
 import {
   getAllSessions,
   updateSession,
@@ -39,6 +40,7 @@ export default function SessionsTab() {
   const [editForm, setEditForm] = useState<Partial<Session>>({});
   const [submitting, setSubmitting] = useState(false);
   const [expandedSessions, setExpandedSessions] = useState<Set<string>>(new Set());
+  const { confirm, ConfirmModalNode } = useConfirmModal();
 
   useEffect(() => {
     loadSessions();
@@ -100,7 +102,7 @@ export default function SessionsTab() {
   };
 
   const handleDelete = async (id: string, title: string) => {
-    if (!confirm(`Êtes-vous sûr de vouloir supprimer la session "${title}" ? Cette action est irréversible.`)) {
+    if (!await confirm({ title: `Supprimer la session`, message: `"${title}" sera définitivement supprimée avec tous ses participants. Action irréversible.`, confirmLabel: 'Supprimer', variant: 'danger' })) {
       return;
     }
 
