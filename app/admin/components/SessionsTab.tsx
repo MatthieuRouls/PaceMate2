@@ -118,7 +118,7 @@ export default function SessionsTab() {
   };
 
   const handleRemoveParticipant = async (participantId: string, username: string) => {
-    if (!confirm(`Retirer ${username} de cette session ?`)) {
+    if (!await confirm({ title: `Retirer ${username}`, message: 'Ce participant sera retiré de la session.', confirmLabel: 'Retirer', variant: 'warning' })) {
       return;
     }
 

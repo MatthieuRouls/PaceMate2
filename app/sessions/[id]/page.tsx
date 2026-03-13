@@ -9,10 +9,9 @@ import {
   getUserSessionStatus,
   joinSession,
   leaveSession,
-  rateSession,
   deleteSession,
 } from '@/lib/actions';
-import RatingModal from '@/components/ui/RatingModal';
+import PostRunWizard from '@/components/overlays/PostRunWizard';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
 import { ArrowLeft, Calendar, MapPin, Users, Clock, Target, Zap, Trash2, MessageCircle } from 'lucide-react';
 import { useAuth } from '@/components/providers/AuthProvider';
@@ -44,7 +43,7 @@ export default function SessionDetailsPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [actionLoading, setActionLoading] = useState(false);
-  const [showRatingModal, setShowRatingModal] = useState(false);
+  const [showPostRunWizard, setShowPostRunWizard] = useState(false);
 
   // Charger les données
   useEffect(() => {
@@ -177,16 +176,9 @@ export default function SessionDetailsPage() {
     setActionLoading(false);
   };
 
-  const handleRating = async (rating: number, comment: string) => {
-    const result = await rateSession(sessionId, rating, comment);
-
-    if (result.success) {
-      const status = await getUserSessionStatus(sessionId);
-      setUserStatus(status);
-      alert('Merci pour votre note ! Vous avez gagné des XP 🎉');
-    } else {
-      alert(result.error || 'Erreur lors de l\'envoi de la note');
-    }
+  const handleWizardComplete = async () => {
+    const status = await getUserSessionStatus(sessionId);
+    setUserStatus(status);
   };
 
   const handleDelete = async () => {
@@ -506,24 +498,27 @@ export default function SessionDetailsPage() {
                 </div>
               )}
 
-              {/* Past session - rate */}
+              {/* Past session - awaiting validation */}
               {userStatus && userStatus.status === 'confirmed' && isSessionPast() && !userStatus.rating && (
                 <button
-                  onClick={() => setShowRatingModal(true)}
-                  className="w-full py-4 rounded-lg bg-pink-500 text-white text-lg font-bold hover:bg-pink-600 transition-colors"
+                  onClick={() => setShowPostRunWizard(true)}
+                  className="w-full py-4 rounded-lg bg-pink-500 text-white text-lg font-bold hover:bg-pink-600 transition-colors flex items-center justify-center gap-2"
                 >
-                  Noter cette sortie
+                  <Zap className="w-5 h-5" />
+                  Valider ma sortie &amp; gagner des XP
                 </button>
               )}
 
-              {/* Already rated */}
-              {userStatus && userStatus.rating && (
-                <div className="text-center py-6">
-                  <div className="text-4xl mb-3">⭐</div>
-                  <p className="text-xl font-bold text-dark-800 mb-2">
-                    Vous avez donne {userStatus.rating}/5
-                  </p>
-                  <p className="text-dark-500">Merci pour votre retour !</p>
+              {/* Already completed */}
+              {userStatus && userStatus.status === 'completed' && (
+                <div className="text-center py-4 space-y-2">
+                  <div className="text-4xl">✅</div>
+                  <p className="text-lg font-bold text-dark-800">Sortie validée !</p>
+                  {userStatus.rating && (
+                    <p className="text-dark-500">
+                      {'★'.repeat(userStatus.rating)}{'☆'.repeat(5 - userStatus.rating)} — Merci pour ta note
+                    </p>
+                  )}
                 </div>
               )}
 
@@ -537,13 +532,13 @@ export default function SessionDetailsPage() {
           </div>
         )}
 
-        {/* Rating Modal */}
-        {session && (
-          <RatingModal
-            isOpen={showRatingModal}
-            onClose={() => setShowRatingModal(false)}
-            onSubmit={handleRating}
-            sessionTitle={session.title}
+        {/* Post-Run Wizard */}
+        {session && showPostRunWizard && (
+          <PostRunWizard
+            session={session}
+            currentUserId={profile?.id ?? ''}
+            onClose={() => setShowPostRunWizard(false)}
+            onComplete={handleWizardComplete}
           />
         )}
       </div>

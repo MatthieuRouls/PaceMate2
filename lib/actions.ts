@@ -1003,6 +1003,184 @@ export async function rateSession(
 }
 
 // ============================================
+// POST-RUN FLOW
+// ============================================
+
+export interface PeerFeedbackInput {
+  userId: string;
+  rating: 'positive' | 'neutral' | 'negative';
+  flags?: string[];
+}
+
+export interface CompleteRunResult {
+  success: boolean;
+  xpGained?: number;
+  kmAdded?: number;
+  totalKm?: number;
+  totalXp?: number;
+  teamKmAdded?: number;
+  error?: string;
+}
+
+/**
+ * Valider la participation à une sortie terminée.
+ * - Si participated=true : marque completed, met à jour les stats, enregistre les peer feedbacks.
+ * - Si participated=false : marque cancelled.
+ */
+export async function completeRun(
+  sessionId: string,
+  data: {
+    participated: boolean;
+    sessionRating?: number;      // 1-5
+    sessionComment?: string;
+    peerFeedbacks?: PeerFeedbackInput[];
+  }
+): Promise<CompleteRunResult> {
+  try {
+    const user = await getCurrentUser();
+    if (!user) return { success: false, error: 'Non authentifié' };
+
+    const supabase = await getServerSupabaseClient();
+
+    // --- Cas : l'utilisateur n'a pas participé ---
+    if (!data.participated) {
+      await supabase
+        .from('session_participants')
+        .update({ status: 'cancelled' })
+        .eq('session_id', sessionId)
+        .eq('user_id', user.id);
+      return { success: true };
+    }
+
+    // --- Récupérer les infos de la session ---
+    const { data: session, error: sessionError } = await supabase
+      .from('sessions')
+      .select('distance_km')
+      .eq('id', sessionId)
+      .single();
+
+    if (sessionError || !session) {
+      return { success: false, error: 'Session introuvable' };
+    }
+
+    const distanceKm = Number(session.distance_km) || 0;
+
+    // --- 1. Mettre à jour la participation ---
+    const { error: partError } = await supabase
+      .from('session_participants')
+      .update({
+        status: 'completed',
+        ...(data.sessionRating ? { rating: data.sessionRating } : {}),
+        ...(data.sessionComment ? { comment: data.sessionComment } : {}),
+      })
+      .eq('session_id', sessionId)
+      .eq('user_id', user.id);
+
+    if (partError) {
+      console.error('Error completing participation:', partError);
+      return { success: false, error: 'Erreur lors de la validation de la sortie' };
+    }
+
+    // --- 2. Calculer les XP ---
+    // Base : 50 XP pour avoir participé
+    // +10 si note laissée
+    // +5 par co-coureur évalué (max 3)
+    // +5 bonus si note >= 4
+    let xpGained = 50;
+    if (data.sessionRating) {
+      xpGained += 10;
+      if (data.sessionRating >= 4) xpGained += 5;
+    }
+    const peersReviewed = (data.peerFeedbacks ?? []).length;
+    xpGained += Math.min(peersReviewed, 3) * 5;
+
+    // --- 3. Mettre à jour le profil (distance + XP) ---
+    const { data: profile, error: profileError } = await supabase
+      .from('profiles')
+      .select('xp_points, total_distance_km, team_id')
+      .eq('id', user.id)
+      .single();
+
+    let totalKm = distanceKm;
+    let totalXp = xpGained;
+    let teamKmAdded = 0;
+
+    if (!profileError && profile) {
+      totalKm = (Number(profile.total_distance_km) || 0) + distanceKm;
+      totalXp = (Number(profile.xp_points) || 0) + xpGained;
+
+      await supabase
+        .from('profiles')
+        .update({
+          total_distance_km: totalKm,
+          xp_points: totalXp,
+        })
+        .eq('id', user.id);
+
+      // --- 4. Mettre à jour le total de l'équipe ---
+      if (profile.team_id) {
+        const { data: team } = await supabase
+          .from('teams')
+          .select('total_distance')
+          .eq('id', profile.team_id)
+          .single();
+
+        if (team) {
+          teamKmAdded = distanceKm;
+          await supabase
+            .from('teams')
+            .update({ total_distance: (Number(team.total_distance) || 0) + distanceKm })
+            .eq('id', profile.team_id);
+        }
+      }
+    }
+
+    // --- 5. Enregistrer les peer feedbacks (safety) ---
+    if ((data.peerFeedbacks ?? []).length > 0) {
+      const feedbackRows = (data.peerFeedbacks ?? []).map((pf) => ({
+        id: `fb_${Date.now()}_${pf.userId.slice(0, 8)}_${Math.random().toString(36).slice(2, 7)}`,
+        session_id: sessionId,
+        reviewer_id: user.id,
+        reviewed_user_id: pf.userId,
+        rating: pf.rating,
+        flags: pf.flags ?? [],
+        anonymous: false,
+        processed: false,
+        moderation_triggered: (pf.flags ?? []).some((f) =>
+          ['inappropriate_behavior', 'harassment', 'unsafe_behavior', 'aggressive', 'uncomfortable'].includes(f)
+        ),
+        created_at: new Date().toISOString(),
+      }));
+
+      try {
+        await supabase.from('safety_feedbacks').upsert(feedbackRows, {
+          onConflict: 'session_id,reviewer_id,reviewed_user_id',
+          ignoreDuplicates: true,
+        });
+      } catch (feedbackErr) {
+        // Table might not exist yet — non-blocking
+        console.warn('Could not save peer feedbacks (table may not exist yet):', feedbackErr);
+      }
+    }
+
+    return {
+      success: true,
+      xpGained,
+      kmAdded: distanceKm,
+      totalKm,
+      totalXp,
+      teamKmAdded,
+    };
+  } catch (error) {
+    console.error('Unexpected error in completeRun:', error);
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'Une erreur inattendue s\'est produite',
+    };
+  }
+}
+
+// ============================================
 // HOMEPAGE ACTIONS
 // ============================================
 
