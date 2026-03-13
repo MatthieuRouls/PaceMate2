@@ -1,6 +1,6 @@
 'use server';
 
-import { getCurrentUser, getServerSupabaseClient } from './supabase-auth';
+import { getCurrentUser, getServerSupabaseClient, getServiceSupabaseClient } from './supabase-auth';
 import type { Profile, Session, Team } from './types';
 
 // ============================================================================
@@ -33,7 +33,7 @@ async function logAdminAction(
   details?: Record<string, unknown>
 ) {
   try {
-    const supabase = await getServerSupabaseClient();
+    const supabase = getServiceSupabaseClient();
     await supabase.from('admin_activity_log').insert({
       admin_id: adminId,
       action,
@@ -55,7 +55,7 @@ export async function getAdminStats() {
   if (!validation.isValid) return { success: false, error: validation.error };
 
   try {
-    const supabase = await getServerSupabaseClient();
+    const supabase = getServiceSupabaseClient();
 
     const [
       profilesResult,
@@ -104,7 +104,7 @@ export async function getAdminActivityLog(limit = 20) {
   if (!validation.isValid) return { success: false, error: validation.error };
 
   try {
-    const supabase = await getServerSupabaseClient();
+    const supabase = getServiceSupabaseClient();
     const { data, error } = await supabase
       .from('admin_activity_log')
       .select('*, admin:profiles(username)')
@@ -127,7 +127,7 @@ export async function getAllProfiles(search?: string) {
   if (!validation.isValid) return { success: false, error: validation.error };
 
   try {
-    const supabase = await getServerSupabaseClient();
+    const supabase = getServiceSupabaseClient();
 
     let query = supabase
       .from('profiles')
@@ -149,9 +149,9 @@ export async function getAllProfiles(search?: string) {
       .from('identity_verifications')
       .select('user_id, id_verified, level, level_name, selfie_match_score, admin_review_required, id_document_type, id_verified_at, verification_attempts');
 
-    const identityMap = new Map((identities || []).map((i) => [i.user_id, i]));
+    const identityMap = new Map((identities || []).map((i: Record<string, unknown>) => [(i.user_id as string), i]));
 
-    const profilesWithIdentity = (profiles || []).map((p) => ({
+    const profilesWithIdentity = (profiles || []).map((p: Record<string, unknown>) => ({
       ...p,
       identity_verification: identityMap.get(p.id) || null,
     }));
@@ -168,7 +168,7 @@ export async function updateAdminProfile(id: string, updates: Partial<Profile>) 
   if (!validation.isValid) return { success: false, error: validation.error };
 
   try {
-    const supabase = await getServerSupabaseClient();
+    const supabase = getServiceSupabaseClient();
     const { data, error } = await supabase
       .from('profiles')
       .update(updates)
@@ -195,7 +195,7 @@ export async function suspendUser(id: string, reason: string) {
   if (!validation.isValid) return { success: false, error: validation.error };
 
   try {
-    const supabase = await getServerSupabaseClient();
+    const supabase = getServiceSupabaseClient();
     const { error } = await supabase
       .from('profiles')
       .update({ is_suspended: true, suspension_reason: reason })
@@ -214,7 +214,7 @@ export async function unsuspendUser(id: string) {
   if (!validation.isValid) return { success: false, error: validation.error };
 
   try {
-    const supabase = await getServerSupabaseClient();
+    const supabase = getServiceSupabaseClient();
     const { error } = await supabase
       .from('profiles')
       .update({ is_suspended: false, suspension_reason: null })
@@ -233,7 +233,7 @@ export async function grantAdminRole(id: string) {
   if (!validation.isValid) return { success: false, error: validation.error };
 
   try {
-    const supabase = await getServerSupabaseClient();
+    const supabase = getServiceSupabaseClient();
     const { error } = await supabase.from('profiles').update({ is_admin: true }).eq('id', id);
     if (error) throw error;
     await logAdminAction(validation.userId!, 'grant_admin', 'profile', id);
@@ -253,7 +253,7 @@ export async function revokeAdminRole(id: string) {
   }
 
   try {
-    const supabase = await getServerSupabaseClient();
+    const supabase = getServiceSupabaseClient();
     const { error } = await supabase.from('profiles').update({ is_admin: false }).eq('id', id);
     if (error) throw error;
     await logAdminAction(validation.userId!, 'revoke_admin', 'profile', id);
@@ -268,7 +268,7 @@ export async function forcePhoneVerified(userId: string, phone: string) {
   if (!validation.isValid) return { success: false, error: validation.error };
 
   try {
-    const supabase = await getServerSupabaseClient();
+    const supabase = getServiceSupabaseClient();
     const { error } = await supabase
       .from('profiles')
       .update({ phone_number: phone, phone_verified: true })
@@ -290,7 +290,7 @@ export async function deleteProfile(id: string) {
   }
 
   try {
-    const supabase = await getServerSupabaseClient();
+    const supabase = getServiceSupabaseClient();
     await Promise.all([
       supabase.from('session_participants').delete().eq('user_id', id),
       supabase.from('team_memberships').delete().eq('user_id', id),
@@ -301,7 +301,8 @@ export async function deleteProfile(id: string) {
     await logAdminAction(validation.userId!, 'delete_profile', 'profile', id);
     return { success: true };
   } catch (error) {
-    return { success: false, error: 'Erreur suppression' };
+    console.error('deleteProfile error:', error);
+    return { success: false, error: (error as Error).message || 'Erreur suppression' };
   }
 }
 
@@ -314,7 +315,7 @@ export async function getPendingIdentityReviews() {
   if (!validation.isValid) return { success: false, error: validation.error };
 
   try {
-    const supabase = await getServerSupabaseClient();
+    const supabase = getServiceSupabaseClient();
     const { data, error } = await supabase
       .from('identity_verifications')
       .select(`
@@ -337,7 +338,7 @@ export async function getAllIdentityVerifications() {
   if (!validation.isValid) return { success: false, error: validation.error };
 
   try {
-    const supabase = await getServerSupabaseClient();
+    const supabase = getServiceSupabaseClient();
     const { data, error } = await supabase
       .from('identity_verifications')
       .select(`
@@ -358,7 +359,7 @@ export async function approveIdentityVerification(verificationId: string, userId
   if (!validation.isValid) return { success: false, error: validation.error };
 
   try {
-    const supabase = await getServerSupabaseClient();
+    const supabase = getServiceSupabaseClient();
     const now = new Date().toISOString();
 
     const { error } = await supabase
@@ -389,7 +390,7 @@ export async function rejectIdentityVerification(verificationId: string, userId:
   if (!validation.isValid) return { success: false, error: validation.error };
 
   try {
-    const supabase = await getServerSupabaseClient();
+    const supabase = getServiceSupabaseClient();
     const now = new Date().toISOString();
 
     const { error } = await supabase
@@ -418,7 +419,7 @@ export async function forceIdentityVerified(userId: string) {
   if (!validation.isValid) return { success: false, error: validation.error };
 
   try {
-    const supabase = await getServerSupabaseClient();
+    const supabase = getServiceSupabaseClient();
     const now = new Date().toISOString();
 
     await supabase.from('identity_verifications').upsert({
@@ -451,7 +452,7 @@ export async function resetIdentityVerification(userId: string) {
   if (!validation.isValid) return { success: false, error: validation.error };
 
   try {
-    const supabase = await getServerSupabaseClient();
+    const supabase = getServiceSupabaseClient();
     const { error } = await supabase
       .from('identity_verifications')
       .delete()
@@ -474,7 +475,7 @@ export async function getFeatureFlags() {
   if (!validation.isValid) return { success: false, error: validation.error };
 
   try {
-    const supabase = await getServerSupabaseClient();
+    const supabase = getServiceSupabaseClient();
     const { data, error } = await supabase
       .from('app_settings')
       .select('*')
@@ -492,7 +493,7 @@ export async function updateFeatureFlag(key: string, value: boolean | number | s
   if (!validation.isValid) return { success: false, error: validation.error };
 
   try {
-    const supabase = await getServerSupabaseClient();
+    const supabase = getServiceSupabaseClient();
     const { error } = await supabase
       .from('app_settings')
       .update({ value: JSON.stringify(value), updated_at: new Date().toISOString(), updated_by: validation.userId })
@@ -515,7 +516,7 @@ export async function getAllSessions(filter?: 'all' | 'upcoming' | 'past') {
   if (!validation.isValid) return { success: false, error: validation.error };
 
   try {
-    const supabase = await getServerSupabaseClient();
+    const supabase = getServiceSupabaseClient();
     const now = new Date().toISOString();
 
     let query = supabase
@@ -547,7 +548,7 @@ export async function updateSession(id: string, updates: Partial<Session>) {
   if (!validation.isValid) return { success: false, error: validation.error };
 
   try {
-    const supabase = await getServerSupabaseClient();
+    const supabase = getServiceSupabaseClient();
     const { data, error } = await supabase
       .from('sessions')
       .update(updates)
@@ -568,7 +569,7 @@ export async function deleteSession(id: string) {
   if (!validation.isValid) return { success: false, error: validation.error };
 
   try {
-    const supabase = await getServerSupabaseClient();
+    const supabase = getServiceSupabaseClient();
     await supabase.from('session_participants').delete().eq('session_id', id);
     const { error } = await supabase.from('sessions').delete().eq('id', id);
     if (error) throw error;
@@ -588,7 +589,7 @@ export async function getAllTeams() {
   if (!validation.isValid) return { success: false, error: validation.error };
 
   try {
-    const supabase = await getServerSupabaseClient();
+    const supabase = getServiceSupabaseClient();
     const { data: teams, error } = await supabase
       .from('teams')
       .select(`
@@ -612,7 +613,7 @@ export async function updateTeam(id: string, updates: Partial<Team>) {
   if (!validation.isValid) return { success: false, error: validation.error };
 
   try {
-    const supabase = await getServerSupabaseClient();
+    const supabase = getServiceSupabaseClient();
     const { data, error } = await supabase.from('teams').update(updates).eq('id', id).select().single();
     if (error) throw error;
     await logAdminAction(validation.userId!, 'update_team', 'team', id);
@@ -627,7 +628,7 @@ export async function deleteTeam(id: string) {
   if (!validation.isValid) return { success: false, error: validation.error };
 
   try {
-    const supabase = await getServerSupabaseClient();
+    const supabase = getServiceSupabaseClient();
     await supabase.from('profiles').update({ team_id: null }).eq('team_id', id);
     await supabase.from('team_memberships').delete().eq('team_id', id);
     const { error } = await supabase.from('teams').delete().eq('id', id);
@@ -648,7 +649,7 @@ export async function removeParticipant(participantId: string) {
   if (!validation.isValid) return { success: false, error: validation.error };
 
   try {
-    const supabase = await getServerSupabaseClient();
+    const supabase = getServiceSupabaseClient();
     const { error } = await supabase.from('session_participants').delete().eq('id', participantId);
     if (error) throw error;
     return { success: true };
@@ -665,7 +666,7 @@ export async function updateParticipantStatus(
   if (!validation.isValid) return { success: false, error: validation.error };
 
   try {
-    const supabase = await getServerSupabaseClient();
+    const supabase = getServiceSupabaseClient();
     const { data, error } = await supabase
       .from('session_participants')
       .update({ status })
