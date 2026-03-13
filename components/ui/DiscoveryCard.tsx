@@ -69,9 +69,12 @@ export default function DiscoveryCard({ session, onClick }: Props) {
   const creator = session.creator as any;
 
   return (
-    <button
+    <div
       onClick={onClick}
-      className="group flex-shrink-0 w-[272px] text-left bg-dark-800 border border-white/10 rounded-2xl overflow-hidden hover:border-neon-500/40 hover:shadow-xl hover:shadow-neon-500/5 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-neon-500/50"
+      role="button"
+      tabIndex={0}
+      onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') onClick(); }}
+      className="group flex-shrink-0 w-[272px] text-left bg-dark-800 border border-white/10 rounded-2xl overflow-hidden hover:border-neon-500/40 hover:shadow-xl hover:shadow-neon-500/5 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-neon-500/50 cursor-pointer"
     >
       {/* Cover image */}
       <div className="relative h-[140px] overflow-hidden">
@@ -214,20 +217,18 @@ export default function DiscoveryCard({ session, onClick }: Props) {
         </div>
 
         {/* CTA */}
-        <button
-          onClick={(e) => { e.stopPropagation(); onClick(); }}
-          disabled={spotsLeft === 0}
+        <div
           className={`w-full flex items-center justify-center gap-1.5 py-2.5 rounded-xl text-xs font-bold transition-all ${
             spotsLeft === 0
               ? 'bg-white/8 text-dark-400 cursor-not-allowed'
-              : 'bg-neon-500 text-dark-800 hover:bg-neon-400 active:scale-[0.97]'
+              : 'bg-neon-500 text-dark-800 group-hover:bg-neon-400'
           }`}
         >
           {spotsLeft === 0 ? 'Complet' : (
             <>Rejoindre <ChevronRight className="w-3.5 h-3.5" /></>
           )}
-        </button>
+        </div>
       </div>
-    </button>
+    </div>
   );
 }
