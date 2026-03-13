@@ -210,22 +210,6 @@ export async function getServerSupabaseClient() {
 }
 
 /**
- * Client Supabase avec la service role key — bypasse RLS.
- * À utiliser UNIQUEMENT dans les server actions admin, après validateAdmin().
- */
-export function getServiceSupabaseClient() {
-  if (!process.env.SUPABASE_SERVICE_ROLE_KEY) {
-    throw new Error('SUPABASE_SERVICE_ROLE_KEY non configurée');
-  }
-  // Import dynamique pour éviter le bundling côté client
-  const { createClient } = require('@supabase/supabase-js');
-  return createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!
-  );
-}
-
-/**
  * Récupérer la session active
  */
 export async function getSession(): Promise<Session | null> {

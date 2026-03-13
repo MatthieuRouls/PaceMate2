@@ -1,6 +1,7 @@
 'use server';
 
-import { getCurrentUser, getServerSupabaseClient, getServiceSupabaseClient } from './supabase-auth';
+import { getCurrentUser, getServerSupabaseClient } from './supabase-auth';
+import { getServiceSupabaseClient } from './supabase-service';
 import type { Profile, Session, Team } from './types';
 
 // ============================================================================
@@ -153,7 +154,7 @@ export async function getAllProfiles(search?: string) {
 
     const profilesWithIdentity = (profiles || []).map((p: Record<string, unknown>) => ({
       ...p,
-      identity_verification: identityMap.get(p.id) || null,
+      identity_verification: identityMap.get(p.id as string) || null,
     }));
 
     return { success: true, profiles: profilesWithIdentity };
