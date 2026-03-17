@@ -620,7 +620,7 @@ export async function getSessionDetails(sessionId: string) {
     // 2. Récupérer le créateur
     const { data: creator } = await supabase
       .from('profiles')
-      .select('id, username, running_level, avatar_url')
+      .select('id, username, running_level, avatar_url, runs_hosted, reliability_score, phone_verified')
       .eq('id', session.creator_id)
       .single();
 
