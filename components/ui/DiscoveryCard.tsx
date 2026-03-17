@@ -3,6 +3,7 @@
 import Image from 'next/image';
 import type { DiscoverySession } from '@/lib/actions';
 import { MapPin, Clock, Users, Shield, Zap, ChevronRight, Flame, Sparkles } from 'lucide-react';
+import { decodeSafetyTags } from '@/lib/trust';
 
 // ─── Session visual config ────────────────────────────────────────────────────
 
@@ -94,6 +95,7 @@ export default function DiscoveryCard({ session, onClick }: Props) {
   const fillPct    = Math.round((count / Math.max(session.max_participants, 1)) * 100);
   const cd         = countdown(session.start_time);
   const matchPct   = scoreToMatchPct(session.score);
+  const safetyTags = decodeSafetyTags(session.description);
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const creator      = session.creator as any;
@@ -186,6 +188,27 @@ export default function DiscoveryCard({ session, onClick }: Props) {
             </span>
           )}
         </div>
+
+        {/* Safety tags */}
+        {(safetyTags.women_only || safetyTags.verified_only || session.max_participants <= 4) && (
+          <div className="flex flex-wrap gap-1.5">
+            {safetyTags.women_only && (
+              <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-pink-500/10 border border-pink-500/25 rounded-full text-[10px] font-semibold text-pink-400">
+                🚺 Femmes
+              </span>
+            )}
+            {safetyTags.verified_only && (
+              <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-neon-500/10 border border-neon-500/25 rounded-full text-[10px] font-semibold text-neon-400">
+                🛡️ Vérifiés
+              </span>
+            )}
+            {session.max_participants <= 4 && !safetyTags.women_only && !safetyTags.verified_only && (
+              <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-white/6 border border-white/12 rounded-full text-[10px] font-semibold text-white/50">
+                👥 Petit groupe
+              </span>
+            )}
+          </div>
+        )}
 
         {/* Divider */}
         <div className="border-t border-white/8" />

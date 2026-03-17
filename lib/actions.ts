@@ -1899,13 +1899,15 @@ export async function getDiscoverySessions(options?: {
     const user = await getCurrentUser();
     const now = new Date();
 
-    // 1. Sessions + creator profile
+    // 1. Sessions + creator profile (includes trust fields for scoring)
     const { data: sessions, error } = await supabase
       .from('sessions')
       .select(`
         *,
         creator:profiles!sessions_creator_id_fkey(
-          id, username, avatar_url, running_level, phone_verified, team_id
+          id, username, avatar_url, running_level,
+          phone_verified, team_id,
+          runs_completed, runs_hosted, reliability_score
         )
       `)
       .gte('start_time', now.toISOString())
@@ -2009,9 +2011,24 @@ export async function getDiscoverySessions(options?: {
       const creator = session.creator as any;
       let hostTrustLevel: 'phone' | 'reliable' | 'basic' = 'basic';
       let hostTrustScore = 0;
+
+      // Phone verification: strong trust signal (+10)
       if (creator?.phone_verified) {
         hostTrustLevel = 'phone';
-        hostTrustScore = 10;
+        hostTrustScore += 10;
+      }
+      // Experienced host: reliability_score >= 70 (+8)
+      if ((creator?.reliability_score ?? 0) >= 70) {
+        if (hostTrustLevel === 'basic') hostTrustLevel = 'reliable';
+        hostTrustScore += 8;
+      }
+      // Active participant: runs_completed >= 5 (+5)
+      if ((creator?.runs_completed ?? 0) >= 5) hostTrustScore += 5;
+      // Experienced organizer: runs_hosted >= 3 (+3)
+      if ((creator?.runs_hosted ?? 0) >= 3) hostTrustScore += 3;
+      // Low-reliability penalty (reliability < 30 and active user)
+      if ((creator?.reliability_score ?? 50) < 30 && (creator?.runs_completed ?? 0) >= 3) {
+        hostTrustScore -= 10;
       }
 
       const isCoRunner = coRunnerIds.has(session.creator_id);
@@ -2021,7 +2038,7 @@ export async function getDiscoverySessions(options?: {
         distanceScore +
         paceScore +
         participantScore +
-        hostTrustScore +
+        Math.max(0, hostTrustScore) +
         (isCoRunner ? 15 : 0) +
         (isTeamRun ? 10 : 0);
 

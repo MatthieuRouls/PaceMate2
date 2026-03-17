@@ -5,6 +5,7 @@ import Image from 'next/image';
 import { Session } from '@/lib/types';
 import { getSessionDetails, joinSession, leaveSession } from '@/lib/actions';
 import { getSessionConversation } from '@/lib/chat-actions';
+import { decodeSafetyTags } from '@/lib/trust';
 import { useAuth } from '@/components/providers/AuthProvider';
 import { useChat } from '@/components/chat/ChatProvider';
 import GlassOverlay from './GlassOverlay';
@@ -263,10 +264,13 @@ export default function SessionPanel({ sessionId, isOpen, onClose }: SessionPane
   const matchScore = computeMatchScore(profile?.calculated_avg_pace, session?.target_pace);
   const hostRating = reliabilityToRating(creator?.reliability_score);
 
+  const decoded = decodeSafetyTags(session?.description);
   const safetyTags: string[] = [];
-  if (creator?.phone_verified)                     safetyTags.push('✓ Vérifié');
+  if (decoded.women_only)                          safetyTags.push('🚺 Femmes uniquement');
+  if (decoded.verified_only)                       safetyTags.push('🛡️ Vérifiés');
+  if (creator?.phone_verified)                     safetyTags.push('✓ Hôte vérifié');
   if (session && session.max_participants <= 6)     safetyTags.push('👥 Petit groupe');
-  if ((creator?.reliability_score ?? 0) >= 80)     safetyTags.push('🛡️ Fiable');
+  if ((creator?.reliability_score ?? 0) >= 80)     safetyTags.push('⭐ Hôte fiable');
   if (!session?.walk_breaks_ok)                    safetyTags.push('🏃 Run continu');
 
   const displayedAvatars = participants.slice(0, 3);

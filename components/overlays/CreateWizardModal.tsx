@@ -11,7 +11,9 @@ import {
   Check, ChevronRight, ChevronLeft, MapPin, Search, Crosshair,
   Calendar, Zap, Navigation, ClipboardCheck, ArrowRight,
   X, Sun, Sunrise, Clock, Users, Gauge, Route, Pencil, Loader2,
+  Shield,
 } from 'lucide-react';
+import { encodeSafetyTags } from '@/lib/trust';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -34,6 +36,9 @@ interface FormState {
   session_type: 'casual' | 'recovery' | 'tempo' | 'long_run' | 'intervals';
   level_required: number;
   walk_breaks_ok: boolean;
+  // Safety options (encoded into description on submit)
+  women_only: boolean;
+  verified_only: boolean;
 }
 
 // ─── Constants ────────────────────────────────────────────────────────────────
@@ -246,6 +251,7 @@ export default function CreateWizardModal({ isOpen, onClose, onSuccess }: Create
     pace_seconds: 330,
     max_participants: 6,
     session_type: 'casual', level_required: 3, walk_breaks_ok: false,
+    women_only: false, verified_only: false,
   });
 
   const [loading, setLoading] = useState(false);
@@ -372,7 +378,10 @@ export default function CreateWizardModal({ isOpen, onClose, onSuccess }: Create
     setLoading(true); setError(null);
     const data: CreateSessionData = {
       title: form.title.trim() || autoTitle,
-      description: form.description,
+      description: encodeSafetyTags(
+        { women_only: form.women_only, verified_only: form.verified_only },
+        form.description,
+      ),
       start_time: form.start_time,
       location_name: form.location_name,
       latitude: form.latitude, longitude: form.longitude,
@@ -699,6 +708,66 @@ export default function CreateWizardModal({ isOpen, onClose, onSuccess }: Create
                               {n}
                             </button>
                           ))}
+                        </div>
+                      </div>
+
+                      {/* Safety options */}
+                      <div>
+                        <div className="mb-3">
+                          <label className="text-sm font-semibold text-white/70 flex items-center gap-2">
+                            <Shield className="w-4 h-4 text-neon-400" />
+                            Options de sécurité
+                          </label>
+                          <p className="text-xs text-white/35 mt-0.5">Contrôle qui peut rejoindre ta sortie</p>
+                        </div>
+                        <div className="space-y-2.5">
+                          {/* Women only toggle */}
+                          <button
+                            type="button"
+                            onClick={() => { set('women_only', !form.women_only); haptic(); }}
+                            className={`w-full flex items-center justify-between px-4 py-3 rounded-xl border transition-all duration-150 active:scale-[0.98] ${
+                              form.women_only
+                                ? 'bg-pink-500/15 border-pink-500/40 text-pink-400'
+                                : 'bg-white/5 border-white/10 text-white/45 hover:border-white/20 hover:text-white/65'
+                            }`}
+                          >
+                            <div className="flex items-center gap-3">
+                              <span className="text-base">🚺</span>
+                              <div className="text-left">
+                                <p className="text-sm font-semibold">Femmes uniquement</p>
+                                <p className="text-[11px] opacity-60">Réservé aux femmes et personnes non-binaires</p>
+                              </div>
+                            </div>
+                            <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all ${
+                              form.women_only ? 'bg-pink-500 border-pink-500' : 'bg-transparent border-white/20'
+                            }`}>
+                              {form.women_only && <Check className="w-3 h-3 text-white" />}
+                            </div>
+                          </button>
+
+                          {/* Verified only toggle */}
+                          <button
+                            type="button"
+                            onClick={() => { set('verified_only', !form.verified_only); haptic(); }}
+                            className={`w-full flex items-center justify-between px-4 py-3 rounded-xl border transition-all duration-150 active:scale-[0.98] ${
+                              form.verified_only
+                                ? 'bg-neon-500/10 border-neon-500/35 text-neon-400'
+                                : 'bg-white/5 border-white/10 text-white/45 hover:border-white/20 hover:text-white/65'
+                            }`}
+                          >
+                            <div className="flex items-center gap-3">
+                              <span className="text-base">🛡️</span>
+                              <div className="text-left">
+                                <p className="text-sm font-semibold">Coureurs vérifiés</p>
+                                <p className="text-[11px] opacity-60">Réservé aux profils avec téléphone vérifié</p>
+                              </div>
+                            </div>
+                            <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all ${
+                              form.verified_only ? 'bg-neon-500 border-neon-500' : 'bg-transparent border-white/20'
+                            }`}>
+                              {form.verified_only && <Check className="w-3 h-3 text-dark-800" />}
+                            </div>
+                          </button>
                         </div>
                       </div>
 

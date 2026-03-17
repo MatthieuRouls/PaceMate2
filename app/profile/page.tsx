@@ -23,8 +23,13 @@ import {
   Users,
   Calendar,
   ChevronRight,
+  Shield,
 } from 'lucide-react';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
+import TrustScore from '@/components/ui/TrustScore';
+import TrustBadge from '@/components/ui/TrustBadge';
+import EmergencyButton from '@/components/ui/EmergencyButton';
+import { getVerificationInfo } from '@/lib/trust';
 
 export const dynamic = 'force-dynamic';
 
@@ -304,6 +309,118 @@ export default function ProfilePage() {
                     {parseBestTimes(profile.best_times) || '--'}
                   </div>
                   <div className="text-sm text-dark-500">meilleur temps</div>
+                </div>
+              </div>
+            </div>
+
+            {/* ── Trust & Safety Section ── */}
+            <div>
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-2xl font-bold text-dark-800">Confiance & Sécurité</h2>
+                {profile.phone_verified && (
+                  <TrustBadge level="phone" />
+                )}
+              </div>
+              <div className="space-y-4">
+                {/* Trust score card */}
+                <div className="card p-0 overflow-hidden bg-dark-800">
+                  <TrustScore profile={profile} expanded />
+                </div>
+
+                {/* Verification steps */}
+                <div className="card p-6 space-y-4">
+                  <h3 className="text-base font-bold text-dark-800 flex items-center gap-2">
+                    <Shield className="w-4 h-4 text-neon-700" />
+                    Niveau de vérification
+                  </h3>
+                  <div className="space-y-3">
+                    {/* Email */}
+                    <div className="flex items-center justify-between py-2 border-b border-silver-200">
+                      <div className="flex items-center gap-2.5 text-sm text-dark-700">
+                        <span className="text-base">✉️</span>
+                        Email
+                      </div>
+                      <TrustBadge
+                        level={profile.email ? 'email' : 'none'}
+                        label={profile.email ? 'Vérifié' : 'Non configuré'}
+                        size="md"
+                      />
+                    </div>
+                    {/* Phone */}
+                    <div className="flex items-center justify-between py-2 border-b border-silver-200">
+                      <div className="flex items-center gap-2.5 text-sm text-dark-700">
+                        <span className="text-base">📱</span>
+                        Téléphone
+                      </div>
+                      {profile.phone_verified ? (
+                        <TrustBadge level="phone" label="Vérifié" size="md" />
+                      ) : (
+                        <a
+                          href="/settings/verification"
+                          className="text-xs text-neon-700 font-semibold hover:text-neon-600 underline"
+                        >
+                          Vérifier →
+                        </a>
+                      )}
+                    </div>
+                    {/* Stats */}
+                    <div className="grid grid-cols-3 gap-3 pt-1">
+                      <div className="text-center">
+                        <p className="text-xl font-black text-dark-800">{profile.runs_completed ?? 0}</p>
+                        <p className="text-xs text-dark-500">Sorties</p>
+                      </div>
+                      <div className="text-center border-x border-silver-200">
+                        <p className="text-xl font-black text-dark-800">
+                          {profile.reliability_score != null ? `${profile.reliability_score}%` : '–'}
+                        </p>
+                        <p className="text-xs text-dark-500">Fiabilité</p>
+                      </div>
+                      <div className="text-center">
+                        <p className="text-xs text-dark-500 mb-1">Depuis</p>
+                        <p className="text-sm font-bold text-dark-800">
+                          {profile.created_at
+                            ? new Date(profile.created_at).toLocaleDateString('fr-FR', { month: 'short', year: 'numeric' })
+                            : '–'}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Trusted contact + emergency */}
+                <div className="card p-6 space-y-4">
+                  <div className="flex items-center justify-between">
+                    <h3 className="text-base font-bold text-dark-800">Sécurité lors des runs</h3>
+                    <EmergencyButton
+                      trustedContactPhone={profile.trusted_contact_phone}
+                      trustedContactName={profile.trusted_contact_name}
+                    />
+                  </div>
+                  {profile.trusted_contact_name ? (
+                    <div className="flex items-center gap-3 p-3 bg-neon-50 border border-neon-200 rounded-xl">
+                      <div className="w-9 h-9 rounded-full bg-neon-100 flex items-center justify-center text-neon-700 text-sm font-bold flex-shrink-0">
+                        {profile.trusted_contact_name.charAt(0).toUpperCase()}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-semibold text-dark-800 truncate">{profile.trusted_contact_name}</p>
+                        <p className="text-xs text-dark-500">
+                          {profile.trusted_contact_relation && `${profile.trusted_contact_relation} · `}
+                          Contact de confiance
+                        </p>
+                      </div>
+                      <CheckCircle className="w-5 h-5 text-neon-600 flex-shrink-0" />
+                    </div>
+                  ) : (
+                    <div className="flex items-center gap-3 p-3 bg-silver-100 border border-silver-300 rounded-xl">
+                      <div className="w-9 h-9 rounded-full bg-silver-200 flex items-center justify-center flex-shrink-0">
+                        <Users className="w-4 h-4 text-dark-400" />
+                      </div>
+                      <div className="flex-1">
+                        <p className="text-sm font-semibold text-dark-700">Aucun contact configuré</p>
+                        <p className="text-xs text-dark-500">Ajoute un contact de confiance dans les paramètres</p>
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
