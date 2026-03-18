@@ -43,6 +43,10 @@ export default function OnboardingPage() {
       safety_enhanced_mode: data.safetyEnhancedMode,
     };
 
+    if (data.gender) {
+      updatePayload.gender = data.gender;
+    }
+
     if (data.phoneNumber) {
       updatePayload.phone_number = data.phoneNumber;
       updatePayload.phone_verified = data.phoneVerified;

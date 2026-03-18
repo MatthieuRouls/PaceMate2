@@ -69,6 +69,9 @@ export default function DashboardPage() {
   const [fabHovered, setFabHovered] = useState(false);
   const [showFabTooltip, setShowFabTooltip] = useState(false);
 
+  // Level filter: 'accessible' = ≤ my level +1 | 'near' = ±1 | 'below' = ≤ my level
+  const [levelFilter, setLevelFilter] = useState<'accessible' | 'near' | 'below'>('accessible');
+
   // Overlay states
   const [selectedSessionId, setSelectedSessionId] = useState<string | null>(null);
   const [isSessionPanelOpen, setIsSessionPanelOpen] = useState(false);
@@ -111,8 +114,10 @@ export default function DashboardPage() {
   useEffect(() => {
     async function fetchData() {
       try {
+        // Fetch up to 20 sessions accessible to the user (≤ level + 1) for client-side filtering
+        const userLevel = profile?.running_level || 1;
         const [sessionsData, team] = await Promise.all([
-          getUpcomingSessions(5),
+          getUpcomingSessions(20, userLevel + 1),
           getUserTeam(),
         ]);
         setSessions(sessionsData);
@@ -124,11 +129,24 @@ export default function DashboardPage() {
         setTimeout(() => setLevelBarAnimated(true), 300);
       }
     }
-    fetchData();
-  }, []);
+    if (profile !== undefined) fetchData(); // wait until auth context resolves
+  }, [profile?.running_level]); // re-fetch if level changes (e.g. after Strava sync)
 
-  const featuredSession = sessions[0];
-  const secondarySessions = sessions.slice(1, 4);
+  // Apply client-side level filter on top of the pre-filtered sessions
+  const filteredSessions = useMemo(() => {
+    const userLevel = profile?.running_level || 1;
+    if (levelFilter === 'near') {
+      return sessions.filter(s => s.level_required >= userLevel - 1 && s.level_required <= userLevel + 1);
+    }
+    if (levelFilter === 'below') {
+      return sessions.filter(s => s.level_required <= userLevel);
+    }
+    // 'accessible': already pre-filtered server-side (≤ userLevel + 1)
+    return sessions;
+  }, [sessions, levelFilter, profile?.running_level]);
+
+  const featuredSession = filteredSessions[0];
+  const secondarySessions = filteredSessions.slice(1, 4);
 
   // Calcul du countdown pour la prochaine session
   const countdown = useMemo(() => {
@@ -535,13 +553,41 @@ export default function DashboardPage() {
         {/* ============================================ */}
         {/* SECTION 3 — COURIR AUJOURD'HUI (Élargi) */}
         {/* ============================================ */}
-        {secondarySessions.length > 0 && (
+        {(filteredSessions.length > 0 || sessions.length > 0) && (
           <section className="mb-14 section-reveal">
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-xl font-bold text-text-primary">Courir aujourd'hui</h2>
-              <Link href="/sessions" className="text-sm font-semibold text-neon-700 hover:text-neon-600 transition-colors flex items-center gap-1">
-                Voir tout <ChevronRight className="w-4 h-4" />
-              </Link>
+            <div className="flex flex-col gap-4 mb-6">
+              <div className="flex items-center justify-between">
+                <h2 className="text-xl font-bold text-text-primary">Courir aujourd'hui</h2>
+                <Link href="/sessions" className="text-sm font-semibold text-neon-700 hover:text-neon-600 transition-colors flex items-center gap-1">
+                  Voir tout <ChevronRight className="w-4 h-4" />
+                </Link>
+              </div>
+
+              {/* Level filter tabs */}
+              <div className="flex gap-2 flex-wrap">
+                {([
+                  { key: 'accessible', label: 'Accessible', desc: 'Mon niveau et au-dessus' },
+                  { key: 'near',       label: 'Mon niveau', desc: 'Niveau ± 1' },
+                  { key: 'below',      label: 'En dessous',  desc: 'Tous niveaux inférieurs' },
+                ] as const).map(({ key, label }) => (
+                  <button
+                    key={key}
+                    type="button"
+                    onClick={() => setLevelFilter(key)}
+                    className={`px-4 py-2 rounded-xl text-sm font-semibold transition-all duration-150 border ${
+                      levelFilter === key
+                        ? 'bg-dark-800 text-neon-500 border-dark-800 shadow-sm'
+                        : 'bg-white text-dark-500 border-silver-300 hover:border-dark-400 hover:text-dark-700'
+                    }`}
+                  >
+                    {label}
+                  </button>
+                ))}
+              </div>
+
+              {filteredSessions.length === 0 && (
+                <p className="text-sm text-dark-400">Aucune sortie disponible pour ce filtre.</p>
+              )}
             </div>
 
             <div className="flex flex-col lg:flex-row gap-6">

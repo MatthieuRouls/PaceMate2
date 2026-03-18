@@ -2,7 +2,8 @@ export interface Profile {
   id: string;
   email?: string;
   username: string;
-  running_level: number; // 1-5
+  running_level: number; // 1-9
+  gender?: 'male' | 'female' | 'other';
   avatar_url?: string;
   bio?: string;
   team_id?: string;

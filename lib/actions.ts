@@ -1194,13 +1194,13 @@ export async function completeRun(
 /**
  * Récupérer les prochaines sessions pour la homepage
  */
-export async function getUpcomingSessions(limit: number = 3) {
+export async function getUpcomingSessions(limit: number = 3, maxLevel?: number) {
   try {
     const supabase = await getServerSupabaseClient();
     const user = await getCurrentUser();
 
     // Récupérer les sessions avec le créateur en une seule requête (JOIN)
-    const { data: sessions, error } = await supabase
+    let query = supabase
       .from('sessions')
       .select(`
         *,
@@ -1209,6 +1209,13 @@ export async function getUpcomingSessions(limit: number = 3) {
       .gte('start_time', new Date().toISOString())
       .order('start_time', { ascending: true })
       .limit(limit);
+
+    // Filtrer par niveau max si fourni (niveau utilisateur + 1)
+    if (maxLevel !== undefined) {
+      query = query.lte('level_required', maxLevel);
+    }
+
+    const { data: sessions, error } = await query;
 
     if (error) {
       console.error('Error fetching upcoming sessions:', error);
@@ -1422,6 +1429,7 @@ export async function updateProfileLocation(data: {
 export async function updateProfile(data: {
   username?: string;
   bio?: string;
+  gender?: 'male' | 'female' | 'other';
   avatar_url?: string;
   phone_number?: string;
   phone_verified?: boolean;
@@ -1439,6 +1447,7 @@ export async function updateProfile(data: {
     const updateData: Record<string, string | boolean | null> = {};
     if (data.username !== undefined) updateData.username = data.username.trim();
     if (data.bio !== undefined) updateData.bio = data.bio.trim();
+    if (data.gender !== undefined) updateData.gender = data.gender;
     if (data.avatar_url !== undefined) updateData.avatar_url = data.avatar_url;
     if (data.phone_number !== undefined) updateData.phone_number = data.phone_number;
     if (data.phone_verified !== undefined) updateData.phone_verified = data.phone_verified;

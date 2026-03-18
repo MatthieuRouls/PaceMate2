@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useRef } from 'react';
-import { Camera, User, MapPin, AlertCircle } from 'lucide-react';
+import { Camera, User, MapPin, AlertCircle, Venus, Mars, Sparkles } from 'lucide-react';
 import { StepProps, validateStep1 } from './onboarding.types';
 
 export default function StepProfile({
@@ -95,6 +95,45 @@ export default function StepProfile({
           onChange={(e) => { const f = e.target.files?.[0]; if (f) handleFileSelect(f); }}
           className="hidden"
         />
+      </div>
+
+      {/* Genre */}
+      <div>
+        <div className="flex items-center justify-between mb-2">
+          <label className="block text-sm font-medium text-dark-800">Genre</label>
+          <span className="text-xs font-medium text-pink-600 bg-pink-50 px-2 py-0.5 rounded-full border border-pink-200">
+            Obligatoire
+          </span>
+        </div>
+        <div className="grid grid-cols-3 gap-2">
+          {([
+            { value: 'male',   label: 'Homme', Icon: Mars },
+            { value: 'female', label: 'Femme', Icon: Venus },
+            { value: 'other',  label: 'Autre', Icon: Sparkles },
+          ] as const).map(({ value, label, Icon }) => (
+            <button
+              key={value}
+              type="button"
+              onClick={() => { updateData({ gender: value }); setErrors(prev => ({ ...prev, gender: '' })); }}
+              className={`flex flex-col items-center gap-1.5 py-3 rounded-xl border-2 transition-all font-medium text-sm ${
+                data.gender === value
+                  ? 'border-neon-700 bg-neon-50 text-neon-700'
+                  : errors.gender
+                  ? 'border-pink-300 bg-pink-50/30 text-dark-500 hover:border-silver-400'
+                  : 'border-silver-300 text-dark-600 hover:border-neon-700 hover:bg-neon-50/30'
+              }`}
+            >
+              <Icon className="w-5 h-5" />
+              {label}
+            </button>
+          ))}
+        </div>
+        {errors.gender && (
+          <p className="flex items-center gap-1 text-xs text-pink-600 mt-1.5">
+            <AlertCircle className="w-3.5 h-3.5" />
+            {errors.gender}
+          </p>
+        )}
       </div>
 
       {/* Prénom */}

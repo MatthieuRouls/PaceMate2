@@ -16,6 +16,7 @@ export const TOTAL_STEPS = 5;
 export interface OnboardingData {
   // Step 1 - Profile
   firstName: string;
+  gender: 'male' | 'female' | 'other' | '';
   city: string;
   photoUrl: string | null;
   photoFile: File | null;
@@ -39,6 +40,7 @@ export interface OnboardingData {
 
 export const INITIAL_ONBOARDING_DATA: OnboardingData = {
   firstName: '',
+  gender: '',
   city: '',
   photoUrl: null,
   photoFile: null,
@@ -80,6 +82,10 @@ export function validateStep1(data: OnboardingData): StepValidation {
 
   if (!data.firstName || data.firstName.trim().length < 2) {
     errors.firstName = 'Prénom requis (min 2 caractères)';
+  }
+
+  if (!data.gender) {
+    errors.gender = 'Genre requis';
   }
 
   if (!data.photoUrl && !data.photoFile) {

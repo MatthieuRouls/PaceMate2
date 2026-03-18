@@ -22,6 +22,9 @@ import {
   X,
   LogOut,
   Link2,
+  Venus,
+  Mars,
+  Sparkles,
   RefreshCw,
   Unlink,
   TrendingUp,
@@ -53,6 +56,7 @@ export default function SettingsPage() {
   // Form state
   const [username, setUsername] = useState('');
   const [bio, setBio] = useState('');
+  const [gender, setGender] = useState<'male' | 'female' | 'other' | ''>('');
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
   const [initialized, setInitialized] = useState(false);
 
@@ -119,6 +123,7 @@ export default function SettingsPage() {
   if (profile && !initialized) {
     setUsername(profile.username || '');
     setBio(profile.bio || '');
+    setGender(profile.gender || '');
     setAvatarUrl(profile.avatar_url || null);
     setPhoneNumber(profile.phone_number || '');
     setPhoneVerified(profile.phone_verified || false);
@@ -167,7 +172,7 @@ export default function SettingsPage() {
   const handleSaveProfile = async () => {
     setSaving(true);
     setError(null);
-    const result = await updateProfile({ username: username.trim(), bio: bio.trim() });
+    const result = await updateProfile({ username: username.trim(), bio: bio.trim(), ...(gender ? { gender } : {}) });
     setSaving(false);
     if (result.success) { showSuccess('Profil mis à jour'); window.location.reload(); }
     else setError(result.error || 'Erreur');
@@ -367,6 +372,30 @@ export default function SettingsPage() {
                   className="w-full px-4 py-3 rounded-lg border border-silver-400 focus:border-neon-700 focus:ring-2 focus:ring-neon-700/20 outline-none transition-all resize-none"
                 />
                 <p className="text-xs text-dark-500 mt-1">{bio.length}/200 caractères</p>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-dark-800 mb-2">Genre</label>
+                <div className="grid grid-cols-3 gap-2">
+                  {([
+                    { value: 'male',   label: 'Homme', Icon: Mars },
+                    { value: 'female', label: 'Femme', Icon: Venus },
+                    { value: 'other',  label: 'Autre', Icon: Sparkles },
+                  ] as const).map(({ value, label, Icon }) => (
+                    <button
+                      key={value}
+                      type="button"
+                      onClick={() => setGender(value)}
+                      className={`flex flex-col items-center gap-1.5 py-3 rounded-xl border-2 transition-all font-medium text-sm ${
+                        gender === value
+                          ? 'border-neon-700 bg-neon-50 text-neon-700'
+                          : 'border-silver-300 text-dark-600 hover:border-neon-700 hover:bg-neon-50/30'
+                      }`}
+                    >
+                      <Icon className="w-5 h-5" />
+                      {label}
+                    </button>
+                  ))}
+                </div>
               </div>
               <button
                 onClick={handleSaveProfile}
