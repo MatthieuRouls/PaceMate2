@@ -1,7 +1,7 @@
 'use client';
 
-import { useState, useCallback } from 'react';
-import { useRouter } from 'next/navigation';
+import { useState, useCallback, useEffect } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import {
   OnboardingStep,
   OnboardingData,
@@ -16,6 +16,7 @@ import StepProfile from './StepProfile';
 import StepPhone from './StepPhone';
 import StepSafety from './StepSafety';
 import StepTrustedContact from './StepTrustedContact';
+import StepStrava from './StepStrava';
 
 interface OnboardingFlowProps {
   onComplete?: (data: OnboardingData) => Promise<void>;
@@ -23,9 +24,32 @@ interface OnboardingFlowProps {
 
 export default function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [currentStep, setCurrentStep] = useState<OnboardingStep>(1);
   const [data, setData] = useState<OnboardingData>(INITIAL_ONBOARDING_DATA);
   const [isLoading, setIsLoading] = useState(false);
+
+  // Handle return from Strava OAuth — auto-mark as connected and complete
+  useEffect(() => {
+    if (searchParams.get('strava_success') === 'true') {
+      setData((prev) => ({ ...prev, stravaConnected: true }));
+      setCurrentStep(5);
+      // Auto-advance to complete onboarding after a brief moment
+      const timer = setTimeout(async () => {
+        setIsLoading(true);
+        try {
+          if (onComplete) {
+            await onComplete({ ...INITIAL_ONBOARDING_DATA, stravaConnected: true });
+          }
+          router.push('/dashboard?strava_connected=true');
+        } catch (error) {
+          console.error('Onboarding error:', error);
+          setIsLoading(false);
+        }
+      }, 1500);
+      return () => clearTimeout(timer);
+    }
+  }, [searchParams, onComplete, router]);
 
   const updateData = useCallback((updates: Partial<OnboardingData>) => {
     setData((prev) => ({ ...prev, ...updates }));
@@ -71,6 +95,9 @@ export default function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
     isLoading,
   };
 
+  // Show success state while redirecting after Strava connect
+  const isStravaReturn = searchParams.get('strava_success') === 'true';
+
   return (
     <div className="min-h-screen bg-neu-base pt-20 pb-12 px-4">
       <div className="max-w-lg mx-auto">
@@ -98,10 +125,25 @@ export default function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
 
         {/* Card */}
         <div className="card p-6 sm:p-8">
-          {currentStep === 1 && <StepProfile {...stepProps} />}
-          {currentStep === 2 && <StepPhone {...stepProps} />}
-          {currentStep === 3 && <StepSafety {...stepProps} />}
-          {currentStep === 4 && <StepTrustedContact {...stepProps} />}
+          {isStravaReturn ? (
+            <div className="flex flex-col items-center justify-center py-8 space-y-4">
+              <div className="w-14 h-14 rounded-full bg-neon-500/20 flex items-center justify-center">
+                <span className="text-2xl">🎉</span>
+              </div>
+              <div className="text-center">
+                <p className="font-bold text-dark-800 text-lg">Strava connecté !</p>
+                <p className="text-sm text-dark-500 mt-1">Tes données de course sont synchronisées</p>
+              </div>
+            </div>
+          ) : (
+            <>
+              {currentStep === 1 && <StepProfile {...stepProps} />}
+              {currentStep === 2 && <StepPhone {...stepProps} />}
+              {currentStep === 3 && <StepSafety {...stepProps} />}
+              {currentStep === 4 && <StepTrustedContact {...stepProps} />}
+              {currentStep === 5 && <StepStrava {...stepProps} />}
+            </>
+          )}
         </div>
       </div>
     </div>

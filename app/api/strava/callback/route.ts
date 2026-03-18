@@ -14,16 +14,21 @@ export async function GET(request: NextRequest) {
   const error = searchParams.get('error');
   const state = searchParams.get('state');
 
+  // Decode context from state: "{userId}" or "{userId}:onboarding"
+  const isOnboarding = state?.endsWith(':onboarding') ?? false;
+  const errorBase = isOnboarding ? '/onboarding?strava_error' : '/settings?strava_error';
+  const successUrl = isOnboarding ? '/onboarding?strava_success=true' : '/settings?strava_success=true';
+
   // Gerer les erreurs d'autorisation
   if (error) {
     return NextResponse.redirect(
-      new URL('/settings?strava_error=access_denied', request.url)
+      new URL(`${errorBase}=access_denied`, request.url)
     );
   }
 
   if (!code) {
     return NextResponse.redirect(
-      new URL('/settings?strava_error=no_code', request.url)
+      new URL(`${errorBase}=no_code`, request.url)
     );
   }
 
@@ -54,7 +59,7 @@ export async function GET(request: NextRequest) {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) {
       return NextResponse.redirect(
-        new URL('/settings?strava_error=not_authenticated', request.url)
+        new URL(`${errorBase}=not_authenticated`, request.url)
       );
     }
 
@@ -89,18 +94,18 @@ export async function GET(request: NextRequest) {
     if (updateError) {
       console.error('Error updating profile with Strava data:', updateError);
       return NextResponse.redirect(
-        new URL('/settings?strava_error=update_failed', request.url)
+        new URL(`${errorBase}=update_failed`, request.url)
       );
     }
 
-    // 7. Rediriger vers les parametres avec succes
+    // 7. Rediriger vers la destination appropriee
     return NextResponse.redirect(
-      new URL('/settings?strava_success=true', request.url)
+      new URL(successUrl, request.url)
     );
   } catch (err) {
     console.error('Strava OAuth error:', err);
     return NextResponse.redirect(
-      new URL('/settings?strava_error=exchange_failed', request.url)
+      new URL(`${errorBase}=exchange_failed`, request.url)
     );
   }
 }

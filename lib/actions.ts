@@ -1747,6 +1747,23 @@ export async function getStravaConnectUrl(): Promise<{ url: string } | { error: 
 }
 
 /**
+ * Genere l'URL de connexion Strava depuis l'onboarding
+ * State encode le contexte ":onboarding" pour que le callback redirige vers /onboarding
+ */
+export async function getStravaConnectUrlForOnboarding(): Promise<{ url: string } | { error: string }> {
+  try {
+    const user = await getCurrentUser();
+    if (!user) return { error: 'Non authentifie' };
+
+    const url = getStravaAuthUrl(`${user.id}:onboarding`);
+    return { url };
+  } catch (error) {
+    console.error('Error generating Strava URL for onboarding:', error);
+    return { error: 'Erreur inattendue' };
+  }
+}
+
+/**
  * Synchronise les donnees Strava et recalcule le niveau
  */
 export async function syncStravaData(): Promise<{ success: boolean; level?: number; error?: string }> {

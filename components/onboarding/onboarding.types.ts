@@ -1,16 +1,17 @@
 /**
  * Onboarding Flow Types
  *
- * Security-focused onboarding with 4 steps (user is already authenticated):
+ * Security-focused onboarding with 5 steps (user is already authenticated):
  * 1. Profile (photo required, name, city)
  * 2. Phone verification (optional but encouraged)
  * 3. Safety mode toggle
  * 4. Trusted contact (optional)
+ * 5. Strava connection (optional, enhances matching)
  */
 
-export type OnboardingStep = 1 | 2 | 3 | 4;
+export type OnboardingStep = 1 | 2 | 3 | 4 | 5;
 
-export const TOTAL_STEPS = 4;
+export const TOTAL_STEPS = 5;
 
 export interface OnboardingData {
   // Step 1 - Profile
@@ -31,6 +32,9 @@ export interface OnboardingData {
   trustedContactName: string;
   trustedContactPhone: string;
   trustedContactRelation: string;
+
+  // Step 5 - Strava
+  stravaConnected: boolean;
 }
 
 export const INITIAL_ONBOARDING_DATA: OnboardingData = {
@@ -45,6 +49,7 @@ export const INITIAL_ONBOARDING_DATA: OnboardingData = {
   trustedContactName: '',
   trustedContactPhone: '',
   trustedContactRelation: '',
+  stravaConnected: false,
 };
 
 export interface StepProps {
@@ -67,6 +72,7 @@ export const STEP_TITLES: Record<OnboardingStep, string> = {
   2: 'Téléphone',
   3: 'Sécurité',
   4: 'Contact',
+  5: 'Strava',
 };
 
 export function validateStep1(data: OnboardingData): StepValidation {
@@ -127,5 +133,5 @@ export function validateCurrentStep(step: OnboardingStep, data: OnboardingData):
 }
 
 export function canSkipStep(step: OnboardingStep): boolean {
-  return step === 2 || step === 4;
+  return step === 2 || step === 4 || step === 5;
 }
