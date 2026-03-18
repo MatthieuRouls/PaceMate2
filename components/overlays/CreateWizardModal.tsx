@@ -257,6 +257,10 @@ export default function CreateWizardModal({ isOpen, onClose, onSuccess }: Create
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  // Prevent accidental form submission when arriving at step 4 via tap/click
+  // (the submit button appears at the same DOM position as "Continuer" and
+  // mobile browsers fire a synthetic click event ~300ms after touchend)
+  const [submitReady, setSubmitReady] = useState(false);
   const [geoSearchQuery, setGeoSearchQuery] = useState('');
   const [geoSearchResults, setGeoSearchResults] = useState<Array<{ display_name: string; lat: string; lon: string }>>([]);
   const [geoSearching, setGeoSearching] = useState(false);
@@ -290,11 +294,22 @@ export default function CreateWizardModal({ isOpen, onClose, onSuccess }: Create
   // Reset on open
   useEffect(() => {
     if (isOpen) {
-      setCurrentStep(1); setError(null); setSuccess(false);
+      setCurrentStep(1); setError(null); setSuccess(false); setSubmitReady(false);
       setTitleEdited(false); setGeoSearchResults([]); setGeoSearchQuery('');
       setTransitionDir(1); setAnimKey(0);
     }
   }, [isOpen]);
+
+  // Guard against accidental submit when the "Publier" button appears at the
+  // same DOM position as "Continuer". Mobile fires a synthetic click ~300ms
+  // after touchend — wait 400ms before enabling submit on the last step.
+  useEffect(() => {
+    if (currentStep === totalSteps) {
+      setSubmitReady(false);
+      const t = setTimeout(() => setSubmitReady(true), 400);
+      return () => clearTimeout(t);
+    }
+  }, [currentStep, totalSteps]);
 
   // ESC key
   useEffect(() => {
@@ -885,7 +900,7 @@ export default function CreateWizardModal({ isOpen, onClose, onSuccess }: Create
                 ) : (
                   <button
                     type="submit"
-                    disabled={loading}
+                    disabled={loading || !submitReady}
                     className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl bg-gradient-to-r from-pink-500 to-purple-500 hover:from-pink-400 hover:to-purple-400 text-white font-bold active:scale-[0.97] transition-all duration-150 disabled:opacity-60 shadow-[0_4px_20px_rgba(168,85,247,0.3)] hover:shadow-[0_4px_28px_rgba(168,85,247,0.5)]"
                   >
                     {loading ? (
