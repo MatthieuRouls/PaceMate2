@@ -374,7 +374,12 @@ export default function SettingsPage() {
                 <p className="text-xs text-dark-500 mt-1">{bio.length}/200 caractères</p>
               </div>
               <div>
-                <label className="block text-sm font-medium text-dark-800 mb-2">Genre</label>
+                <div className="flex items-center justify-between mb-2">
+                  <label className="block text-sm font-medium text-dark-800">Genre</label>
+                  {profile?.gender && (
+                    <span className="text-xs text-dark-400">Non modifiable</span>
+                  )}
+                </div>
                 <div className="grid grid-cols-3 gap-2">
                   {([
                     { value: 'male',   label: 'Homme', Icon: Mars },
@@ -384,12 +389,13 @@ export default function SettingsPage() {
                     <button
                       key={value}
                       type="button"
-                      onClick={() => setGender(value)}
+                      onClick={() => { if (!profile?.gender) setGender(value); }}
+                      disabled={!!profile?.gender}
                       className={`flex flex-col items-center gap-1.5 py-3 rounded-xl border-2 transition-all font-medium text-sm ${
                         gender === value
                           ? 'border-neon-700 bg-neon-50 text-neon-700'
-                          : 'border-silver-300 text-dark-600 hover:border-neon-700 hover:bg-neon-50/30'
-                      }`}
+                          : 'border-silver-300 text-dark-400'
+                      } ${profile?.gender ? 'cursor-not-allowed opacity-60' : 'cursor-pointer hover:border-neon-700 hover:bg-neon-50/30'}`}
                     >
                       <Icon className="w-5 h-5" />
                       {label}
