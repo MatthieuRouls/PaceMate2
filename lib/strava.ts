@@ -370,6 +370,50 @@ function calculatePerformanceBonus(bestEfforts: BestEffort[]): number {
   return bonus;
 }
 
+// ─── Level display helpers ────────────────────────────────────────────────────
+
+export interface LevelConfig {
+  label: string;       // full name shown to users
+  shortLabel: string;  // abbreviated for tight spaces
+  // Tailwind classes (compatible with light bg cards and dark bg cards)
+  textClass: string;
+  bgClass: string;
+  borderClass: string;
+}
+
+/**
+ * Maps running level (1-9) to display config.
+ * Safe for level values outside 1-9 — falls back to level 1.
+ */
+export function getLevelConfig(level: number): LevelConfig {
+  const configs: Record<number, LevelConfig> = {
+    1: { label: 'Débutant',        shortLabel: 'Déb.',    textClass: 'text-slate-500',  bgClass: 'bg-slate-100',   borderClass: 'border-slate-300' },
+    2: { label: 'Occasionnel',     shortLabel: 'Occ.',    textClass: 'text-blue-500',   bgClass: 'bg-blue-50',     borderClass: 'border-blue-200' },
+    3: { label: 'Régulier',        shortLabel: 'Rég.',    textClass: 'text-green-600',  bgClass: 'bg-green-50',    borderClass: 'border-green-200' },
+    4: { label: 'Confirmé',        shortLabel: 'Conf.',   textClass: 'text-teal-600',   bgClass: 'bg-teal-50',     borderClass: 'border-teal-200' },
+    5: { label: 'Compétiteur',     shortLabel: 'Comp.',   textClass: 'text-amber-600',  bgClass: 'bg-amber-50',    borderClass: 'border-amber-200' },
+    6: { label: 'Expert',          shortLabel: 'Exp.',    textClass: 'text-orange-600', bgClass: 'bg-orange-50',   borderClass: 'border-orange-200' },
+    7: { label: 'Performance',     shortLabel: 'Perf.',   textClass: 'text-pink-600',   bgClass: 'bg-pink-50',     borderClass: 'border-pink-200' },
+    8: { label: 'Élite amateur',   shortLabel: 'Élite',   textClass: 'text-purple-600', bgClass: 'bg-purple-50',   borderClass: 'border-purple-200' },
+    9: { label: 'Élite national',  shortLabel: 'Nat.',    textClass: 'text-yellow-600', bgClass: 'bg-yellow-50',   borderClass: 'border-yellow-200' },
+  };
+  return configs[level] ?? configs[1];
+}
+
+/**
+ * Derives a suggested required level from a pace (seconds/km).
+ * Used when creating a run to auto-set level_required from target pace.
+ */
+export function levelFromPaceSeconds(paceSeconds: number): number {
+  const min = paceSeconds / 60;
+  if (min <= 4.0) return 6;
+  if (min <= 4.5) return 5;
+  if (min <= 5.0) return 4;
+  if (min <= 5.5) return 3;
+  if (min <= 6.5) return 2;
+  return 1;
+}
+
 /**
  * Formatte l'allure en min:sec/km
  */

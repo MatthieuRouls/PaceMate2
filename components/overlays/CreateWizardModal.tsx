@@ -14,6 +14,7 @@ import {
   Shield,
 } from 'lucide-react';
 import { encodeSafetyTags } from '@/lib/trust';
+import { levelFromPaceSeconds } from '@/lib/strava';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -401,7 +402,7 @@ export default function CreateWizardModal({ isOpen, onClose, onSuccess }: Create
       location_name: form.location_name,
       latitude: form.latitude, longitude: form.longitude,
       distance_km: form.distance_km,
-      session_type: form.session_type, level_required: form.level_required,
+      session_type: form.session_type, level_required: levelFromPaceSeconds(form.pace_seconds),
       target_pace: paceToString(form.pace_seconds),
       walk_breaks_ok: form.walk_breaks_ok, max_participants: form.max_participants,
     };

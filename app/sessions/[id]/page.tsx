@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { Session, Profile } from '@/lib/types';
+import { getLevelConfig } from '@/lib/strava';
 import {
   getSessionDetails,
   getUserSessionStatus,
@@ -107,7 +108,7 @@ export default function SessionDetailsPage() {
     intervals: 'Fractionné',
   };
 
-  const levelLabels = ['Débutant', 'Intermédiaire', 'Confirmé', 'Avancé', 'Expert'];
+  const levelCfg = session ? getLevelConfig(session.level_required) : null;
 
   // Générer les initiales pour l'avatar
   const getInitials = (username: string) => {
@@ -307,19 +308,12 @@ export default function SessionDetailsPage() {
               </div>
 
               <div className="bg-white rounded-lg p-5 border border-silver-400">
-                <div className="flex gap-1 mb-2">
-                  {Array.from({ length: 5 }).map((_, i) => (
-                    <div
-                      key={i}
-                      className={`w-2.5 h-2.5 rounded-full ${
-                        i < session.level_required ? 'bg-pink-500' : 'bg-silver-300'
-                      }`}
-                    />
-                  ))}
-                </div>
-                <div className="text-sm text-dark-500 uppercase tracking-wider font-medium">
-                  {levelLabels[session.level_required - 1]}
-                </div>
+                <div className="text-xs text-dark-400 uppercase tracking-wider font-medium mb-2">Niveau</div>
+                {levelCfg && (
+                  <span className={`inline-flex items-center px-2.5 py-1 rounded-lg border text-xs font-semibold ${levelCfg.textClass} ${levelCfg.bgClass} ${levelCfg.borderClass}`}>
+                    {levelCfg.label}
+                  </span>
+                )}
               </div>
             </div>
 

@@ -4,6 +4,7 @@ import { useEffect } from 'react';
 import { Session } from '@/lib/types';
 import { X } from 'lucide-react';
 import Link from 'next/link';
+import { getLevelConfig } from '@/lib/strava';
 
 interface SessionDetailsDrawerProps {
   session: Session | null;
@@ -47,7 +48,7 @@ export default function SessionDetailsDrawer({ session, isOpen, onClose }: Sessi
   const isFull = spotsLeft === 0;
   const estimatedDuration = Math.round((session.distance_km * parseFloat(session.target_pace?.split(':')[0] || '5')) / 60);
 
-  const levelLabels = ['Debutant', 'Intermediaire', 'Confirme', 'Avance', 'Expert'];
+  const levelCfg = getLevelConfig(session.level_required);
 
   return (
     <>
@@ -122,19 +123,9 @@ export default function SessionDetailsDrawer({ session, isOpen, onClose }: Sessi
           {/* Level */}
           <div>
             <div className="font-semibold text-dark-800 mb-3">Niveau requis</div>
-            <div className="flex items-center gap-3">
-              <div className="flex gap-1">
-                {Array.from({ length: 5 }).map((_, i) => (
-                  <div
-                    key={i}
-                    className={`w-3 h-3 rounded-full ${
-                      i < session.level_required ? 'bg-pink-500' : 'bg-silver-300'
-                    }`}
-                  />
-                ))}
-              </div>
-              <span className="text-dark-500">{levelLabels[session.level_required - 1]}</span>
-            </div>
+            <span className={`inline-flex items-center px-3 py-1.5 rounded-lg border text-sm font-semibold ${levelCfg.textClass} ${levelCfg.bgClass} ${levelCfg.borderClass}`}>
+              {levelCfg.label}
+            </span>
           </div>
 
           {/* Description */}

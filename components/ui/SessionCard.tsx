@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { Session } from '@/lib/types';
 import { decodeSafetyTags } from '@/lib/trust';
+import { getLevelConfig } from '@/lib/strava';
 
 interface SessionCardProps {
   session: Session;
@@ -47,7 +48,7 @@ export default function SessionCard({ session, onClick, showJoinButton = true }:
     // Will navigate via Link
   };
 
-  const levelLabels = ['Débutant', 'Intermédiaire', 'Confirmé', 'Avancé', 'Expert'];
+  const levelCfg = getLevelConfig(session.level_required);
 
   const cardContent = (
     <div
@@ -68,21 +69,11 @@ export default function SessionCard({ session, onClick, showJoinButton = true }:
           </div>
 
           {/* Difficulty indicator */}
-          <div className="flex flex-col items-end gap-1.5">
-            <span className="text-xs text-dark-500 font-medium uppercase tracking-wider">Niveau</span>
-            <div className="flex gap-1">
-              {Array.from({ length: 5 }).map((_, i) => (
-                <div
-                  key={i}
-                  className={`w-2 h-2 rounded-full transition-colors ${
-                    i < session.level_required
-                      ? 'bg-pink-500'
-                      : 'bg-silver-300'
-                  }`}
-                ></div>
-              ))}
-            </div>
-            <span className="text-xs text-dark-500 font-medium">{levelLabels[session.level_required - 1]}</span>
+          <div className="flex flex-col items-end gap-1">
+            <span className="text-[10px] text-dark-400 font-medium uppercase tracking-wider">Niveau</span>
+            <span className={`inline-flex items-center px-2.5 py-1 rounded-lg border text-xs font-semibold ${levelCfg.textClass} ${levelCfg.bgClass} ${levelCfg.borderClass}`}>
+              {levelCfg.label}
+            </span>
           </div>
         </div>
 

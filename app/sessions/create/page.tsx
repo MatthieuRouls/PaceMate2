@@ -4,6 +4,7 @@ import { useState, useMemo, FormEvent, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { createSession, CreateSessionData } from '@/lib/actions';
+import { getLevelConfig } from '@/lib/strava';
 import RunPreviewCard from '@/components/ui/RunPreviewCard';
 import {
   Check, ChevronRight, ChevronLeft, MapPin, Search, Crosshair,
@@ -50,7 +51,7 @@ const SESSION_TYPES: Array<{
   { value: 'intervals', label: 'Fractionne', icon: '⚡', description: 'Seance intensive' },
 ];
 
-const LEVEL_LABELS = ['Debutant', 'Debutant confirme', 'Intermediaire', 'Confirme', 'Expert'];
+const LEVELS = [1, 2, 3, 4, 5, 6, 7, 8, 9] as const;
 
 function getQuickPicks(): Array<{ label: string; icon: React.ReactNode; getDate: () => string }> {
   return [
@@ -301,7 +302,6 @@ export default function CreateSessionPage() {
             formData={formData}
             compact
             sessionTypes={SESSION_TYPES}
-            levelLabels={LEVEL_LABELS}
           />
         </div>
 
@@ -554,41 +554,25 @@ export default function CreateSessionPage() {
                         <label className="block text-sm font-semibold text-dark-800 mb-3">
                           Niveau requis <span className="text-pink-500">*</span>
                         </label>
-                        <div className="space-y-2">
-                          {[1, 2, 3, 4, 5].map((level) => {
+                        <div className="grid grid-cols-3 gap-2">
+                          {LEVELS.map((level) => {
                             const isSelected = formData.level_required === level;
+                            const cfg = getLevelConfig(level);
                             return (
                               <button
                                 key={level}
                                 type="button"
                                 onClick={() => setFormData({ ...formData, level_required: level })}
-                                className={`w-full p-3.5 rounded-xl border-2 transition-all duration-200 text-left ${
+                                className={`p-2.5 rounded-xl border-2 transition-all duration-150 text-center ${
                                   isSelected
-                                    ? 'border-neon-700 bg-neon-50 dark:bg-neon-900/20 shadow-md shadow-neon-700/10'
-                                    : 'border-silver-300 hover:border-neon-400 hover:shadow-sm dark:border-dark-500 dark:hover:border-neon-600'
+                                    ? `${cfg.borderClass} ${cfg.bgClass} shadow-sm`
+                                    : 'border-silver-300 hover:border-silver-400 bg-white'
                                 }`}
                                 aria-pressed={isSelected}
                               >
-                                <div className="flex items-center justify-between">
-                                  <div className="flex items-center gap-3">
-                                    {isSelected && <Check className="w-4 h-4 text-neon-700 shrink-0" />}
-                                    <span className={`text-sm font-bold ${isSelected ? 'text-neon-700' : 'text-dark-800'}`}>
-                                      {LEVEL_LABELS[level - 1]}
-                                    </span>
-                                  </div>
-                                  <div className="flex gap-1">
-                                    {Array.from({ length: 5 }).map((_, i) => (
-                                      <div
-                                        key={i}
-                                        className={`w-2.5 h-2.5 rounded-full transition-colors ${
-                                          i < level
-                                            ? isSelected ? 'bg-neon-700' : 'bg-pink-400'
-                                            : 'bg-silver-300 dark:bg-dark-600'
-                                        }`}
-                                      />
-                                    ))}
-                                  </div>
-                                </div>
+                                <span className={`text-xs font-bold ${isSelected ? cfg.textClass : 'text-dark-600'}`}>
+                                  {cfg.label}
+                                </span>
                               </button>
                             );
                           })}
@@ -821,16 +805,11 @@ export default function CreateSessionPage() {
                                 <Zap className="w-3.5 h-3.5 text-pink-500" />
                                 <span className="text-xs text-dark-400 font-medium">Niveau</span>
                               </div>
-                              <div className="flex items-center gap-2">
-                                <span className="text-sm font-semibold text-dark-800">
-                                  {LEVEL_LABELS[formData.level_required - 1]}
+                              {(() => { const cfg = getLevelConfig(formData.level_required); return (
+                                <span className={`inline-flex items-center px-2 py-0.5 rounded-lg border text-xs font-semibold ${cfg.textClass} ${cfg.bgClass} ${cfg.borderClass}`}>
+                                  {cfg.label}
                                 </span>
-                                <div className="flex gap-0.5">
-                                  {Array.from({ length: formData.level_required }).map((_, i) => (
-                                    <div key={i} className="w-1.5 h-1.5 rounded-full bg-pink-400" />
-                                  ))}
-                                </div>
-                              </div>
+                              ); })()}
                             </div>
                           </div>
 
@@ -942,8 +921,7 @@ export default function CreateSessionPage() {
               <RunPreviewCard
                 formData={formData}
                 sessionTypes={SESSION_TYPES}
-                levelLabels={LEVEL_LABELS}
-              />
+                  />
             </div>
           </div>
         </div>

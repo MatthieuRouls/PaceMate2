@@ -2,6 +2,7 @@
 
 import { Calendar, MapPin, Users, Zap, Clock, Crown, Route } from 'lucide-react';
 import { CreateSessionData } from '@/lib/actions';
+import { getLevelConfig } from '@/lib/strava';
 
 interface RunPreviewCardProps {
   formData: CreateSessionData;
@@ -11,14 +12,12 @@ interface RunPreviewCardProps {
     label: string;
     icon: string;
   }>;
-  levelLabels: string[];
 }
 
 export default function RunPreviewCard({
   formData,
   compact = false,
   sessionTypes,
-  levelLabels
 }: RunPreviewCardProps) {
   const sessionType = sessionTypes.find(t => t.value === formData.session_type);
 
@@ -172,21 +171,11 @@ export default function RunPreviewCard({
             <Zap className="w-4 h-4 text-pink-400" />
             <span className="text-sm text-silver-300">Niveau requis</span>
           </div>
-          <div className="flex items-center gap-2">
-            <span className="text-sm font-medium text-white">
-              {levelLabels[formData.level_required - 1] || 'Non defini'}
+          {(() => { const cfg = getLevelConfig(formData.level_required); return (
+            <span className={`inline-flex items-center px-2 py-0.5 rounded-lg border text-xs font-semibold ${cfg.textClass} ${cfg.bgClass} ${cfg.borderClass}`}>
+              {cfg.label}
             </span>
-            <div className="flex gap-0.5">
-              {Array.from({ length: 5 }).map((_, i) => (
-                <div
-                  key={i}
-                  className={`w-1.5 h-1.5 rounded-full ${
-                    i < formData.level_required ? 'bg-pink-400' : 'bg-dark-600'
-                  }`}
-                />
-              ))}
-            </div>
-          </div>
+          ); })()}
         </div>
 
         {/* Organizer badge */}
