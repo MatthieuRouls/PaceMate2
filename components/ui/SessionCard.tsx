@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { Session } from '@/lib/types';
+import { decodeSafetyTags } from '@/lib/trust';
 
 interface SessionCardProps {
   session: Session;
@@ -34,6 +35,9 @@ export default function SessionCard({ session, onClick, showJoinButton = true }:
   // Calculate spots
   const spotsLeft = session.max_participants - (session.participants_count || 0);
   const isFull = spotsLeft === 0;
+
+  // Decode safety tags and strip them from the visible description
+  const { women_only, verified_only, cleanDescription } = decodeSafetyTags(session.description);
 
   // Duration calculation
   const estimatedDuration = Math.round((session.distance_km * parseFloat(session.target_pace?.split(':')[0] || '5')) / 60);
@@ -127,10 +131,26 @@ export default function SessionCard({ session, onClick, showJoinButton = true }:
           </div>
         </div>
 
-        {/* Description */}
-        {session.description && (
+        {/* Safety tags */}
+        {(women_only || verified_only) && (
+          <div className="flex flex-wrap gap-1.5">
+            {women_only && (
+              <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-pink-500/10 border border-pink-500/25 rounded-full text-[11px] font-semibold text-pink-500">
+                🚺 Femmes uniquement
+              </span>
+            )}
+            {verified_only && (
+              <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-neon-500/10 border border-neon-500/25 rounded-full text-[11px] font-semibold text-neon-700">
+                🛡️ Profil vérifié requis
+              </span>
+            )}
+          </div>
+        )}
+
+        {/* Description (without safety tag prefixes) */}
+        {cleanDescription && (
           <p className="text-sm text-dark-500 line-clamp-2 leading-relaxed">
-            {session.description}
+            {cleanDescription}
           </p>
         )}
 
