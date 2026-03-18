@@ -50,7 +50,7 @@ const RELATION_OPTIONS = [
 export default function SettingsPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { profile, loading: authLoading, signOut } = useAuth();
+  const { profile, loading: authLoading, signOut, refreshProfile } = useAuth();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Form state
@@ -58,7 +58,6 @@ export default function SettingsPage() {
   const [bio, setBio] = useState('');
   const [gender, setGender] = useState<'male' | 'female' | 'other' | ''>('');
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
-  const [initialized, setInitialized] = useState(false);
 
   // Phone state
   const [phoneNumber, setPhoneNumber] = useState('');
@@ -120,19 +119,20 @@ export default function SettingsPage() {
     }
   }, [searchParams, router]);
 
-  if (profile && !initialized) {
-    setUsername(profile.username || '');
-    setBio(profile.bio || '');
-    setGender(profile.gender || '');
-    setAvatarUrl(profile.avatar_url || null);
-    setPhoneNumber(profile.phone_number || '');
-    setPhoneVerified(profile.phone_verified || false);
-    setSafetyMode(profile.safety_enhanced_mode || false);
-    setTcName(profile.trusted_contact_name || '');
-    setTcPhone(profile.trusted_contact_phone || '');
-    setTcRelation(profile.trusted_contact_relation || '');
-    setInitialized(true);
-  }
+  useEffect(() => {
+    if (profile) {
+      setUsername(profile.username || '');
+      setBio(profile.bio || '');
+      setGender(profile.gender || '');
+      setAvatarUrl(profile.avatar_url || null);
+      setPhoneNumber(profile.phone_number || '');
+      setPhoneVerified(profile.phone_verified || false);
+      setSafetyMode(profile.safety_enhanced_mode || false);
+      setTcName(profile.trusted_contact_name || '');
+      setTcPhone(profile.trusted_contact_phone || '');
+      setTcRelation(profile.trusted_contact_relation || '');
+    }
+  }, [profile]);
 
   const showSuccess = (msg: string) => {
     setSuccess(msg);
@@ -174,7 +174,7 @@ export default function SettingsPage() {
     setError(null);
     const result = await updateProfile({ username: username.trim(), bio: bio.trim(), ...(gender ? { gender } : {}) });
     setSaving(false);
-    if (result.success) { showSuccess('Profil mis à jour'); window.location.reload(); }
+    if (result.success) { showSuccess('Profil mis à jour'); await refreshProfile(); }
     else setError(result.error || 'Erreur');
   };
 
@@ -211,7 +211,7 @@ export default function SettingsPage() {
     setPhoneVerified(true);
     setOtpSent(false);
     showSuccess('Numéro de téléphone vérifié !');
-    window.location.reload();
+    await refreshProfile();
   };
 
   const handleToggleSafetyMode = async (val: boolean) => {
@@ -246,7 +246,7 @@ export default function SettingsPage() {
   const handleSyncStrava = async () => {
     setSyncingStrava(true);
     const result = await syncStravaData();
-    if (result.success) { showSuccess(`Synchronisé ! Niveau : ${getLevelName(result.level || 1)}`); setTimeout(() => window.location.reload(), 2000); }
+    if (result.success) { showSuccess(`Synchronisé ! Niveau : ${getLevelName(result.level || 1)}`); setTimeout(() => refreshProfile(), 2000); }
     else setError(result.error || 'Erreur');
     setSyncingStrava(false);
   };
@@ -254,7 +254,7 @@ export default function SettingsPage() {
   const handleDisconnectStrava = async () => {
     setDisconnectingStrava(true);
     const result = await disconnectStrava();
-    if (result.success) { showSuccess('Strava déconnecté'); setTimeout(() => window.location.reload(), 2000); }
+    if (result.success) { showSuccess('Strava déconnecté'); setTimeout(() => refreshProfile(), 2000); }
     else setError(result.error || 'Erreur');
     setDisconnectingStrava(false);
   };
