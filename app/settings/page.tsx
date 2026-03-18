@@ -40,6 +40,22 @@ import LoadingSpinner from '@/components/ui/LoadingSpinner';
 
 export const dynamic = 'force-dynamic';
 
+function useInView(threshold = 0.1) {
+  const ref = useRef<HTMLElement>(null);
+  const [inView, setInView] = useState(false);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const ob = new IntersectionObserver(
+      ([e]) => { if (e.isIntersecting) { setInView(true); ob.unobserve(el); } },
+      { threshold }
+    );
+    ob.observe(el);
+    return () => ob.disconnect();
+  }, [threshold]);
+  return [ref, inView] as const;
+}
+
 const RELATION_OPTIONS = [
   { value: 'family', label: 'Famille' },
   { value: 'friend', label: 'Ami(e)' },
@@ -92,6 +108,14 @@ export default function SettingsPage() {
   const [connectingStrava, setConnectingStrava] = useState(false);
   const [syncingStrava, setSyncingStrava] = useState(false);
   const [disconnectingStrava, setDisconnectingStrava] = useState(false);
+
+  // Scroll entrance refs
+  const [headerRef, headerVisible] = useInView(0.2);
+  const [sec1Ref, sec1Visible] = useInView(0.1);
+  const [sec2Ref, sec2Visible] = useInView(0.1);
+  const [sec3Ref, sec3Visible] = useInView(0.1);
+  const [sec4Ref, sec4Visible] = useInView(0.1);
+  const [sec5Ref, sec5Visible] = useInView(0.1);
 
   useEffect(() => {
     if (phoneCountdown > 0) {
@@ -269,7 +293,7 @@ export default function SettingsPage() {
 
   if (authLoading) {
     return (
-      <div className="min-h-screen bg-neu-base flex items-center justify-center">
+      <div className="settings-bg min-h-screen flex items-center justify-center">
         <LoadingSpinner size="md" />
       </div>
     );
@@ -277,7 +301,7 @@ export default function SettingsPage() {
 
   if (!profile) {
     return (
-      <div className="min-h-screen bg-neu-base pt-28 px-4">
+      <div className="settings-bg min-h-screen pt-28 px-4">
         <div className="max-w-[720px] mx-auto text-center">
           <p className="text-dark-500">Profil non trouvé</p>
         </div>
@@ -288,14 +312,14 @@ export default function SettingsPage() {
   const genderLabels: Record<string, string> = { male: 'Homme', female: 'Femme', other: 'Autre' };
 
   return (
-    <div className="min-h-screen bg-neu-base pt-24 pb-24 px-4 sm:px-6">
-      <div className="max-w-[720px] mx-auto">
+    <div className="settings-bg settings-noise min-h-screen pt-24 pb-24 px-4 sm:px-6">
+      <div className="relative z-10 max-w-[720px] mx-auto">
 
         {/* ── Toast notifications ── */}
         <div className="fixed top-20 left-1/2 -translate-x-1/2 z-50 flex flex-col gap-2 pointer-events-none">
           {success && (
-            <div className="flex items-center gap-2.5 px-4 py-3 rounded-xl bg-dark-800 text-white text-sm font-medium shadow-xl animate-in slide-in-from-top-2 duration-200">
-              <Check className="w-4 h-4 text-neon-400 shrink-0" />
+            <div className="flex items-center gap-2.5 px-4 py-3 rounded-xl bg-dark-800 text-white text-sm font-medium shadow-xl animate-in slide-in-from-top-2 duration-200 signal-glow-sm">
+              <Check className="w-4 h-4 text-[#16C784] shrink-0" />
               {success}
             </div>
           )}
@@ -308,37 +332,48 @@ export default function SettingsPage() {
         </div>
 
         {/* ── PROFILE HEADER ── */}
-        <div className="flex items-center gap-5 mb-14">
-          <div className="relative shrink-0">
+        <div
+          ref={headerRef as React.RefObject<HTMLDivElement>}
+          className={`flex items-center gap-5 mb-14 ${headerVisible ? 'pm-enter-up' : 'pm-hidden'}`}
+        >
+          <div className="relative shrink-0 avatar-lift">
             {avatarUrl ? (
-              <img src={avatarUrl} alt="Avatar" className="w-20 h-20 rounded-2xl object-cover" />
+              <img
+                src={avatarUrl}
+                alt="Avatar"
+                className={`w-20 h-20 rounded-full object-cover ${phoneVerified ? 'verified-ring' : 'shadow-md ring-2 ring-white'}`}
+              />
             ) : (
-              <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-pink-500 to-neon-600 flex items-center justify-center text-white text-xl font-bold">
+              <div
+                className={`w-20 h-20 rounded-full bg-gradient-to-br from-pink-500 to-neon-600 flex items-center justify-center text-white text-xl font-bold ${phoneVerified ? 'verified-ring' : 'shadow-md ring-2 ring-white'}`}
+              >
                 {getInitials(username || profile.username)}
               </div>
             )}
             {uploadingPhoto && (
-              <div className="absolute inset-0 bg-black/50 rounded-2xl flex items-center justify-center">
+              <div className="absolute inset-0 bg-black/50 rounded-full flex items-center justify-center">
                 <LoadingSpinner size="sm" />
               </div>
             )}
             <button
               onClick={() => fileInputRef.current?.click()}
               disabled={uploadingPhoto}
-              className="absolute -bottom-1.5 -right-1.5 w-7 h-7 rounded-full bg-white border border-silver-200 shadow flex items-center justify-center hover:bg-silver-50 transition-colors"
+              className="absolute -bottom-1 -right-1 w-7 h-7 rounded-full bg-white border border-silver-200 shadow-md flex items-center justify-center hover:bg-silver-50 transition-colors btn-lift"
             >
               <Camera className="w-3.5 h-3.5 text-dark-600" />
             </button>
             <input type="file" ref={fileInputRef} accept="image/*" onChange={handlePhotoUpload} className="hidden" />
           </div>
           <div className="min-w-0">
-            <h1 className="text-2xl font-bold text-dark-800 truncate">{username || profile.username}</h1>
-            <div className="flex items-center flex-wrap gap-2 mt-1">
+            <h1 className="text-2xl font-bold tracking-tight text-dark-800 truncate">
+              {username || profile.username}
+            </h1>
+            <div className="flex items-center flex-wrap gap-2 mt-1.5">
               <span className="text-sm text-dark-400">
                 Niv. {profile.running_level} · {getLevelName(profile.running_level)}
               </span>
               {phoneVerified && (
-                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-neon-50 text-neon-700 border border-neon-200 text-xs font-semibold">
+                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-[#16C784]/10 text-[#0EA371] border border-[#16C784]/25 text-xs font-semibold">
                   <Check className="w-3 h-3" /> Vérifié
                 </span>
               )}
@@ -354,11 +389,11 @@ export default function SettingsPage() {
         <div className="space-y-14">
 
           {/* ══════════════════════════════════════
-              SECTION — MON PROFIL
+              SECTION 1 — MON PROFIL  (fade + slide up)
           ══════════════════════════════════════ */}
-          <section>
-            <p className="text-[11px] font-semibold uppercase tracking-widest text-dark-400 mb-5">Mon profil</p>
-            <div className="space-y-5">
+          <section ref={sec1Ref as React.RefObject<HTMLElement>} className={sec1Visible ? 'pm-enter-up' : 'pm-hidden'}>
+            <p className="text-[10px] font-bold uppercase tracking-widest text-dark-400/70 mb-4">Mon profil</p>
+            <div className="settings-glass p-6 space-y-5">
 
               <div>
                 <label className="block text-xs font-medium text-dark-500 mb-1.5">Nom d'utilisateur</label>
@@ -367,7 +402,7 @@ export default function SettingsPage() {
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
                   maxLength={30}
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-silver-200 bg-white focus:border-neon-600 focus:ring-2 focus:ring-neon-600/10 outline-none transition-all text-dark-800 text-sm"
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-silver-200 bg-white/80 focus:border-[#16C784] focus:ring-2 focus:ring-[#16C784]/10 outline-none transition-all text-dark-800 text-sm"
                 />
                 <p className="text-[11px] text-dark-400 mt-1">{username.length}/30</p>
               </div>
@@ -380,7 +415,7 @@ export default function SettingsPage() {
                   rows={3}
                   maxLength={200}
                   placeholder="Parle de toi en quelques mots..."
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-silver-200 bg-white focus:border-neon-600 focus:ring-2 focus:ring-neon-600/10 outline-none transition-all text-dark-800 text-sm resize-none"
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-silver-200 bg-white/80 focus:border-[#16C784] focus:ring-2 focus:ring-[#16C784]/10 outline-none transition-all text-dark-800 text-sm resize-none"
                 />
                 <p className="text-[11px] text-dark-400 mt-1">{bio.length}/200</p>
               </div>
@@ -401,9 +436,9 @@ export default function SettingsPage() {
                       type="button"
                       onClick={() => { if (!profile.gender) setGender(value); }}
                       disabled={!!profile.gender}
-                      className={`flex flex-col items-center gap-1.5 py-3 rounded-xl border-2 transition-all text-sm font-medium ${
+                      className={`flex flex-col items-center gap-1.5 py-3 rounded-xl border-2 transition-all text-sm font-medium btn-lift ${
                         gender === value
-                          ? 'border-neon-600 bg-neon-50 text-neon-700'
+                          ? 'border-[#16C784] bg-[#16C784]/8 text-[#0EA371]'
                           : 'border-silver-200 text-dark-400'
                       } ${profile.gender ? 'cursor-not-allowed opacity-50' : 'cursor-pointer hover:border-silver-300 hover:text-dark-600'}`}
                     >
@@ -417,7 +452,7 @@ export default function SettingsPage() {
               <button
                 onClick={handleSaveProfile}
                 disabled={saving}
-                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-dark-800 text-neon-400 text-sm font-semibold hover:bg-dark-700 transition-colors disabled:opacity-50"
+                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#16C784] text-white text-sm font-semibold hover:bg-[#0EA371] transition-colors disabled:opacity-50 btn-lift signal-glow-sm"
               >
                 {saving ? <LoadingSpinner size="sm" /> : <Check className="w-4 h-4" />}
                 {saving ? 'Enregistrement...' : 'Enregistrer les modifications'}
@@ -426,34 +461,41 @@ export default function SettingsPage() {
           </section>
 
           {/* ══════════════════════════════════════
-              SECTION — SÉCURITÉ
+              SECTION 2 — SÉCURITÉ  (fade + scale)
           ══════════════════════════════════════ */}
-          <section>
-            <p className="text-[11px] font-semibold uppercase tracking-widest text-dark-400 mb-5">Sécurité</p>
-            <div className="bg-slate-50 rounded-2xl divide-y divide-slate-100 overflow-hidden border border-slate-100">
+          <section ref={sec2Ref as React.RefObject<HTMLElement>} className={sec2Visible ? 'pm-enter-scale' : 'pm-hidden'}>
+            <p className="text-[10px] font-bold uppercase tracking-widest text-dark-400/70 mb-4">Sécurité</p>
+            <div className={`safety-glass divide-y divide-[#16C784]/10 overflow-hidden ${safetyMode ? 'safety-pulse' : ''}`}>
 
               {/* Safety mode toggle */}
               <div className="flex items-center justify-between px-6 py-5">
                 <div className="flex items-start gap-3">
-                  <div className={`mt-0.5 w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${safetyMode ? 'bg-neon-100' : 'bg-silver-200'}`}>
-                    <Shield className={`w-4 h-4 ${safetyMode ? 'text-neon-700' : 'text-dark-400'}`} />
+                  <div className={`mt-0.5 w-8 h-8 rounded-lg flex items-center justify-center shrink-0 transition-colors ${safetyMode ? 'bg-[#16C784]/15' : 'bg-silver-200'}`}>
+                    <Shield className={`w-4 h-4 ${safetyMode ? 'text-[#16C784]' : 'text-dark-400'}`} />
                   </div>
                   <div>
-                    <p className="text-sm font-semibold text-dark-800">Mode sécurité renforcée</p>
+                    <p className="text-sm font-semibold tracking-tight text-dark-800">Mode sécurité renforcée</p>
                     <p className="text-xs text-dark-400 mt-0.5">Position partagée en temps réel pendant tes sorties</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-3 ml-4 shrink-0">
-                  <span className={`text-xs font-medium ${safetyMode ? 'text-neon-700' : 'text-dark-400'}`}>
+                  <span className={`text-xs font-semibold ${safetyMode ? 'text-[#16C784]' : 'text-dark-400'}`}>
                     {safetyMode ? 'Actif' : 'Inactif'}
                   </span>
                   <button
                     type="button"
                     onClick={() => !savingSafety && handleToggleSafetyMode(!safetyMode)}
-                    className={`relative w-10 h-5.5 rounded-full transition-colors duration-200 ${safetyMode ? 'bg-neon-600' : 'bg-silver-300'} ${savingSafety ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
-                    style={{ height: '22px', width: '40px' }}
+                    className={`relative rounded-full transition-all duration-300 ${
+                      safetyMode
+                        ? 'bg-[#16C784] toggle-active-glow'
+                        : 'bg-silver-300'
+                    } ${savingSafety ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
+                    style={{ height: '22px', width: '40px', transitionTimingFunction: 'cubic-bezier(0.34,1.56,0.64,1)' }}
                   >
-                    <span className={`absolute top-0.5 left-0.5 w-[18px] h-[18px] rounded-full bg-white shadow transition-transform duration-200 ${safetyMode ? 'translate-x-[18px]' : ''}`} />
+                    <span
+                      className={`absolute top-0.5 left-0.5 w-[18px] h-[18px] rounded-full bg-white shadow-sm transition-transform duration-300 ${safetyMode ? 'translate-x-[18px]' : ''}`}
+                      style={{ transitionTimingFunction: 'cubic-bezier(0.34,1.56,0.64,1)' }}
+                    />
                   </button>
                 </div>
               </div>
@@ -465,7 +507,7 @@ export default function SettingsPage() {
                     <UserCheck className="w-4 h-4 text-purple-600" />
                   </div>
                   <div>
-                    <p className="text-sm font-semibold text-dark-800">Contact de confiance</p>
+                    <p className="text-sm font-semibold tracking-tight text-dark-800">Contact de confiance</p>
                     <p className="text-xs text-dark-400 mt-0.5">Personne à prévenir en cas d'urgence · jamais partagée sans ton accord</p>
                   </div>
                 </div>
@@ -475,14 +517,14 @@ export default function SettingsPage() {
                     placeholder="Nom du contact"
                     value={tcName}
                     onChange={(e) => setTcName(e.target.value)}
-                    className="px-3.5 py-2 rounded-xl border border-slate-200 bg-white focus:border-neon-600 focus:ring-1 focus:ring-neon-600/10 outline-none text-sm text-dark-800 transition-all"
+                    className="px-3.5 py-2 rounded-xl border border-[#16C784]/20 bg-white/80 focus:border-[#16C784] focus:ring-1 focus:ring-[#16C784]/10 outline-none text-sm text-dark-800 transition-all"
                   />
                   <input
                     type="tel"
                     placeholder="+33 6 12 34 56 78"
                     value={tcPhone}
                     onChange={(e) => setTcPhone(e.target.value)}
-                    className="px-3.5 py-2 rounded-xl border border-slate-200 bg-white focus:border-neon-600 focus:ring-1 focus:ring-neon-600/10 outline-none text-sm text-dark-800 transition-all"
+                    className="px-3.5 py-2 rounded-xl border border-[#16C784]/20 bg-white/80 focus:border-[#16C784] focus:ring-1 focus:ring-[#16C784]/10 outline-none text-sm text-dark-800 transition-all"
                   />
                   <div className="sm:col-span-2 flex flex-wrap gap-2">
                     {RELATION_OPTIONS.map((opt) => (
@@ -490,10 +532,10 @@ export default function SettingsPage() {
                         key={opt.value}
                         type="button"
                         onClick={() => setTcRelation(opt.value)}
-                        className={`px-3 py-1.5 rounded-lg border text-xs font-medium transition-all ${
+                        className={`px-3 py-1.5 rounded-lg border text-xs font-medium transition-all btn-lift ${
                           tcRelation === opt.value
-                            ? 'border-neon-600 bg-neon-50 text-neon-700'
-                            : 'border-slate-200 bg-white text-dark-500 hover:border-slate-300'
+                            ? 'border-[#16C784] bg-[#16C784]/10 text-[#0EA371]'
+                            : 'border-slate-200 bg-white/60 text-dark-500 hover:border-slate-300'
                         }`}
                       >
                         {opt.label}
@@ -503,7 +545,7 @@ export default function SettingsPage() {
                   <button
                     onClick={handleSaveTrustedContact}
                     disabled={savingContact}
-                    className="sm:col-span-2 inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-dark-800 text-neon-400 text-xs font-semibold hover:bg-dark-700 transition-colors disabled:opacity-50 w-fit"
+                    className="sm:col-span-2 inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-[#16C784] text-white text-xs font-semibold hover:bg-[#0EA371] transition-colors disabled:opacity-50 w-fit btn-lift"
                   >
                     {savingContact ? <LoadingSpinner size="sm" /> : <Check className="w-3.5 h-3.5" />}
                     {savingContact ? 'Enregistrement...' : 'Enregistrer le contact'}
@@ -518,13 +560,13 @@ export default function SettingsPage() {
                     <ShieldCheck className="w-4 h-4 text-violet-600" />
                   </div>
                   <div>
-                    <p className="text-sm font-semibold text-dark-800">Vérification d'identité</p>
+                    <p className="text-sm font-semibold tracking-tight text-dark-800">Vérification d'identité</p>
                     <p className="text-xs text-dark-400 mt-0.5">Pièce d'identité + selfie · débloque le niveau 2</p>
                   </div>
                 </div>
                 <a
                   href="/settings/identity"
-                  className="ml-4 shrink-0 inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-violet-600 text-white text-xs font-semibold hover:bg-violet-700 transition-colors"
+                  className="ml-4 shrink-0 inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-violet-600 text-white text-xs font-semibold hover:bg-violet-700 transition-colors btn-lift"
                 >
                   <ShieldCheck className="w-3.5 h-3.5" />
                   Vérifier
@@ -534,14 +576,14 @@ export default function SettingsPage() {
               {/* Phone number */}
               <div className="px-6 py-5">
                 <div className="flex items-start gap-3 mb-4">
-                  <div className={`mt-0.5 w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${phoneVerified ? 'bg-neon-100' : 'bg-silver-200'}`}>
-                    <Phone className={`w-4 h-4 ${phoneVerified ? 'text-neon-700' : 'text-dark-400'}`} />
+                  <div className={`mt-0.5 w-8 h-8 rounded-lg flex items-center justify-center shrink-0 transition-colors ${phoneVerified ? 'bg-[#16C784]/15' : 'bg-silver-200'}`}>
+                    <Phone className={`w-4 h-4 ${phoneVerified ? 'text-[#16C784]' : 'text-dark-400'}`} />
                   </div>
                   <div>
-                    <p className="text-sm font-semibold text-dark-800">
+                    <p className="text-sm font-semibold tracking-tight text-dark-800">
                       Téléphone
                       {phoneVerified && (
-                        <span className="ml-2 inline-flex items-center gap-0.5 text-xs font-semibold text-neon-700">
+                        <span className="ml-2 inline-flex items-center gap-0.5 text-xs font-semibold text-[#16C784]">
                           <Check className="w-3 h-3" /> Vérifié
                         </span>
                       )}
@@ -564,12 +606,12 @@ export default function SettingsPage() {
                       placeholder="+33 6 12 34 56 78"
                       value={phoneNumber}
                       onChange={(e) => setPhoneNumber(e.target.value)}
-                      className="flex-1 px-3.5 py-2 rounded-xl border border-slate-200 bg-white focus:border-neon-600 focus:ring-1 focus:ring-neon-600/10 outline-none text-sm text-dark-800 transition-all"
+                      className="flex-1 px-3.5 py-2 rounded-xl border border-[#16C784]/20 bg-white/80 focus:border-[#16C784] focus:ring-1 focus:ring-[#16C784]/10 outline-none text-sm text-dark-800 transition-all"
                     />
                     <button
                       onClick={handleSendOtp}
                       disabled={sendingOtp}
-                      className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-dark-800 text-neon-400 text-xs font-semibold hover:bg-dark-700 transition-colors disabled:opacity-50 shrink-0"
+                      className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-dark-800 text-[#16C784] text-xs font-semibold hover:bg-dark-700 transition-colors disabled:opacity-50 shrink-0 btn-lift"
                     >
                       {sendingOtp ? <LoadingSpinner size="sm" /> : <Phone className="w-3.5 h-3.5" />}
                       {sendingOtp ? 'Envoi...' : phoneVerified ? 'Changer' : 'Envoyer'}
@@ -585,13 +627,13 @@ export default function SettingsPage() {
                       maxLength={6}
                       value={otpCode}
                       onChange={(e) => setOtpCode(e.target.value.replace(/\D/g, ''))}
-                      className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 bg-white focus:border-neon-600 outline-none text-center text-2xl font-bold tracking-[0.5em] transition-all"
+                      className="w-full px-3.5 py-2.5 rounded-xl border border-[#16C784]/20 bg-white/80 focus:border-[#16C784] outline-none text-center text-2xl font-bold tracking-[0.5em] transition-all"
                     />
                     <div className="flex gap-2">
                       <button
                         onClick={handleVerifyOtp}
                         disabled={otpCode.length !== 6 || verifyingOtp}
-                        className="flex-1 py-2 rounded-xl bg-dark-800 text-neon-400 text-xs font-semibold disabled:opacity-50"
+                        className="flex-1 py-2 rounded-xl bg-[#16C784] text-white text-xs font-semibold disabled:opacity-50 btn-lift hover:bg-[#0EA371] transition-colors"
                       >
                         {verifyingOtp ? 'Vérification...' : 'Vérifier le code'}
                       </button>
@@ -605,7 +647,7 @@ export default function SettingsPage() {
                     {phoneCountdown > 0 ? (
                       <p className="text-[11px] text-dark-400">Renvoyer dans {phoneCountdown}s</p>
                     ) : (
-                      <button onClick={handleSendOtp} className="text-[11px] text-neon-700 hover:underline">Renvoyer le code</button>
+                      <button onClick={handleSendOtp} className="text-[11px] text-[#16C784] hover:underline">Renvoyer le code</button>
                     )}
                   </div>
                 )}
@@ -614,14 +656,14 @@ export default function SettingsPage() {
           </section>
 
           {/* ══════════════════════════════════════
-              SECTION — COMPTE & CONNEXIONS
+              SECTION 3 — COMPTE & CONNEXIONS  (slide from left)
           ══════════════════════════════════════ */}
-          <section>
-            <p className="text-[11px] font-semibold uppercase tracking-widest text-dark-400 mb-5">Compte & Connexions</p>
+          <section ref={sec3Ref as React.RefObject<HTMLElement>} className={sec3Visible ? 'pm-enter-left' : 'pm-hidden'}>
+            <p className="text-[10px] font-bold uppercase tracking-widest text-dark-400/70 mb-4">Compte & Connexions</p>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
 
               {/* Left: Account */}
-              <div className="bg-white rounded-2xl border border-silver-100 p-5 flex flex-col gap-4">
+              <div className="settings-glass p-5 flex flex-col gap-4">
                 <div>
                   <p className="text-[11px] font-medium text-dark-400 uppercase tracking-wider mb-1.5">Email</p>
                   <p className="text-sm font-medium text-dark-700 truncate">{profile.email || '—'}</p>
@@ -629,7 +671,7 @@ export default function SettingsPage() {
                 <div className="h-px bg-silver-100" />
                 <button
                   onClick={() => signOut()}
-                  className="inline-flex items-center gap-2 text-sm text-dark-500 hover:text-dark-800 transition-colors font-medium"
+                  className="inline-flex items-center gap-2 text-sm text-dark-500 hover:text-dark-800 transition-colors font-medium btn-lift w-fit"
                 >
                   <LogOut className="w-4 h-4" />
                   Se déconnecter
@@ -637,12 +679,14 @@ export default function SettingsPage() {
               </div>
 
               {/* Right: Strava */}
-              <div className={`rounded-2xl border p-5 ${profile.strava_connected ? 'bg-orange-50 border-orange-100' : 'bg-white border-silver-100'}`}>
+              <div className={`settings-glass p-5 ${profile.strava_connected ? 'border-orange-200/50' : ''}`}
+                style={profile.strava_connected ? { background: 'rgba(255,247,237,0.75)' } : undefined}
+              >
                 <div className="flex items-center gap-2 mb-3">
                   <svg className="w-5 h-5 text-orange-500 shrink-0" viewBox="0 0 24 24" fill="currentColor">
                     <path d="M15.387 17.944l-2.089-4.116h-3.065L15.387 24l5.15-10.172h-3.066m-7.008-5.599l2.836 5.598h4.172L10.463 0l-7 13.828h4.169" />
                   </svg>
-                  <span className="text-sm font-semibold text-dark-800">Strava</span>
+                  <span className="text-sm font-semibold tracking-tight text-dark-800">Strava</span>
                   {profile.strava_connected && (
                     <span className="ml-auto inline-flex items-center gap-1 text-xs font-semibold text-orange-600">
                       <Check className="w-3 h-3" /> Connecté
@@ -674,7 +718,7 @@ export default function SettingsPage() {
                       <button
                         onClick={handleSyncStrava}
                         disabled={syncingStrava}
-                        className="flex-1 inline-flex items-center justify-center gap-1.5 py-2 rounded-xl bg-orange-500 text-white text-xs font-semibold hover:bg-orange-600 transition-colors disabled:opacity-50"
+                        className="flex-1 inline-flex items-center justify-center gap-1.5 py-2 rounded-xl bg-orange-500 text-white text-xs font-semibold hover:bg-orange-600 transition-colors disabled:opacity-50 btn-lift"
                       >
                         <RefreshCw className={`w-3.5 h-3.5 ${syncingStrava ? 'animate-spin' : ''}`} />
                         {syncingStrava ? 'Sync...' : 'Synchroniser'}
@@ -682,7 +726,7 @@ export default function SettingsPage() {
                       <button
                         onClick={handleDisconnectStrava}
                         disabled={disconnectingStrava}
-                        className="px-3 py-2 rounded-xl border border-orange-200 text-orange-700 text-xs font-medium hover:bg-orange-100 transition-colors disabled:opacity-50"
+                        className="px-3 py-2 rounded-xl border border-orange-200 text-orange-700 text-xs font-medium hover:bg-orange-100 transition-colors disabled:opacity-50 btn-lift"
                       >
                         <Unlink className="w-3.5 h-3.5" />
                       </button>
@@ -694,7 +738,7 @@ export default function SettingsPage() {
                     <button
                       onClick={handleConnectStrava}
                       disabled={connectingStrava}
-                      className="w-full inline-flex items-center justify-center gap-2 py-2.5 rounded-xl bg-orange-500 text-white text-sm font-semibold hover:bg-orange-600 transition-colors disabled:opacity-50"
+                      className="w-full inline-flex items-center justify-center gap-2 py-2.5 rounded-xl bg-orange-500 text-white text-sm font-semibold hover:bg-orange-600 transition-colors disabled:opacity-50 btn-lift"
                     >
                       <Link2 className="w-4 h-4" />
                       {connectingStrava ? 'Connexion...' : 'Connecter Strava'}
@@ -706,22 +750,22 @@ export default function SettingsPage() {
           </section>
 
           {/* ══════════════════════════════════════
-              SECTION — PRÉFÉRENCES DE COURSE
+              SECTION 4 — PRÉFÉRENCES  (fade only)
           ══════════════════════════════════════ */}
-          <section>
-            <p className="text-[11px] font-semibold uppercase tracking-widest text-dark-400 mb-5">Préférences de course</p>
-            <div className="bg-white rounded-2xl border border-silver-100 p-5 space-y-5">
+          <section ref={sec4Ref as React.RefObject<HTMLElement>} className={sec4Visible ? 'pm-enter-fade' : 'pm-hidden'}>
+            <p className="text-[10px] font-bold uppercase tracking-widest text-dark-400/70 mb-4">Préférences de course</p>
+            <div className="settings-glass p-5 space-y-5">
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <p className="text-xs font-medium text-dark-400 mb-1.5">Allure habituelle</p>
-                  <p className="text-xl font-bold text-dark-800">
+                  <p className="text-xl font-bold tracking-tight text-dark-800">
                     {profile.calculated_avg_pace || '—'}
                     {profile.calculated_avg_pace && <span className="text-sm font-normal text-dark-400 ml-1">/km</span>}
                   </p>
                 </div>
                 <div>
                   <p className="text-xs font-medium text-dark-400 mb-1.5">Plus longue sortie</p>
-                  <p className="text-xl font-bold text-dark-800">
+                  <p className="text-xl font-bold tracking-tight text-dark-800">
                     {profile.calculated_longest_run ? `${profile.calculated_longest_run} km` : '—'}
                   </p>
                 </div>
@@ -730,13 +774,13 @@ export default function SettingsPage() {
                 <p className="text-xs font-medium text-dark-400 mb-2.5">Types de sorties</p>
                 <div className="flex flex-wrap gap-2">
                   {[
-                    { label: 'Détente',      key: 'casual' },
-                    { label: 'Tempo',        key: 'tempo' },
-                    { label: 'Fractionné',   key: 'intervals' },
-                    { label: 'Sortie longue',key: 'long_run' },
-                    { label: 'Récupération', key: 'recovery' },
+                    { label: 'Détente',       key: 'casual' },
+                    { label: 'Tempo',         key: 'tempo' },
+                    { label: 'Fractionné',    key: 'intervals' },
+                    { label: 'Sortie longue', key: 'long_run' },
+                    { label: 'Récupération',  key: 'recovery' },
                   ].map(({ label }) => (
-                    <span key={label} className="px-3 py-1.5 rounded-lg bg-silver-50 border border-silver-200 text-xs font-medium text-dark-500">
+                    <span key={label} className="px-3 py-1.5 rounded-lg bg-white/60 border border-silver-200 text-xs font-medium text-dark-500">
                       {label}
                     </span>
                   ))}
@@ -747,11 +791,11 @@ export default function SettingsPage() {
           </section>
 
           {/* ══════════════════════════════════════
-              SECTION — ZONE DE DANGER
+              SECTION 5 — ZONE DE DANGER  (fade only)
           ══════════════════════════════════════ */}
-          <section>
-            <p className="text-[11px] font-semibold uppercase tracking-widest text-dark-400 mb-5">Zone de danger</p>
-            <div className="bg-red-50 rounded-2xl border border-red-100 p-5">
+          <section ref={sec5Ref as React.RefObject<HTMLElement>} className={sec5Visible ? 'pm-enter-fade' : 'pm-hidden'}>
+            <p className="text-[10px] font-bold uppercase tracking-widest text-red-400/70 mb-4">Zone de danger</p>
+            <div className="danger-glass p-5">
               {!showDeleteConfirm ? (
                 <div className="flex items-center justify-between gap-4">
                   <div>
@@ -760,7 +804,7 @@ export default function SettingsPage() {
                   </div>
                   <button
                     onClick={() => setShowDeleteConfirm(true)}
-                    className="shrink-0 inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-red-500 text-white text-sm font-semibold hover:bg-red-600 transition-colors"
+                    className="shrink-0 inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-red-500 text-white text-sm font-semibold hover:bg-red-600 transition-colors btn-lift"
                   >
                     <Trash2 className="w-4 h-4" />
                     Supprimer
@@ -777,13 +821,13 @@ export default function SettingsPage() {
                     value={deleteConfirmText}
                     onChange={(e) => setDeleteConfirmText(e.target.value)}
                     placeholder="SUPPRIMER"
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-red-200 bg-white focus:border-red-400 outline-none text-sm text-dark-800"
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-red-200 bg-white/80 focus:border-red-400 outline-none text-sm text-dark-800"
                   />
                   <div className="flex gap-2">
                     <button
                       onClick={handleDeleteAccount}
                       disabled={deleting || deleteConfirmText !== 'SUPPRIMER'}
-                      className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-red-500 text-white text-sm font-semibold disabled:opacity-40 hover:bg-red-600 transition-colors"
+                      className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-red-500 text-white text-sm font-semibold disabled:opacity-40 hover:bg-red-600 transition-colors btn-lift"
                     >
                       <Trash2 className="w-4 h-4" />
                       {deleting ? 'Suppression...' : 'Confirmer'}
