@@ -323,7 +323,7 @@ export default function ProfilePage() {
               </div>
               <div className="space-y-4">
                 {/* Trust score card */}
-                <div className="card p-0 overflow-hidden bg-dark-800">
+                <div className="rounded-2xl overflow-hidden">
                   <TrustScore profile={profile} expanded />
                 </div>
 

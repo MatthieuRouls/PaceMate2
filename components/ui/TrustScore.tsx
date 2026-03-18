@@ -59,7 +59,7 @@ export default function TrustScore({ profile, expanded = false }: TrustScoreProp
   ];
 
   return (
-    <div className={`rounded-2xl border p-5 space-y-4 ${info.bgClass} ${info.borderClass}`}>
+    <div className={`rounded-2xl border p-5 space-y-4 bg-dark-800 ${info.borderClass}`}>
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="space-y-0.5">
