@@ -4,45 +4,101 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ── Design tokens ─────────────────────────────────────────────── */
 :root {
-  /* Variables par défaut (Discovery) */
-  --color-primary: #FDE047;
-  --color-secondary: #86EFAC;
-  --color-bg: #FFFFFF;
-  --color-text: #1F2937;
-  --radius: 24px;
-  --font-main: 'Poppins', sans-serif;
+  /* Dark High-Performance theme (default) */
+  --pm-bg:          #050A08;
+  --pm-surface-1:   #0B120F;
+  --pm-surface-2:   #141C18;
+  --pm-accent:      #22C55E;
+  --pm-accent-rose: #F43F5E;
+  --pm-border:      rgba(255, 255, 255, 0.05);
+  --pm-text-primary:   #F8FAFC;
+  --pm-text-secondary: #94A3B8;
+
+  /* Legacy Discovery variables (kept for compatibility) */
+  --color-primary:   #22C55E;
+  --color-secondary: #0B120F;
+  --color-bg:        #050A08;
+  --color-text:      #F8FAFC;
+  --radius:          12px;
+  --font-main:       'Space Grotesk', sans-serif;
 }
 
-[data-theme="discovery"] {
-  --color-primary: #FDE047;
-  --color-secondary: #86EFAC;
-  --color-bg: #FFFFFF;
-  --color-text: #1F2937;
-  --radius: 24px;
-  --font-main: 'Poppins', sans-serif;
-}
-
-[data-theme="elite"] {
-  --color-primary: #7C3AED;
-  --color-secondary: #A78BFA;
-  --color-bg: #111827;
-  --color-text: #F9FAFB;
-  --radius: 4px;
-  --font-main: 'Space Grotesk', sans-serif;
+/* ── Base styles ────────────────────────────────────────────────── */
+html {
+  color-scheme: dark;
 }
 
 body {
-  background-color: var(--color-bg);
-  color: var(--color-text);
+  background-color: var(--pm-bg);
+  color: var(--pm-text-primary);
   font-family: var(--font-main);
-  transition: background-color 0.3s ease, color 0.3s ease;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-/* Utility classes pour réutilisation */
+/* ── Skeleton shimmer animation ─────────────────────────────────── */
+@keyframes skeleton-shimmer {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+.skeleton-shimmer {
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.04) 25%,
+    rgba(255, 255, 255, 0.08) 50%,
+    rgba(255, 255, 255, 0.04) 75%
+  );
+  background-size: 200% 100%;
+  animation: skeleton-shimmer 1.6s ease-in-out infinite;
+}
+
+/* ── Neon glow utilities ─────────────────────────────────────────── */
+.glow-green {
+  box-shadow: 0 0 12px rgba(34, 197, 94, 0.4);
+}
+
+.glow-rose {
+  box-shadow: 0 0 12px rgba(244, 63, 94, 0.4);
+}
+
+.text-glow-green {
+  text-shadow: 0 0 10px rgba(34, 197, 94, 0.5);
+}
+
+/* ── Glassmorphism surface ───────────────────────────────────────── */
+.glass {
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  background: rgba(11, 18, 15, 0.75);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+/* ── Scrollbar (webkit) ──────────────────────────────────────────── */
+::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 2px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(34, 197, 94, 0.4);
+}
+
+/* ── Legacy utility classes (kept for compatibility) ─────────────── */
 .btn-primary {
-  background-color: var(--color-primary);
-  color: var(--color-text);
+  background-color: var(--pm-accent);
+  color: var(--pm-bg);
   border-radius: var(--radius);
   padding: 0.75rem 1.5rem;
   font-weight: 600;
@@ -55,13 +111,9 @@ body {
 }
 
 .card {
-  background-color: var(--color-bg);
+  background-color: var(--pm-surface-1);
   border-radius: var(--radius);
   padding: 1.5rem;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border: 1px solid var(--pm-border);
   transition: all 0.3s ease;
-}
-
-[data-theme="elite"] .card {
-  box-shadow: 0 2px 8px rgba(124, 58, 237, 0.2);
 }
