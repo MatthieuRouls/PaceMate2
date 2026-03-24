@@ -64,12 +64,6 @@ export default function Navbar() {
 
   // Check if a nav item is active
   const isActive = (path: string) => {
-    if (path === '/sessions/create') {
-      return pathname === '/sessions/create';
-    }
-    if (path === '/sessions') {
-      return pathname?.startsWith('/sessions') && pathname !== '/sessions/create';
-    }
     return pathname?.startsWith(path);
   };
 
@@ -77,7 +71,6 @@ export default function Navbar() {
   const connectedNavItems = [
     { href: '/sessions', label: 'Sessions' },
     { href: '/mes-sorties', label: 'Mes sorties' },
-    { href: '/sessions/create', label: 'Créer' },
     { href: '/teams', label: 'Équipes' },
     { href: '/friends', label: 'Amis' },
   ];
