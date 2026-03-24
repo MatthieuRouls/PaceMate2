@@ -511,6 +511,25 @@
   .dark .hover\:border-neon-500:hover {
     border-color: #00F57A !important;
   }
+
+  /* ============================================
+     DASHBOARD DARK PREMIUM
+     ============================================ */
+  .dash-card {
+    background: rgba(255, 255, 255, 0.03);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+  .dash-card-hover {
+    transition: background 0.18s ease, border-color 0.18s ease;
+  }
+
+  .dash-card-hover:hover {
+    background: rgba(255, 255, 255, 0.055);
+    border-color: rgba(255, 255, 255, 0.13);
+  }
 }
 
 /* ============================================
