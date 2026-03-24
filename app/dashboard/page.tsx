@@ -193,7 +193,7 @@ export default function DashboardPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-neu-base pt-28 flex items-center justify-center">
+      <div className="min-h-screen bg-dark-900 pt-28 flex items-center justify-center">
         <LoadingSpinner size="lg" />
       </div>
     );
@@ -209,7 +209,7 @@ export default function DashboardPage() {
   const friendsRunningToday = 3;
 
   return (
-    <div className="min-h-screen bg-neu-base">
+    <div className="min-h-screen bg-dark-900">
       <style jsx global>{`
         @keyframes glowPulse {
           0%, 100% { box-shadow: 0 0 20px rgba(236, 72, 153, 0.3), 0 4px 20px rgba(236, 72, 153, 0.2); }
@@ -260,19 +260,14 @@ export default function DashboardPage() {
             backgroundImage: `url('${featuredSession ? getSessionCover(featuredSession) : '/easy-run-1.jpeg'}')`,
           }}
         />
-        {/* Gradient overlay */}
-        <div
-          className="absolute inset-0"
-          style={{
-            background: 'linear-gradient(180deg, rgba(8,12,10,0.5) 0%, rgba(8,12,10,0.75) 100%)',
-          }}
-        />
-        {/* Glow effects */}
-        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-pink-500/15 rounded-full blur-3xl" />
-        <div className="absolute bottom-0 left-1/4 w-80 h-80 bg-neon-500/10 rounded-full blur-3xl" />
+        {/* Gradient overlay — same depth as Sessions */}
+        <div className="absolute inset-0" style={{ background: 'linear-gradient(180deg, rgba(5,26,21,0.55) 0%, rgba(5,26,21,0.88) 100%)' }} />
+        {/* Ambient glows — Sessions style */}
+        <div className="absolute top-0 left-1/4 w-96 h-56 bg-neon-500/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute top-0 right-1/4 w-80 h-48 bg-pink-500/10 rounded-full blur-3xl pointer-events-none" />
 
         {/* Inner Container - Centered Content */}
-        <div className="relative z-10 max-w-[1280px] mx-auto px-8 lg:px-8 md:px-5 py-12 pb-16 min-h-[320px]">
+        <div className="relative z-10 max-w-[1280px] mx-auto px-8 lg:px-8 md:px-5 py-8 pb-6">
           <div>
             {/* Next Run */}
             <div>
@@ -456,48 +451,48 @@ export default function DashboardPage() {
       </section>
 
       {/* ============================================ */}
-      {/* SECTION 2 — STAT BAR (Floating Solid Card, Contained) */}
+      {/* SECTION 2 — STAT BAR */}
       {/* ============================================ */}
-      <div className="relative z-20 -mt-10 mb-0 px-4 sm:px-8">
+      <div className="relative z-20 -mt-8 mb-0 px-4 sm:px-8">
         <section className="max-w-[900px] mx-auto section-reveal">
-          <div className="bg-white rounded-2xl px-7 sm:px-10 py-5 sm:py-6 flex flex-wrap items-center justify-center gap-x-10 gap-y-5 shadow-xl shadow-black/10 border border-silver-200">
-            <div className="flex items-center gap-4">
-              <div className="w-11 h-11 rounded-xl bg-pink-50 flex items-center justify-center">
-                <Route className="w-5 h-5 text-pink-500" />
+          <div className="bg-dark-800/90 backdrop-blur-sm border border-white/8 rounded-2xl px-6 sm:px-9 py-4 sm:py-5 flex flex-wrap items-center justify-center gap-x-8 gap-y-4">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-white/6 flex items-center justify-center">
+                <Route className="w-4 h-4 text-pink-400" />
               </div>
               <div>
-                <div className="text-2xl font-black text-text-primary">
-                  {profile?.calculated_weekly_km ? Math.round(profile.calculated_weekly_km) : 0} <span className="text-base font-semibold text-text-muted">km</span>
+                <div className="text-xl font-black text-white">
+                  {profile?.calculated_weekly_km ? Math.round(profile.calculated_weekly_km) : 0} <span className="text-sm font-semibold text-dark-300">km</span>
                 </div>
-                <div className="text-xs text-text-subtle">cette semaine</div>
+                <div className="text-xs text-dark-300">cette semaine</div>
               </div>
             </div>
 
-            <div className="w-px h-14 bg-silver-200 hidden md:block" />
+            <div className="w-px h-10 bg-white/10 hidden md:block" />
 
-            <div className="flex items-center gap-4">
-              <div className="w-11 h-11 rounded-xl bg-teal-50 flex items-center justify-center">
-                <Calendar className="w-5 h-5 text-teal-600" />
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-white/6 flex items-center justify-center">
+                <Calendar className="w-4 h-4 text-neon-400" />
               </div>
               <div>
-                <div className="text-2xl font-black text-text-primary">
-                  {sessions.length} <span className="text-base font-semibold text-text-muted">sorties</span>
+                <div className="text-xl font-black text-white">
+                  {sessions.length} <span className="text-sm font-semibold text-dark-300">sorties</span>
                 </div>
-                <div className="text-xs text-text-subtle">à venir</div>
+                <div className="text-xs text-dark-300">à venir</div>
               </div>
             </div>
 
-            <div className="w-px h-14 bg-silver-200 hidden md:block" />
+            <div className="w-px h-10 bg-white/10 hidden md:block" />
 
-            <div className="flex items-center gap-4">
-              <div className="w-11 h-11 rounded-xl bg-purple-50 flex items-center justify-center">
-                <Zap className="w-5 h-5 text-purple-500" />
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-white/6 flex items-center justify-center">
+                <Zap className="w-4 h-4 text-purple-400" />
               </div>
               <div>
-                <div className="text-2xl font-black text-text-primary">
-                  {profile?.calculated_avg_pace || '—'} <span className="text-base font-semibold text-text-muted">/km</span>
+                <div className="text-xl font-black text-white">
+                  {profile?.calculated_avg_pace || '—'} <span className="text-sm font-semibold text-dark-300">/km</span>
                 </div>
-                <div className="text-xs text-text-subtle">allure moyenne</div>
+                <div className="text-xs text-dark-300">allure moyenne</div>
               </div>
             </div>
           </div>
@@ -508,44 +503,59 @@ export default function DashboardPage() {
       <div className="max-w-[1280px] mx-auto px-8 pb-24 pt-14">
 
         {/* ============================================ */}
-        {/* SECTION 2.5 — ACTIVITÉ RÉCENTE (Personnalisation) */}
+        {/* SECTION 2.5 — ACTIVITÉ RÉCENTE */}
         {/* ============================================ */}
-        <section className="mb-14 section-reveal">
+        <section className="mb-12 section-reveal">
           <div className="flex items-center gap-3 mb-5">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-pink-500 to-purple-600 flex items-center justify-center">
-              <Activity className="w-4 h-4 text-white" />
-            </div>
-            <h2 className="text-lg font-bold text-text-primary">Ton activité récente</h2>
+            <span className="p-1.5 rounded-lg bg-pink-500/15">
+              <Activity className="w-4 h-4 text-pink-400" />
+            </span>
+            <h2 className="text-base font-bold text-white">Ton activité récente</h2>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <div className="bg-white rounded-2xl p-5 border border-silver-100 card-hover hover:shadow-md">
+            {/* Dernière sortie */}
+            <div className="bg-dark-800/60 border border-white/8 rounded-2xl p-5 card-hover hover:border-white/12 transition-colors">
               <div className="flex items-center gap-2 mb-3">
-                <Footprints className="w-4 h-4 text-pink-500" />
-                <span className="text-xs font-semibold text-text-muted uppercase">Dernière sortie</span>
+                <Footprints className="w-4 h-4 text-pink-400" />
+                <span className="text-xs font-semibold text-dark-300 uppercase tracking-wide">Dernière sortie</span>
               </div>
-              <p className="text-lg font-bold text-text-primary">
+              <p className="text-lg font-bold text-white">
                 {profile?.calculated_weekly_km ? `${(profile.calculated_weekly_km / 2).toFixed(1)} km` : 'Aucune'}
               </p>
-              <p className="text-sm text-text-muted">Il y a 2 jours</p>
+              <p className="text-sm text-dark-300 mt-0.5">Il y a 2 jours</p>
             </div>
 
-            <div className="bg-white rounded-2xl p-5 border border-silver-100 card-hover hover:shadow-md">
-              <div className="flex items-center gap-2 mb-3">
-                <TrendingUp className="w-4 h-4 text-neon-500" />
-                <span className="text-xs font-semibold text-text-muted uppercase">Progression</span>
+            {/* Progression — Sparkline */}
+            <div className="bg-dark-800/60 border border-white/8 rounded-2xl p-5 card-hover hover:border-neon-500/30 transition-colors">
+              <div className="flex items-center justify-between mb-2">
+                <div className="flex items-center gap-2">
+                  <TrendingUp className="w-4 h-4 text-neon-400" />
+                  <span className="text-xs font-semibold text-dark-300 uppercase tracking-wide">Progression</span>
+                </div>
+                <span className="text-sm font-black text-neon-400">+12%</span>
               </div>
-              <p className="text-lg font-bold text-text-primary">+12%</p>
-              <p className="text-sm text-text-muted">vs semaine dernière</p>
+              <svg width="100%" height="36" viewBox="0 0 120 36" preserveAspectRatio="none" className="my-1.5">
+                <defs>
+                  <linearGradient id="dash-spark" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor="#00F57A" stopOpacity="0.25" />
+                    <stop offset="100%" stopColor="#00F57A" stopOpacity="0" />
+                  </linearGradient>
+                </defs>
+                <path d="M0,30 L20,34 L40,22 L60,26 L80,14 L100,7 L120,2" stroke="#00F57A" strokeWidth="1.5" fill="none" strokeLinejoin="round" strokeLinecap="round" />
+                <path d="M0,30 L20,34 L40,22 L60,26 L80,14 L100,7 L120,2 L120,36 L0,36 Z" fill="url(#dash-spark)" />
+              </svg>
+              <p className="text-xs text-dark-300">vs semaine dernière</p>
             </div>
 
-            <div className="bg-white rounded-2xl p-5 border border-silver-100 card-hover hover:shadow-md">
+            {/* Prochain objectif */}
+            <div className="bg-dark-800/60 border border-white/8 rounded-2xl p-5 card-hover hover:border-white/12 transition-colors">
               <div className="flex items-center gap-2 mb-3">
-                <Award className="w-4 h-4 text-purple-500" />
-                <span className="text-xs font-semibold text-text-muted uppercase">Prochain objectif</span>
+                <Award className="w-4 h-4 text-purple-400" />
+                <span className="text-xs font-semibold text-dark-300 uppercase tracking-wide">Prochain objectif</span>
               </div>
-              <p className="text-lg font-bold text-text-primary">Niveau {level + 1}</p>
-              <p className="text-sm text-text-muted">Encore {Math.max(10, 50 - (profile?.calculated_weekly_km || 0)).toFixed(0)} km</p>
+              <p className="text-lg font-bold text-white">Niveau {level + 1}</p>
+              <p className="text-sm text-dark-300 mt-0.5">Encore {Math.max(10, 50 - (profile?.calculated_weekly_km || 0)).toFixed(0)} km</p>
             </div>
           </div>
         </section>
@@ -557,8 +567,8 @@ export default function DashboardPage() {
           <section className="mb-14 section-reveal">
             <div className="flex flex-col gap-4 mb-6">
               <div className="flex items-center justify-between">
-                <h2 className="text-xl font-bold text-text-primary">Courir aujourd'hui</h2>
-                <Link href="/sessions" className="text-sm font-semibold text-neon-700 hover:text-neon-600 transition-colors flex items-center gap-1">
+                <h2 className="text-xl font-bold text-white">Courir aujourd'hui</h2>
+                <Link href="/sessions" className="text-sm font-semibold text-neon-400 hover:text-neon-300 transition-colors flex items-center gap-1">
                   Voir tout <ChevronRight className="w-4 h-4" />
                 </Link>
               </div>
@@ -574,10 +584,10 @@ export default function DashboardPage() {
                     key={key}
                     type="button"
                     onClick={() => setLevelFilter(key)}
-                    className={`px-4 py-2 rounded-xl text-sm font-semibold transition-all duration-150 border ${
+                    className={`px-4 py-2 rounded-xl text-sm font-semibold transition-all duration-150 ${
                       levelFilter === key
-                        ? 'bg-dark-800 text-neon-500 border-dark-800 shadow-sm'
-                        : 'bg-white text-dark-500 border-silver-300 hover:border-dark-400 hover:text-dark-700'
+                        ? 'bg-neon-500 text-dark-800'
+                        : 'bg-white/8 text-dark-200 border border-white/10 hover:bg-white/12'
                     }`}
                   >
                     {label}
@@ -586,7 +596,7 @@ export default function DashboardPage() {
               </div>
 
               {filteredSessions.length === 0 && (
-                <p className="text-sm text-dark-400">Aucune sortie disponible pour ce filtre.</p>
+                <p className="text-sm text-dark-300">Aucune sortie disponible pour ce filtre.</p>
               )}
             </div>
 
@@ -594,7 +604,7 @@ export default function DashboardPage() {
               {/* Featured Run Card */}
               {secondarySessions[0] && (
                 <button onClick={() => openSessionPanel(secondarySessions[0].id)} className="flex-[6] group text-left">
-                  <div className="h-full bg-white rounded-3xl overflow-hidden shadow-sm card-hover hover:shadow-xl border border-silver-100">
+                  <div className="h-full bg-dark-800/60 rounded-2xl overflow-hidden card-hover hover:shadow-xl hover:shadow-neon-500/5 border border-white/8 hover:border-neon-500/30 transition-colors">
                     <div className="relative h-[160px] overflow-hidden">
                       <div
                         className="absolute inset-0 bg-cover bg-center group-hover:scale-105 transition-transform duration-500"
@@ -618,7 +628,7 @@ export default function DashboardPage() {
                       </div>
 
                       <div className="absolute bottom-3 left-4 right-4 flex items-end justify-between">
-                        <span className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white/95 backdrop-blur-sm text-text-primary text-xs font-semibold rounded-full shadow">
+                        <span className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-dark-800/80 backdrop-blur-sm text-white text-xs font-semibold rounded-full shadow">
                           <Clock className="w-3.5 h-3.5" />
                           {formatTime(secondarySessions[0].start_time)}
                         </span>
@@ -627,19 +637,19 @@ export default function DashboardPage() {
                     </div>
 
                     <div className="p-6">
-                      <h3 className="text-xl font-bold text-text-primary mb-2 group-hover:text-pink-600 transition-colors">
+                      <h3 className="text-xl font-bold text-white mb-2 group-hover:text-neon-400 transition-colors">
                         {secondarySessions[0].title}
                       </h3>
-                      <div className="flex flex-wrap gap-4 text-sm text-text-muted mb-5">
+                      <div className="flex flex-wrap gap-4 text-sm text-dark-300 mb-5">
                         {secondarySessions[0].distance_km && (
                           <span className="flex items-center gap-1.5">
-                            <Activity className="w-4 h-4 text-text-subtle" />
+                            <Activity className="w-4 h-4 text-dark-400" />
                             {secondarySessions[0].distance_km} km
                           </span>
                         )}
                         {secondarySessions[0].location_name && (
                           <span className="flex items-center gap-1.5">
-                            <MapPin className="w-4 h-4 text-text-subtle" />
+                            <MapPin className="w-4 h-4 text-dark-400" />
                             {secondarySessions[0].location_name}
                           </span>
                         )}
@@ -649,14 +659,14 @@ export default function DashboardPage() {
                           {/* Avatars avec + nombre */}
                           <div className="flex -space-x-2">
                             {[...Array(Math.min(secondarySessions[0].participants_count || 2, 4))].map((_, i) => (
-                              <div key={i} className={`w-9 h-9 rounded-full bg-gradient-to-br ${['from-pink-400 to-purple-500', 'from-neon-400 to-teal-500', 'from-orange-400 to-red-500', 'from-blue-400 to-indigo-500'][i]} border-2 border-white flex items-center justify-center text-xs font-bold text-white`}>
+                              <div key={i} className={`w-9 h-9 rounded-full bg-gradient-to-br ${['from-pink-400 to-purple-500', 'from-neon-400 to-teal-500', 'from-orange-400 to-red-500', 'from-blue-400 to-indigo-500'][i]} border-2 border-dark-800 flex items-center justify-center text-xs font-bold text-white`}>
                                 {String.fromCharCode(65 + i)}
                               </div>
                             ))}
                           </div>
-                          <span className="text-sm text-text-secondary font-medium">{secondarySessions[0].participants_count || 2} inscrits</span>
+                          <span className="text-sm text-dark-300 font-medium">{secondarySessions[0].participants_count || 2} inscrits</span>
                         </div>
-                        <span className="inline-flex items-center gap-2 px-5 py-2.5 bg-dark-800 text-white font-semibold rounded-xl group-hover:bg-pink-500 transition-colors">
+                        <span className="inline-flex items-center gap-2 px-5 py-2.5 bg-neon-500 text-dark-800 font-semibold rounded-xl group-hover:bg-neon-400 transition-colors">
                           Rejoindre <ArrowRight className="w-4 h-4" />
                         </span>
                       </div>
@@ -671,7 +681,7 @@ export default function DashboardPage() {
                   <button
                     key={session.id}
                     onClick={() => openSessionPanel(session.id)}
-                    className="group bg-white rounded-2xl overflow-hidden shadow-sm card-hover hover:shadow-lg border border-silver-100 text-left"
+                    className="group bg-dark-800/60 rounded-2xl overflow-hidden card-hover hover:shadow-lg border border-white/8 hover:border-white/12 transition-colors text-left"
                   >
                     <div className="flex">
                       <div className="relative w-24 min-h-[110px] flex-shrink-0">
@@ -689,16 +699,16 @@ export default function DashboardPage() {
                       </div>
                       <div className="p-4 flex-1">
                         <div className="flex items-center justify-between mb-2">
-                          <span className="text-xs font-semibold text-text-muted">{formatDate(session.start_time)} • {formatTime(session.start_time)}</span>
-                          <ChevronRight className="w-4 h-4 text-text-subtle group-hover:text-pink-500 transition-colors" />
+                          <span className="text-xs font-semibold text-dark-300">{formatDate(session.start_time)} • {formatTime(session.start_time)}</span>
+                          <ChevronRight className="w-4 h-4 text-dark-400 group-hover:text-pink-400 transition-colors" />
                         </div>
-                        <h4 className="font-bold text-text-primary mb-2 group-hover:text-pink-600 transition-colors">{session.title}</h4>
+                        <h4 className="font-bold text-white mb-2 group-hover:text-neon-400 transition-colors">{session.title}</h4>
                         <div className="flex items-center gap-3">
                           {/* Avatar organisateur */}
                           <div className="w-6 h-6 rounded-full bg-gradient-to-br from-neon-400 to-teal-500 flex items-center justify-center text-[10px] font-bold text-white">
                             O
                           </div>
-                          <span className="text-sm text-text-muted">
+                          <span className="text-sm text-dark-300">
                             {session.distance_km && `${session.distance_km} km • `}
                             {session.participants_count || 1} coureurs
                           </span>
@@ -709,7 +719,7 @@ export default function DashboardPage() {
                 ))}
 
                 {secondarySessions.length < 3 && (
-                  <Link href="/sessions" className="flex-1 flex items-center justify-center gap-2 bg-silver-50 rounded-2xl p-5 text-text-muted hover:text-dark-700 hover:bg-silver-100 transition-colors border-2 border-dashed border-silver-200">
+                  <Link href="/sessions" className="flex-1 flex items-center justify-center gap-2 bg-white/5 rounded-2xl p-5 text-dark-300 hover:text-white hover:bg-white/8 transition-colors border-2 border-dashed border-white/10">
                     <Plus className="w-5 h-5" />
                     <span className="font-semibold">Voir plus de sessions</span>
                   </Link>
@@ -725,8 +735,8 @@ export default function DashboardPage() {
         <section className="mb-14 section-reveal">
           <div className="flex items-center justify-between mb-6">
             <div className="flex items-center gap-3">
-              <h2 className="text-xl font-bold text-text-primary">Ton réseau court</h2>
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-neon-100 text-neon-700 text-xs font-semibold rounded-full">
+              <h2 className="text-xl font-bold text-white">Ton réseau court</h2>
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-neon-500/10 text-neon-400 text-xs font-semibold rounded-full">
                 <Flame className="w-3 h-3" />
                 {friendsRunningToday} amis courent aujourd'hui
               </span>
@@ -734,21 +744,21 @@ export default function DashboardPage() {
           </div>
 
           <div className="flex flex-col lg:flex-row gap-6">
-            <div className="flex-[6] bg-white rounded-2xl overflow-hidden border border-silver-100 shadow-md">
-              <div className="divide-y divide-silver-100">
+            <div className="flex-[6] bg-dark-800/60 rounded-2xl overflow-hidden border border-white/8">
+              <div className="divide-y divide-white/8">
                 {socialFeed.map((item, i) => (
-                  <div key={i} className="px-5 py-4 flex items-center gap-4 hover:bg-silver-50/80 transition-colors">
+                  <div key={i} className="px-5 py-4 flex items-center gap-4 hover:bg-white/5 transition-colors">
                     <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${item.gradient} flex items-center justify-center text-base font-bold text-white flex-shrink-0 shadow-sm`}>
                       {item.user.charAt(0)}
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm text-dark-700">
-                        <strong className="font-semibold">{item.user}</strong>{' '}
-                        <span className="text-text-muted">{item.action}</span>{' '}
-                        <strong className="font-semibold text-text-primary">{item.target}</strong>
+                      <p className="text-sm text-dark-200">
+                        <strong className="font-semibold text-white">{item.user}</strong>{' '}
+                        <span className="text-dark-300">{item.action}</span>{' '}
+                        <strong className="font-semibold text-white">{item.target}</strong>
                       </p>
                       <div className="flex items-center gap-3 mt-1">
-                        <span className="text-xs text-text-subtle">{item.time}</span>
+                        <span className="text-xs text-dark-400">{item.time}</span>
                         <div className="flex items-center gap-1">
                           {item.reactions.map((reaction, j) => (
                             <span key={j} className="text-sm">{reaction}</span>
@@ -756,13 +766,13 @@ export default function DashboardPage() {
                         </div>
                       </div>
                     </div>
-                    <button className="p-2 hover:bg-silver-100 rounded-lg transition-colors">
-                      <Heart className="w-4 h-4 text-text-subtle hover:text-pink-500 transition-colors" />
+                    <button className="p-2 hover:bg-white/8 rounded-lg transition-colors">
+                      <Heart className="w-4 h-4 text-dark-400 hover:text-pink-500 transition-colors" />
                     </button>
                   </div>
                 ))}
               </div>
-              <Link href="/sessions" className="block px-6 py-4 text-center text-sm font-semibold text-neon-700 hover:bg-neon-50 transition-colors border-t border-silver-100">
+              <Link href="/sessions" className="block px-6 py-4 text-center text-sm font-semibold text-neon-400 hover:bg-white/5 transition-colors border-t border-white/8">
                 Voir toute l'activité
               </Link>
             </div>
@@ -840,43 +850,43 @@ export default function DashboardPage() {
         {/* ============================================ */}
         <section className="section-reveal">
           <div className="flex items-center justify-between mb-6">
-            <h2 className="text-xl font-bold text-text-primary">Découvrir</h2>
-            <Link href="/sessions" className="text-sm font-semibold text-neon-700 hover:text-neon-600 transition-colors flex items-center gap-1">
+            <h2 className="text-xl font-bold text-white">Découvrir</h2>
+            <Link href="/sessions" className="text-sm font-semibold text-neon-400 hover:text-neon-300 transition-colors flex items-center gap-1">
               Explorer <ChevronRight className="w-4 h-4" />
             </Link>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            <Link href="/sessions" className="group bg-white rounded-2xl p-5 card-hover hover:shadow-lg border border-silver-100 overflow-hidden relative">
-              <div className="absolute top-0 right-0 w-24 h-24 bg-neon-100 rounded-full blur-2xl opacity-50 group-hover:opacity-70 transition-opacity" />
+            <Link href="/sessions" className="group bg-dark-800/60 rounded-2xl p-5 card-hover hover:shadow-lg border border-white/8 hover:border-neon-500/30 transition-colors overflow-hidden relative">
+              <div className="absolute top-0 right-0 w-24 h-24 bg-neon-500/15 rounded-full blur-2xl opacity-50 group-hover:opacity-70 transition-opacity" />
               <div className="relative">
                 <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-neon-400 to-teal-500 flex items-center justify-center mb-4 shadow-lg shadow-neon-500/20">
                   <MapPin className="w-6 h-6 text-white" />
                 </div>
-                <h4 className="font-bold text-text-primary mb-1 group-hover:text-neon-700 transition-colors">Sessions proches</h4>
-                <p className="text-sm text-text-muted">Trouve des runs autour de toi aujourd'hui</p>
+                <h4 className="font-bold text-white mb-1 group-hover:text-neon-400 transition-colors">Sessions proches</h4>
+                <p className="text-sm text-dark-300">Trouve des runs autour de toi aujourd'hui</p>
               </div>
             </Link>
 
-            <Link href="/teams" className="group bg-white rounded-2xl p-5 card-hover hover:shadow-lg border border-silver-100 overflow-hidden relative">
-              <div className="absolute top-0 right-0 w-24 h-24 bg-pink-100 rounded-full blur-2xl opacity-50 group-hover:opacity-70 transition-opacity" />
+            <Link href="/teams" className="group bg-dark-800/60 rounded-2xl p-5 card-hover hover:shadow-lg border border-white/8 hover:border-pink-500/30 transition-colors overflow-hidden relative">
+              <div className="absolute top-0 right-0 w-24 h-24 bg-pink-500/15 rounded-full blur-2xl opacity-50 group-hover:opacity-70 transition-opacity" />
               <div className="relative">
                 <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-pink-500 to-purple-600 flex items-center justify-center mb-4 shadow-lg shadow-pink-500/20">
                   <Users className="w-6 h-6 text-white" />
                 </div>
-                <h4 className="font-bold text-text-primary mb-1 group-hover:text-pink-600 transition-colors">Équipes actives</h4>
-                <p className="text-sm text-text-muted">Rejoins une communauté de coureurs</p>
+                <h4 className="font-bold text-white mb-1 group-hover:text-pink-400 transition-colors">Équipes actives</h4>
+                <p className="text-sm text-dark-300">Rejoins une communauté de coureurs</p>
               </div>
             </Link>
 
-            <button onClick={openCreateModal} className="group bg-white rounded-2xl p-5 card-hover hover:shadow-lg border border-silver-100 text-left overflow-hidden relative">
-              <div className="absolute top-0 right-0 w-24 h-24 bg-purple-100 rounded-full blur-2xl opacity-50 group-hover:opacity-70 transition-opacity" />
+            <button onClick={openCreateModal} className="group bg-dark-800/60 rounded-2xl p-5 card-hover hover:shadow-lg border border-white/8 hover:border-purple-500/30 transition-colors text-left overflow-hidden relative">
+              <div className="absolute top-0 right-0 w-24 h-24 bg-purple-500/15 rounded-full blur-2xl opacity-50 group-hover:opacity-70 transition-opacity" />
               <div className="relative">
                 <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-purple-500 to-indigo-600 flex items-center justify-center mb-4 shadow-lg shadow-purple-500/20">
                   <Plus className="w-6 h-6 text-white" />
                 </div>
-                <h4 className="font-bold text-text-primary mb-1 group-hover:text-purple-600 transition-colors">Organise un run</h4>
-                <p className="text-sm text-text-muted">Crée ta propre session et invite tes amis</p>
+                <h4 className="font-bold text-white mb-1 group-hover:text-purple-400 transition-colors">Organise un run</h4>
+                <p className="text-sm text-dark-300">Crée ta propre session et invite tes amis</p>
               </div>
             </button>
           </div>
