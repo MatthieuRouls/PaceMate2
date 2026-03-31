@@ -190,27 +190,36 @@ export async function updateStatsOnRunComplete(sessionId: string): Promise<void>
       }));
 
       try {
-        // Try upsert with increment — fallback to insert if table doesn't exist
-        for (const row of connectionRows) {
-          const { data: existing } = await supabase
-            .from('runner_connections')
-            .select('id, runs_together')
-            .eq('user_id', row.user_id)
-            .eq('other_user_id', row.other_user_id)
-            .maybeSingle();
+        // Batch SELECT — one round-trip instead of N
+        const { data: existingRows } = await supabase
+          .from('runner_connections')
+          .select('id, other_user_id, runs_together')
+          .eq('user_id', user.id)
+          .in('other_user_id', coUserIds);
 
-          if (existing) {
-            await supabase
-              .from('runner_connections')
-              .update({
-                runs_together: existing.runs_together + 1,
-                last_run_date: row.last_run_date,
-              })
-              .eq('id', existing.id);
-          } else {
-            await supabase.from('runner_connections').insert(row);
-          }
+        const existingMap = new Map(
+          (existingRows || []).map((c) => [c.other_user_id as string, c as { id: string; runs_together: number }])
+        );
+
+        const toInsert = connectionRows.filter((r) => !existingMap.has(r.other_user_id));
+
+        // Batch INSERT new connections
+        if (toInsert.length > 0) {
+          await supabase.from('runner_connections').insert(toInsert);
         }
+
+        // UPDATE existing connections (increment counter)
+        await Promise.all(
+          connectionRows
+            .filter((r) => existingMap.has(r.other_user_id))
+            .map((r) => {
+              const existing = existingMap.get(r.other_user_id)!;
+              return supabase
+                .from('runner_connections')
+                .update({ runs_together: existing.runs_together + 1, last_run_date: r.last_run_date })
+                .eq('id', existing.id);
+            })
+        );
       } catch (connErr) {
         console.warn('[stats] runner_connections table may not exist yet:', connErr);
       }

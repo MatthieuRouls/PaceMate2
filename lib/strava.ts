@@ -79,6 +79,7 @@ export async function exchangeStravaCode(code: string): Promise<StravaTokens> {
       code,
       grant_type: 'authorization_code',
     }),
+    signal: AbortSignal.timeout(10_000),
   });
 
   if (!response.ok) {
@@ -101,6 +102,7 @@ export async function refreshStravaToken(refreshToken: string): Promise<StravaTo
       refresh_token: refreshToken,
       grant_type: 'refresh_token',
     }),
+    signal: AbortSignal.timeout(10_000),
   });
 
   if (!response.ok) {
@@ -120,6 +122,7 @@ export async function fetchStravaActivities(accessToken: string): Promise<Strava
     `https://www.strava.com/api/v3/athlete/activities?after=${threeMonthsAgo}&per_page=100`,
     {
       headers: { Authorization: `Bearer ${accessToken}` },
+      signal: AbortSignal.timeout(15_000),
     }
   );
 

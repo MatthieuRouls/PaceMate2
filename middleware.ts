@@ -16,6 +16,15 @@ const protectedRoutes = [
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
+  // Court-circuit : seules la landing page et les routes protégées
+  // nécessitent une vérification Supabase. Tout le reste passe directement.
+  const isProtected = protectedRoutes.some(r => pathname === r || pathname.startsWith(r + '/'));
+  const isLanding   = pathname === '/';
+
+  if (!isLanding && !isProtected) {
+    return NextResponse.next({ request: { headers: request.headers } });
+  }
+
   // Créer un response mutable pour que Supabase puisse rafraîchir les cookies
   let response = NextResponse.next({
     request: { headers: request.headers },
@@ -61,11 +70,7 @@ export async function middleware(request: NextRequest) {
   }
 
   // RÈGLE 2: Routes protégées → si pas connecté, aller à la landing page
-  const isProtectedRoute = protectedRoutes.some(route =>
-    pathname === route || pathname.startsWith(route + '/')
-  );
-
-  if (isProtectedRoute && !isAuthenticated) {
+  if (isProtected && !isAuthenticated) {
     return NextResponse.redirect(new URL('/', request.url));
   }
 

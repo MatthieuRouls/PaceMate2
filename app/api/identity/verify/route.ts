@@ -79,7 +79,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'ANTHROPIC_API_KEY non configurée' }, { status: 500 });
     }
 
-    const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
+    const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY, timeout: 15_000 });
 
     // Extrait le media type depuis le base64 data URI ou assume jpeg
     const getMediaType = (b64: string): 'image/jpeg' | 'image/png' | 'image/webp' => {
