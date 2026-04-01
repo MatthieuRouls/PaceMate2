@@ -47,13 +47,22 @@ CREATE INDEX IF NOT EXISTS admin_log_created_at_idx ON admin_activity_log (creat
 -- ── teams (si pas encore créée) ───────────────────────────────────────────────
 CREATE TABLE IF NOT EXISTS teams (
   id              uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  name            text NOT NULL,
+  name            text NOT NULL UNIQUE,
   description     text,
-  creator_id      uuid REFERENCES profiles(id) ON DELETE SET NULL,
+  total_distance  numeric NOT NULL DEFAULT 0,
   runs_completed  integer NOT NULL DEFAULT 0,
-  member_count    integer NOT NULL DEFAULT 0,
-  created_at      timestamptz NOT NULL DEFAULT now(),
-  updated_at      timestamptz NOT NULL DEFAULT now()
+  created_at      timestamptz NOT NULL DEFAULT now()
 );
 
-CREATE INDEX IF NOT EXISTS teams_creator_id_idx ON teams (creator_id);
+-- ── team_memberships ──────────────────────────────────────────────────────────
+CREATE TABLE IF NOT EXISTS team_memberships (
+  id         uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  team_id    uuid NOT NULL REFERENCES teams(id) ON DELETE CASCADE,
+  user_id    uuid NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
+  role       text NOT NULL DEFAULT 'member' CHECK (role IN ('captain', 'member')),
+  joined_at  timestamptz NOT NULL DEFAULT now(),
+  UNIQUE (team_id, user_id)
+);
+
+CREATE INDEX IF NOT EXISTS team_memberships_team_id_idx ON team_memberships (team_id);
+CREATE INDEX IF NOT EXISTS team_memberships_user_id_idx ON team_memberships (user_id);

@@ -136,24 +136,57 @@ CREATE POLICY "connections_update_own" ON runner_connections
   FOR UPDATE USING (user_id = auth.uid());
 
 -- ── teams ────────────────────────────────────────────────────────────────────
+-- Pas de creator_id sur teams : le créateur est capitaine dans team_memberships
 ALTER TABLE teams ENABLE ROW LEVEL SECURITY;
 
-DROP POLICY IF EXISTS "teams_select_public"  ON teams;
-DROP POLICY IF EXISTS "teams_insert_auth"    ON teams;
-DROP POLICY IF EXISTS "teams_update_creator" ON teams;
-DROP POLICY IF EXISTS "teams_delete_creator" ON teams;
+DROP POLICY IF EXISTS "teams_select_public"   ON teams;
+DROP POLICY IF EXISTS "teams_insert_auth"     ON teams;
+DROP POLICY IF EXISTS "teams_update_captain"  ON teams;
+DROP POLICY IF EXISTS "teams_delete_captain"  ON teams;
 
 CREATE POLICY "teams_select_public" ON teams
   FOR SELECT USING (true);
 
+-- Tout utilisateur authentifié peut créer une équipe
 CREATE POLICY "teams_insert_auth" ON teams
-  FOR INSERT WITH CHECK (auth.uid() IS NOT NULL AND creator_id = auth.uid());
+  FOR INSERT WITH CHECK (auth.uid() IS NOT NULL);
 
-CREATE POLICY "teams_update_creator" ON teams
-  FOR UPDATE USING (creator_id = auth.uid());
+-- Seul le capitaine peut modifier/supprimer son équipe
+CREATE POLICY "teams_update_captain" ON teams
+  FOR UPDATE USING (
+    EXISTS (
+      SELECT 1 FROM team_memberships
+      WHERE team_id = teams.id
+        AND user_id = auth.uid()
+        AND role = 'captain'
+    )
+  );
 
-CREATE POLICY "teams_delete_creator" ON teams
-  FOR DELETE USING (creator_id = auth.uid());
+CREATE POLICY "teams_delete_captain" ON teams
+  FOR DELETE USING (
+    EXISTS (
+      SELECT 1 FROM team_memberships
+      WHERE team_id = teams.id
+        AND user_id = auth.uid()
+        AND role = 'captain'
+    )
+  );
+
+-- ── team_memberships ──────────────────────────────────────────────────────────
+ALTER TABLE team_memberships ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "memberships_select_public" ON team_memberships;
+DROP POLICY IF EXISTS "memberships_insert_own"    ON team_memberships;
+DROP POLICY IF EXISTS "memberships_delete_own"    ON team_memberships;
+
+CREATE POLICY "memberships_select_public" ON team_memberships
+  FOR SELECT USING (true);
+
+CREATE POLICY "memberships_insert_own" ON team_memberships
+  FOR INSERT WITH CHECK (user_id = auth.uid());
+
+CREATE POLICY "memberships_delete_own" ON team_memberships
+  FOR DELETE USING (user_id = auth.uid());
 
 -- ── admin_activity_log ───────────────────────────────────────────────────────
 -- Accessible uniquement via service role (backend admin actions)
