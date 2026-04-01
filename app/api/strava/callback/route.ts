@@ -74,14 +74,27 @@ export async function GET(request: NextRequest) {
     const avgPaceSeconds = Math.round(stats.avgPaceSeconds % 60);
     const paceInterval = `00:${avgPaceMinutes.toString().padStart(2, '0')}:${avgPaceSeconds.toString().padStart(2, '0')}`;
 
-    // 6. Mettre a jour le profil avec les donnees Strava
+    // 6a. Stocker les tokens OAuth dans la table dédiée (isolée de profiles)
+    const { error: tokenError } = await supabase
+      .from('strava_tokens')
+      .upsert({
+        user_id: user.id,
+        access_token: tokens.access_token,
+        refresh_token: tokens.refresh_token,
+        expires_at: new Date(tokens.expires_at * 1000).toISOString(),
+        athlete_id: tokens.athlete.id,
+      }, { onConflict: 'user_id' });
+
+    if (tokenError) {
+      logger.error('Error storing Strava tokens:', tokenError);
+      return NextResponse.redirect(new URL(`${errorBase}=update_failed`, request.url));
+    }
+
+    // 6b. Mettre a jour les métadonnées non-sensibles dans profiles
     const { error: updateError } = await supabase
       .from('profiles')
       .update({
         strava_athlete_id: tokens.athlete.id,
-        strava_access_token: tokens.access_token,
-        strava_refresh_token: tokens.refresh_token,
-        strava_token_expires_at: new Date(tokens.expires_at * 1000).toISOString(),
         strava_connected: true,
         strava_last_sync: new Date().toISOString(),
         running_level: calculatedLevel,
@@ -94,9 +107,7 @@ export async function GET(request: NextRequest) {
 
     if (updateError) {
       logger.error('Error updating profile with Strava data:', updateError);
-      return NextResponse.redirect(
-        new URL(`${errorBase}=update_failed`, request.url)
-      );
+      return NextResponse.redirect(new URL(`${errorBase}=update_failed`, request.url));
     }
 
     // 7. Rediriger vers la destination appropriee

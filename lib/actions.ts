@@ -1783,35 +1783,35 @@ export async function syncStravaData(): Promise<{ success: boolean; level?: numb
 
     const supabase = await getServerSupabaseClient();
 
-    // 1. Recuperer les tokens Strava du profil
-    const { data: profile, error: profileError } = await supabase
-      .from('profiles')
-      .select('strava_access_token, strava_refresh_token, strava_token_expires_at, strava_connected')
-      .eq('id', user.id)
+    // 1. Récupérer les tokens depuis la table dédiée (plus sécurisée que profiles)
+    const { data: stravaToken, error: tokenError } = await supabase
+      .from('strava_tokens')
+      .select('access_token, refresh_token, expires_at')
+      .eq('user_id', user.id)
       .single();
 
-    if (profileError || !profile?.strava_connected) {
+    if (tokenError || !stravaToken) {
       return { success: false, error: 'Strava non connecte' };
     }
 
-    let accessToken = profile.strava_access_token;
+    let accessToken = stravaToken.access_token;
 
     // 2. Rafraichir le token si expire
-    const expiresAt = new Date(profile.strava_token_expires_at).getTime();
-    if (Date.now() >= expiresAt - 60000) { // 1 minute de marge
+    const expiresAt = new Date(stravaToken.expires_at).getTime();
+    if (Date.now() >= expiresAt - 60_000) { // 1 minute de marge
       try {
-        const newTokens = await refreshStravaToken(profile.strava_refresh_token);
+        const newTokens = await refreshStravaToken(stravaToken.refresh_token);
         accessToken = newTokens.access_token;
 
-        // Mettre a jour les tokens
+        // Mettre a jour les tokens dans la table dédiée
         await supabase
-          .from('profiles')
+          .from('strava_tokens')
           .update({
-            strava_access_token: newTokens.access_token,
-            strava_refresh_token: newTokens.refresh_token,
-            strava_token_expires_at: new Date(newTokens.expires_at * 1000).toISOString(),
+            access_token: newTokens.access_token,
+            refresh_token: newTokens.refresh_token,
+            expires_at: new Date(newTokens.expires_at * 1000).toISOString(),
           })
-          .eq('id', user.id);
+          .eq('user_id', user.id);
       } catch {
         return { success: false, error: 'Erreur de rafraichissement du token' };
       }
@@ -1861,13 +1861,13 @@ export async function disconnectStrava(): Promise<{ success: boolean; error?: st
 
     const supabase = await getServerSupabaseClient();
 
+    // Supprimer les tokens de la table dédiée
+    await supabase.from('strava_tokens').delete().eq('user_id', user.id);
+
     const { error } = await supabase
       .from('profiles')
       .update({
         strava_athlete_id: null,
-        strava_access_token: null,
-        strava_refresh_token: null,
-        strava_token_expires_at: null,
         strava_connected: false,
         strava_last_sync: null,
         // Remettre le niveau a 1 (debutant) par defaut
