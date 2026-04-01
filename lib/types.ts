@@ -65,7 +65,7 @@ export interface UserBadge {
   id: string;
   user_id: string;
   badge_type: BadgeType;
-  earned_at: string;
+  awarded_at: string;
 }
 
 export interface RunnerConnection {

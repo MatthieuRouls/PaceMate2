@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useAuth } from '@/components/providers/AuthProvider';
-import { Session, SessionParticipant } from '@/lib/types';
+import { Session, SessionParticipant, BadgeType } from '@/lib/types';
 import { calculateLevel } from '@/lib/constants';
 import ProgressBar from '@/components/ui/ProgressBar';
 import SessionCard from '@/components/ui/SessionCard';
@@ -12,6 +12,8 @@ import {
   getUserSessionHistory,
   updateProfileLocation,
 } from '@/lib/actions';
+import { getRunnerStats } from '@/lib/stats-actions';
+import type { RunnerStats } from '@/lib/types';
 import {
   MapPin,
   Search,
@@ -33,11 +35,26 @@ import { getVerificationInfo } from '@/lib/trust';
 
 export const dynamic = 'force-dynamic';
 
+const BADGE_META_PROFILE: Record<BadgeType, { label: string; emoji: string }> = {
+  first_run:         { label: 'Premier run',              emoji: '🏃' },
+  social_runner:     { label: 'Coureur social',            emoji: '👥' },
+  community_builder: { label: 'Bâtisseur de communauté',  emoji: '🌍' },
+  reliable_runner:   { label: 'Coureur fiable',            emoji: '✅' },
+  team_player:       { label: 'Esprit d\'équipe',          emoji: '🤝' },
+};
+
+// Shown while stats are loading
+const BADGE_DEFS_FALLBACK = Object.entries(BADGE_META_PROFILE).map(([type]) => [
+  type,
+  { current: 0, target: 1 },
+]) as [string, { current: number; target: number }][];
+
 export default function ProfilePage() {
   const { profile, loading: authLoading } = useAuth();
 
   const [upcomingSessions, setUpcomingSessions] = useState<Session[]>([]);
   const [sessionHistory, setSessionHistory] = useState<SessionParticipant[]>([]);
+  const [runnerStats, setRunnerStats] = useState<RunnerStats | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -119,12 +136,14 @@ export default function ProfilePage() {
         setLoading(true);
         setError(null);
 
-        const [upcoming, history] = await Promise.all([
+        const [upcoming, history, stats] = await Promise.all([
           getUserUpcomingSessions(),
           getUserSessionHistory(),
+          getRunnerStats(),
         ]);
         setUpcomingSessions(upcoming);
         setSessionHistory(history);
+        setRunnerStats(stats);
       } catch (err) {
         console.error('Error fetching profile data:', err);
         setError(err instanceof Error ? err.message : 'Erreur lors du chargement des donnees');
@@ -310,6 +329,50 @@ export default function ProfilePage() {
                   </div>
                   <div className="text-sm text-dark-500">meilleur temps</div>
                 </div>
+              </div>
+            </div>
+
+            {/* ── Badges Section ── */}
+            <div>
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-2xl font-bold text-dark-800">Mes badges</h2>
+                {runnerStats && (
+                  <span className="text-sm text-dark-500">
+                    {runnerStats.badges.length}/{Object.keys(runnerStats.badgeProgress).length} obtenus
+                  </span>
+                )}
+              </div>
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3">
+                {(runnerStats ? Object.entries(runnerStats.badgeProgress) : BADGE_DEFS_FALLBACK).map(([type, progress]) => {
+                  const meta = BADGE_META_PROFILE[type as BadgeType];
+                  const isEarned = runnerStats?.badges.some(b => b.badge_type === type) ?? false;
+                  const pct = Math.min(100, Math.round(((progress as {current:number;target:number}).current / (progress as {current:number;target:number}).target) * 100));
+                  return (
+                    <div
+                      key={type}
+                      className={`flex flex-col items-center gap-2 p-4 rounded-2xl border transition-all ${
+                        isEarned
+                          ? 'bg-neon-50 border-neon-300 shadow-sm'
+                          : 'bg-silver-50 border-silver-200 opacity-70'
+                      }`}
+                    >
+                      <span className={`text-3xl ${isEarned ? '' : 'grayscale opacity-50'}`}>{meta.emoji}</span>
+                      <span className="text-xs font-semibold text-dark-800 text-center leading-tight">{meta.label}</span>
+                      {isEarned ? (
+                        <span className="text-[10px] font-bold text-neon-700 bg-neon-100 px-2 py-0.5 rounded-full">Obtenu ✓</span>
+                      ) : (
+                        <>
+                          <div className="w-full bg-silver-200 rounded-full h-1.5">
+                            <div className="bg-neon-500 h-1.5 rounded-full" style={{ width: `${pct}%` }} />
+                          </div>
+                          <span className="text-[10px] text-dark-400">
+                            {(progress as {current:number;target:number}).current}/{(progress as {current:number;target:number}).target}
+                          </span>
+                        </>
+                      )}
+                    </div>
+                  );
+                })}
               </div>
             </div>
 

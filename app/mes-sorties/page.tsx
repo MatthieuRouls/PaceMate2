@@ -428,37 +428,63 @@ export default function MesSortiesPage() {
                       </div>
                     ) : (
                       <div className="space-y-4">
-                        {/* Past created */}
-                        {pastCreated.length > 0 && (
-                          <div>
-                            <div className="flex items-center gap-2 mb-3">
-                              <span className="text-sm">👑</span>
-                              <h3 className="text-sm font-semibold text-dark-600">Mes creations passees</h3>
-                              <span className="text-xs text-dark-400">({pastCreated.length})</span>
-                            </div>
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                              {pastCreated.map((session) => (
-                                <SessionCard key={session.id} session={session} />
-                              ))}
-                            </div>
-                          </div>
-                        )}
-
-                        {/* Past joined */}
-                        {pastJoined.length > 0 && (
-                          <div>
-                            <div className="flex items-center gap-2 mb-3">
-                              <span className="text-sm">🏃</span>
-                              <h3 className="text-sm font-semibold text-dark-600">Mes participations</h3>
-                              <span className="text-xs text-dark-400">({pastJoined.length})</span>
-                            </div>
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                              {pastJoined.map((session) => (
-                                <SessionCard key={session.id} session={session} />
-                              ))}
-                            </div>
-                          </div>
-                        )}
+                        {/* Unified chronological history */}
+                        <div className="bg-white rounded-2xl border border-silver-200 divide-y divide-silver-100 overflow-hidden">
+                          {[...pastCreated.map(s => ({ ...s, _role: 'created' as const })),
+                            ...pastJoined.map(s => ({ ...s, _role: 'joined' as const }))]
+                            .sort((a, b) => new Date(b.start_time).getTime() - new Date(a.start_time).getTime())
+                            .map((session) => {
+                              const typeColors: Record<string, string> = {
+                                intervals: 'bg-orange-100 text-orange-700',
+                                long_run: 'bg-purple-100 text-purple-700',
+                                tempo: 'bg-pink-100 text-pink-700',
+                                recovery: 'bg-sky-100 text-sky-700',
+                                casual: 'bg-teal-100 text-teal-700',
+                              };
+                              const typeLabels: Record<string, string> = {
+                                intervals: 'Fractionné', long_run: 'Sortie longue',
+                                tempo: 'Tempo', recovery: 'Récupération', casual: 'Détente',
+                              };
+                              const colorClass = typeColors[session.session_type || ''] ?? 'bg-silver-100 text-dark-600';
+                              const typeLabel = typeLabels[session.session_type || ''] ?? 'Run';
+                              return (
+                                <Link
+                                  key={session.id}
+                                  href={`/sessions/${session.id}`}
+                                  className="flex items-center gap-4 px-5 py-4 hover:bg-silver-50 transition-colors group"
+                                >
+                                  <div className="flex-shrink-0 text-center w-12">
+                                    <div className="text-lg font-bold text-dark-800 leading-none">
+                                      {new Date(session.start_time).getDate()}
+                                    </div>
+                                    <div className="text-[10px] text-dark-400 uppercase tracking-wide">
+                                      {new Date(session.start_time).toLocaleDateString('fr-FR', { month: 'short' })}
+                                    </div>
+                                  </div>
+                                  <div className="flex-1 min-w-0">
+                                    <div className="flex items-center gap-2 mb-0.5">
+                                      <span className="font-semibold text-dark-800 truncate">{session.title}</span>
+                                      {session._role === 'created' && (
+                                        <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-pink-100 text-pink-700 font-medium flex-shrink-0">Organisé</span>
+                                      )}
+                                    </div>
+                                    <div className="flex items-center gap-3 text-xs text-dark-400">
+                                      <span className={`px-2 py-0.5 rounded-full font-medium ${colorClass}`}>{typeLabel}</span>
+                                      <span className="flex items-center gap-1">
+                                        <TrendingUp className="w-3 h-3" />
+                                        {session.distance_km} km
+                                      </span>
+                                      <span className="flex items-center gap-1 truncate">
+                                        <MapPin className="w-3 h-3 flex-shrink-0" />
+                                        {session.location_name}
+                                      </span>
+                                    </div>
+                                  </div>
+                                  <ChevronRight className="w-4 h-4 text-dark-300 group-hover:text-dark-600 transition-colors flex-shrink-0" />
+                                </Link>
+                              );
+                            })}
+                        </div>
                       </div>
                     )}
                   </>

@@ -2,6 +2,8 @@
 import { logger } from '@/lib/logger';
 
 import { getCurrentUser, getServerSupabaseClient } from './supabase-auth';
+import { createNotification } from './notification-actions';
+import { logActivity } from './activity-actions';
 import type { RunnerStats, BadgeType, UserBadge } from './types';
 
 // ============================================================
@@ -302,6 +304,15 @@ async function evaluateAndAwardBadges(userId: string, stats: ProfileStats): Prom
           user_id: userId,
           badge_type: def.type,
         });
+        // Notify user + log activity (non-blocking)
+        createNotification(
+          userId,
+          'badge_earned',
+          `🏅 Badge obtenu : ${def.label}`,
+          'Rendez-vous sur votre profil pour le voir.',
+          { badge_type: def.type }
+        );
+        logActivity(userId, 'badge_earned', 'badge', def.type, def.label);
       }
     }
   } catch (err) {
@@ -421,7 +432,7 @@ export async function getRunnerStats(): Promise<RunnerStats | null> {
         .from('user_badges')
         .select('*')
         .eq('user_id', user.id)
-        .order('earned_at', { ascending: true });
+        .order('awarded_at', { ascending: true });
       badges = (rawBadges || []) as UserBadge[];
     } catch {
       // Table may not exist yet
