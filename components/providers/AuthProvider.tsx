@@ -303,28 +303,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const signOut = async () => {
-    try {
-      // Clear state immediately
-      currentUserIdRef.current = null;
-      setUser(null);
-      setProfile(null);
+    // Clear local state immediately
+    currentUserIdRef.current = null;
+    setUser(null);
+    setProfile(null);
 
-      // 1. Déconnexion côté serveur pour supprimer les cookies HTTPOnly
-      await signOutAction();
+    // Fire server + client signout without blocking the redirect
+    signOutAction().catch(() => {});
+    supabase.auth.signOut().catch(() => {});
 
-      // 2. Déconnexion côté client
-      await supabase.auth.signOut();
-
-      // 3. Rediriger vers la landing page
-      window.location.href = '/';
-    } catch (error) {
-      console.error('Erreur lors de la déconnexion:', error);
-      // Même en cas d'erreur, on force la déconnexion côté client
-      currentUserIdRef.current = null;
-      setUser(null);
-      setProfile(null);
-      window.location.href = '/';
-    }
+    // Navigate immediately — don't wait for async ops
+    window.location.href = '/';
   };
 
   const value = {

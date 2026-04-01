@@ -121,7 +121,7 @@ export default function DashboardPage() {
         setLoading(false);
       }
     }
-    if (profile !== undefined) fetchData();
+    if (profile) fetchData();
   }, [profile?.running_level]);
 
   const nearbyRuns = sessions.slice(0, 5);
