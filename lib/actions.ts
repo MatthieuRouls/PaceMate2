@@ -1,4 +1,5 @@
 'use server';
+import { logger } from '@/lib/logger';
 
 import { getCurrentUser, getServerSupabaseClient } from './supabase-auth';
 import { updateStatsOnRunComplete } from './stats-actions';
@@ -91,7 +92,7 @@ export async function createSession(data: CreateSessionData): Promise<CreateSess
       .single();
 
     if (insertError) {
-      console.error('Error inserting session:', insertError);
+      logger.error('Error inserting session:', insertError);
       return {
         success: false,
         error: `Erreur lors de la création de la session: ${insertError.message}`,
@@ -108,7 +109,7 @@ export async function createSession(data: CreateSessionData): Promise<CreateSess
       });
 
     if (participantError) {
-      console.error('Error adding creator as participant:', participantError);
+      logger.error('Error adding creator as participant:', participantError);
       // On ne bloque pas car la session est créée
     }
 
@@ -117,7 +118,7 @@ export async function createSession(data: CreateSessionData): Promise<CreateSess
       session_id: session.id,
     };
   } catch (error) {
-    console.error('Unexpected error in createSession:', error);
+    logger.error('Unexpected error in createSession:', error);
     return {
       success: false,
       error: error instanceof Error ? error.message : 'Une erreur inattendue s\'est produite',
@@ -186,7 +187,7 @@ export async function createTeam(
       .single();
 
     if (teamError) {
-      console.error('Error creating team:', teamError);
+      logger.error('Error creating team:', teamError);
 
       // Vérifier si c'est une erreur de duplication de nom
       if (teamError.code === '23505') {
@@ -212,7 +213,7 @@ export async function createTeam(
       });
 
     if (membershipError) {
-      console.error('Error creating team membership:', membershipError);
+      logger.error('Error creating team membership:', membershipError);
 
       // Nettoyer : supprimer l'équipe créée
       await supabase.from('teams').delete().eq('id', team.id);
@@ -230,7 +231,7 @@ export async function createTeam(
       .eq('id', user.id);
 
     if (profileError) {
-      console.error('Error updating profile:', profileError);
+      logger.error('Error updating profile:', profileError);
 
       // Nettoyer
       await supabase.from('team_memberships').delete().eq('team_id', team.id);
@@ -247,7 +248,7 @@ export async function createTeam(
       team_id: team.id,
     };
   } catch (error) {
-    console.error('Unexpected error in createTeam:', error);
+    logger.error('Unexpected error in createTeam:', error);
     return {
       success: false,
       error: error instanceof Error ? error.message : 'Une erreur inattendue s\'est produite',
@@ -279,7 +280,7 @@ export async function leaveTeam(teamId: string): Promise<ActionResult> {
       .eq('team_id', teamId);
 
     if (membershipError) {
-      console.error('Error deleting team membership:', membershipError);
+      logger.error('Error deleting team membership:', membershipError);
       return {
         success: false,
         error: 'Erreur lors de la suppression de l\'appartenance à l\'équipe',
@@ -293,7 +294,7 @@ export async function leaveTeam(teamId: string): Promise<ActionResult> {
       .eq('id', user.id);
 
     if (profileError) {
-      console.error('Error updating profile:', profileError);
+      logger.error('Error updating profile:', profileError);
       return {
         success: false,
         error: 'Erreur lors de la mise à jour du profil',
@@ -307,7 +308,7 @@ export async function leaveTeam(teamId: string): Promise<ActionResult> {
       .eq('team_id', teamId);
 
     if (countError) {
-      console.error('Error counting remaining members:', countError);
+      logger.error('Error counting remaining members:', countError);
       // Continuer quand même, c'est pas critique
     } else if (remainingMembers && (remainingMembers as any).count === 0) {
       // Si c'était le dernier membre, supprimer l'équipe
@@ -318,7 +319,7 @@ export async function leaveTeam(teamId: string): Promise<ActionResult> {
       success: true,
     };
   } catch (error) {
-    console.error('Unexpected error in leaveTeam:', error);
+    logger.error('Unexpected error in leaveTeam:', error);
     return {
       success: false,
       error: error instanceof Error ? error.message : 'Une erreur inattendue s\'est produite',
@@ -340,7 +341,7 @@ export async function getTeamsLeaderboard() {
       .limit(20);
 
     if (error) {
-      console.error('Error fetching teams leaderboard:', error);
+      logger.error('Error fetching teams leaderboard:', error);
       throw error;
     }
 
@@ -369,7 +370,7 @@ export async function getTeamsLeaderboard() {
 
     return teamsWithCounts;
   } catch (error) {
-    console.error('Error in getTeamsLeaderboard:', error);
+    logger.error('Error in getTeamsLeaderboard:', error);
     throw error;
   }
 }
@@ -420,7 +421,7 @@ export async function getUserTeam() {
       members_count: count || 0,
     };
   } catch (error) {
-    console.error('Error in getUserTeam:', error);
+    logger.error('Error in getUserTeam:', error);
     return null;
   }
 }
@@ -450,7 +451,7 @@ export async function getUserProfile() {
       .single();
 
     if (profileError || !profile) {
-      console.error('Error fetching profile:', profileError);
+      logger.error('Error fetching profile:', profileError);
       return null;
     }
 
@@ -482,7 +483,7 @@ export async function getUserProfile() {
       completed_sessions_count: count || 0,
     };
   } catch (error) {
-    console.error('Error in getUserProfile:', error);
+    logger.error('Error in getUserProfile:', error);
     return null;
   }
 }
@@ -520,13 +521,13 @@ export async function getUserUpcomingSessions() {
       .limit(3);
 
     if (sessionsError) {
-      console.error('Error fetching sessions:', sessionsError);
+      logger.error('Error fetching sessions:', sessionsError);
       return [];
     }
 
     return sessions || [];
   } catch (error) {
-    console.error('Error in getUserUpcomingSessions:', error);
+    logger.error('Error in getUserUpcomingSessions:', error);
     return [];
   }
 }
@@ -553,7 +554,7 @@ export async function getUserSessionHistory() {
       .limit(5);
 
     if (participationsError) {
-      console.error('Error fetching participations:', participationsError);
+      logger.error('Error fetching participations:', participationsError);
       return [];
     }
 
@@ -571,7 +572,7 @@ export async function getUserSessionHistory() {
       .order('start_time', { ascending: false });
 
     if (sessionsError) {
-      console.error('Error fetching sessions:', sessionsError);
+      logger.error('Error fetching sessions:', sessionsError);
       return [];
     }
 
@@ -589,7 +590,7 @@ export async function getUserSessionHistory() {
 
     return participationsWithSessions;
   } catch (error) {
-    console.error('Error in getUserSessionHistory:', error);
+    logger.error('Error in getUserSessionHistory:', error);
     return [];
   }
 }
@@ -613,7 +614,7 @@ export async function getSessionDetails(sessionId: string) {
       .single();
 
     if (sessionError || !session) {
-      console.error('Error fetching session:', sessionError);
+      logger.error('Error fetching session:', sessionError);
       return null;
     }
 
@@ -650,7 +651,7 @@ export async function getSessionDetails(sessionId: string) {
       participants_count: participants.length,
     };
   } catch (error) {
-    console.error('Error in getSessionDetails:', error);
+    logger.error('Error in getSessionDetails:', error);
     return null;
   }
 }
@@ -676,13 +677,13 @@ export async function getUserSessionStatus(sessionId: string) {
       .maybeSingle();
 
     if (error) {
-      console.error('Error fetching user session status:', error);
+      logger.error('Error fetching user session status:', error);
       return null;
     }
 
     return data;
   } catch (error) {
-    console.error('Error in getUserSessionStatus:', error);
+    logger.error('Error in getUserSessionStatus:', error);
     return null;
   }
 }
@@ -763,7 +764,7 @@ export async function joinSession(sessionId: string): Promise<ActionResult> {
         .eq('id', existing.id);
 
       if (updateError) {
-        console.error('Error updating participation:', updateError);
+        logger.error('Error updating participation:', updateError);
         return {
           success: false,
           error: 'Erreur lors de la mise à jour de la participation',
@@ -780,7 +781,7 @@ export async function joinSession(sessionId: string): Promise<ActionResult> {
         });
 
       if (insertError) {
-        console.error('Error creating participation:', insertError);
+        logger.error('Error creating participation:', insertError);
         return {
           success: false,
           error: 'Erreur lors de l\'inscription à la session',
@@ -792,7 +793,7 @@ export async function joinSession(sessionId: string): Promise<ActionResult> {
       success: true,
     };
   } catch (error) {
-    console.error('Unexpected error in joinSession:', error);
+    logger.error('Unexpected error in joinSession:', error);
     return {
       success: false,
       error: error instanceof Error ? error.message : 'Une erreur inattendue s\'est produite',
@@ -824,7 +825,7 @@ export async function leaveSession(sessionId: string): Promise<ActionResult> {
       .eq('user_id', user.id);
 
     if (error) {
-      console.error('Error leaving session:', error);
+      logger.error('Error leaving session:', error);
       return {
         success: false,
         error: 'Erreur lors du désistement',
@@ -835,7 +836,7 @@ export async function leaveSession(sessionId: string): Promise<ActionResult> {
       success: true,
     };
   } catch (error) {
-    console.error('Unexpected error in leaveSession:', error);
+    logger.error('Unexpected error in leaveSession:', error);
     return {
       success: false,
       error: error instanceof Error ? error.message : 'Une erreur inattendue s\'est produite',
@@ -887,7 +888,7 @@ export async function deleteSession(sessionId: string): Promise<ActionResult> {
       .eq('session_id', sessionId);
 
     if (deleteParticipantsError) {
-      console.error('Error deleting session participants:', deleteParticipantsError);
+      logger.error('Error deleting session participants:', deleteParticipantsError);
       return {
         success: false,
         error: 'Erreur lors de la suppression des participants',
@@ -901,7 +902,7 @@ export async function deleteSession(sessionId: string): Promise<ActionResult> {
       .eq('id', sessionId);
 
     if (deleteError) {
-      console.error('Error deleting session:', deleteError);
+      logger.error('Error deleting session:', deleteError);
       return {
         success: false,
         error: 'Erreur lors de la suppression de la session',
@@ -912,7 +913,7 @@ export async function deleteSession(sessionId: string): Promise<ActionResult> {
       success: true,
     };
   } catch (error) {
-    console.error('Unexpected error in deleteSession:', error);
+    logger.error('Unexpected error in deleteSession:', error);
     return {
       success: false,
       error: error instanceof Error ? error.message : 'Une erreur inattendue s\'est produite',
@@ -952,7 +953,7 @@ export async function rateSession(
       .eq('user_id', user.id);
 
     if (updateError) {
-      console.error('Error rating session:', updateError);
+      logger.error('Error rating session:', updateError);
       return {
         success: false,
         error: 'Erreur lors de l\'enregistrement de la note',
@@ -973,7 +974,7 @@ export async function rateSession(
       .single();
 
     if (profileError || !profile) {
-      console.error('Error fetching profile for XP:', profileError);
+      logger.error('Error fetching profile for XP:', profileError);
       // Continuer quand même, la note a été enregistrée
       return {
         success: true,
@@ -988,7 +989,7 @@ export async function rateSession(
       .eq('id', user.id);
 
     if (xpError) {
-      console.error('Error updating XP:', xpError);
+      logger.error('Error updating XP:', xpError);
       // La note a été enregistrée, c'est l'essentiel
     }
 
@@ -996,7 +997,7 @@ export async function rateSession(
       success: true,
     };
   } catch (error) {
-    console.error('Unexpected error in rateSession:', error);
+    logger.error('Unexpected error in rateSession:', error);
     return {
       success: false,
       error: error instanceof Error ? error.message : 'Une erreur inattendue s\'est produite',
@@ -1079,7 +1080,7 @@ export async function completeRun(
       .eq('user_id', user.id);
 
     if (partError) {
-      console.error('Error completing participation:', partError);
+      logger.error('Error completing participation:', partError);
       return { success: false, error: 'Erreur lors de la validation de la sortie' };
     }
 
@@ -1161,13 +1162,13 @@ export async function completeRun(
         });
       } catch (feedbackErr) {
         // Table might not exist yet — non-blocking
-        console.warn('Could not save peer feedbacks (table may not exist yet):', feedbackErr);
+        logger.warn('Could not save peer feedbacks (table may not exist yet):', feedbackErr);
       }
     }
 
     // Non-blocking stats update (badges, connections, reliability score, etc.)
     updateStatsOnRunComplete(sessionId).catch((err) =>
-      console.error('[completeRun] stats update error:', err)
+      logger.error('[completeRun] stats update error:', err)
     );
 
     return {
@@ -1179,7 +1180,7 @@ export async function completeRun(
       teamKmAdded,
     };
   } catch (error) {
-    console.error('Unexpected error in completeRun:', error);
+    logger.error('Unexpected error in completeRun:', error);
     return {
       success: false,
       error: error instanceof Error ? error.message : 'Une erreur inattendue s\'est produite',
@@ -1218,7 +1219,7 @@ export async function getUpcomingSessions(limit: number = 3, maxLevel?: number) 
     const { data: sessions, error } = await query;
 
     if (error) {
-      console.error('Error fetching upcoming sessions:', error);
+      logger.error('Error fetching upcoming sessions:', error);
       return [];
     }
 
@@ -1253,7 +1254,7 @@ export async function getUpcomingSessions(limit: number = 3, maxLevel?: number) 
 
     return sessionsWithDetails;
   } catch (error) {
-    console.error('Error in getUpcomingSessions:', error);
+    logger.error('Error in getUpcomingSessions:', error);
     return [];
   }
 }
@@ -1272,7 +1273,7 @@ export async function getTopTeams(limit: number = 3) {
       .limit(limit);
 
     if (error) {
-      console.error('Error fetching top teams:', error);
+      logger.error('Error fetching top teams:', error);
       return [];
     }
 
@@ -1293,7 +1294,7 @@ export async function getTopTeams(limit: number = 3) {
 
     return teamsWithCounts;
   } catch (error) {
-    console.error('Error in getTopTeams:', error);
+    logger.error('Error in getTopTeams:', error);
     return [];
   }
 }
@@ -1335,7 +1336,7 @@ export async function getAllUpcomingSessions(options?: {
       .order('start_time', { ascending: true });
 
     if (error) {
-      console.error('Error fetching all sessions:', error);
+      logger.error('Error fetching all sessions:', error);
       return [];
     }
 
@@ -1383,7 +1384,7 @@ export async function getAllUpcomingSessions(options?: {
 
     return sessionsWithDetails;
   } catch (error) {
-    console.error('Error in getAllUpcomingSessions:', error);
+    logger.error('Error in getAllUpcomingSessions:', error);
     return [];
   }
 }
@@ -1412,13 +1413,13 @@ export async function updateProfileLocation(data: {
       .eq('id', user.id);
 
     if (error) {
-      console.error('Error updating profile location:', error);
+      logger.error('Error updating profile location:', error);
       return { success: false, error: error.message };
     }
 
     return { success: true };
   } catch (error) {
-    console.error('Error in updateProfileLocation:', error);
+    logger.error('Error in updateProfileLocation:', error);
     return { success: false, error: 'Erreur inattendue' };
   }
 }
@@ -1476,13 +1477,13 @@ export async function updateProfile(data: {
       .eq('id', user.id);
 
     if (error) {
-      console.error('Error updating profile:', error);
+      logger.error('Error updating profile:', error);
       return { success: false, error: error.message };
     }
 
     return { success: true };
   } catch (error) {
-    console.error('Error in updateProfile:', error);
+    logger.error('Error in updateProfile:', error);
     return { success: false, error: 'Erreur inattendue' };
   }
 }
@@ -1501,7 +1502,7 @@ export async function sendPhoneOtp(phoneNumber: string): Promise<{ success: bool
     const { error } = await supabase.auth.updateUser({ phone: phoneNumber });
 
     if (error) {
-      console.error('Error sending phone OTP:', error);
+      logger.error('Error sending phone OTP:', error);
       if (error.message.includes('not enabled') || error.message.includes('Phone provider')) {
         return { success: false, error: 'phone_provider_disabled' };
       }
@@ -1510,7 +1511,7 @@ export async function sendPhoneOtp(phoneNumber: string): Promise<{ success: bool
 
     return { success: true };
   } catch (error) {
-    console.error('Error in sendPhoneOtp:', error);
+    logger.error('Error in sendPhoneOtp:', error);
     return { success: false, error: 'Erreur inattendue' };
   }
 }
@@ -1536,7 +1537,7 @@ export async function verifyPhoneOtp(
     });
 
     if (error) {
-      console.error('Error verifying phone OTP:', error);
+      logger.error('Error verifying phone OTP:', error);
       return { success: false, error: 'Code incorrect ou expiré' };
     }
 
@@ -1552,7 +1553,7 @@ export async function verifyPhoneOtp(
 
     return { success: true };
   } catch (error) {
-    console.error('Error in verifyPhoneOtp:', error);
+    logger.error('Error in verifyPhoneOtp:', error);
     return { success: false, error: 'Erreur inattendue' };
   }
 }
@@ -1588,7 +1589,7 @@ export async function getIdentityVerification(): Promise<{
 
     return { data: data || null };
   } catch (error) {
-    console.error('Error in getIdentityVerification:', error);
+    logger.error('Error in getIdentityVerification:', error);
     return { data: null, error: 'Erreur inattendue' };
   }
 }
@@ -1603,7 +1604,7 @@ export async function deleteAccount(): Promise<{ success: boolean; error?: strin
     if (!user) return { success: false, error: 'Non authentifie' };
 
     if (!process.env.SUPABASE_SERVICE_ROLE_KEY) {
-      console.error('SUPABASE_SERVICE_ROLE_KEY is not set');
+      logger.error('SUPABASE_SERVICE_ROLE_KEY is not set');
       return { success: false, error: 'Configuration serveur manquante' };
     }
 
@@ -1619,13 +1620,13 @@ export async function deleteAccount(): Promise<{ success: boolean; error?: strin
     // 2. Supprimer l'utilisateur auth
     const { error: authError } = await adminClient.auth.admin.deleteUser(user.id);
     if (authError) {
-      console.error('Error deleting auth user:', authError);
+      logger.error('Error deleting auth user:', authError);
       return { success: false, error: 'Erreur lors de la suppression du compte' };
     }
 
     return { success: true };
   } catch (error) {
-    console.error('Error in deleteAccount:', error);
+    logger.error('Error in deleteAccount:', error);
     return { success: false, error: `Erreur inattendue: ${error instanceof Error ? error.message : String(error)}` };
   }
 }
@@ -1654,7 +1655,7 @@ export async function getUserSessions() {
       .order('start_time', { ascending: true });
 
     if (createdError) {
-      console.error('Error fetching created sessions:', createdError);
+      logger.error('Error fetching created sessions:', createdError);
     }
 
     // Récupérer les IDs des sessions auxquelles l'utilisateur participe
@@ -1665,7 +1666,7 @@ export async function getUserSessions() {
       .eq('status', 'confirmed');
 
     if (participationsError) {
-      console.error('Error fetching user participations:', participationsError);
+      logger.error('Error fetching user participations:', participationsError);
     }
 
     const sessionIds = participations?.map((p) => p.session_id) || [];
@@ -1721,7 +1722,7 @@ export async function getUserSessions() {
 
     return { upcomingJoined, pastJoined, upcomingCreated, pastCreated };
   } catch (error) {
-    console.error('Error in getUserSessions:', error);
+    logger.error('Error in getUserSessions:', error);
     return { upcomingJoined: [], pastJoined: [], upcomingCreated: [], pastCreated: [] };
   }
 }
@@ -1750,7 +1751,7 @@ export async function getStravaConnectUrl(): Promise<{ url: string } | { error: 
     const url = getStravaAuthUrl(user.id);
     return { url };
   } catch (error) {
-    console.error('Error generating Strava URL:', error);
+    logger.error('Error generating Strava URL:', error);
     return { error: 'Erreur inattendue' };
   }
 }
@@ -1767,7 +1768,7 @@ export async function getStravaConnectUrlForOnboarding(): Promise<{ url: string 
     const url = getStravaAuthUrl(`${user.id}:onboarding`);
     return { url };
   } catch (error) {
-    console.error('Error generating Strava URL for onboarding:', error);
+    logger.error('Error generating Strava URL for onboarding:', error);
     return { error: 'Erreur inattendue' };
   }
 }
@@ -1845,7 +1846,7 @@ export async function syncStravaData(): Promise<{ success: boolean; level?: numb
 
     return { success: true, level: calculatedLevel };
   } catch (error) {
-    console.error('Error syncing Strava data:', error);
+    logger.error('Error syncing Strava data:', error);
     return { success: false, error: 'Erreur inattendue' };
   }
 }
@@ -1884,7 +1885,7 @@ export async function disconnectStrava(): Promise<{ success: boolean; error?: st
 
     return { success: true };
   } catch (error) {
-    console.error('Error disconnecting Strava:', error);
+    logger.error('Error disconnecting Strava:', error);
     return { success: false, error: 'Erreur inattendue' };
   }
 }
@@ -2084,7 +2085,7 @@ export async function getDiscoverySessions(options?: {
     // Highest score first
     return enriched.sort((a, b) => b.score - a.score);
   } catch (error) {
-    console.error('Error in getDiscoverySessions:', error);
+    logger.error('Error in getDiscoverySessions:', error);
     return [];
   }
 }

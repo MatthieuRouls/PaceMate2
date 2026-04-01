@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import { createServerClient } from '@supabase/ssr';
@@ -92,7 +93,7 @@ export async function GET(request: NextRequest) {
       .eq('id', user.id);
 
     if (updateError) {
-      console.error('Error updating profile with Strava data:', updateError);
+      logger.error('Error updating profile with Strava data:', updateError);
       return NextResponse.redirect(
         new URL(`${errorBase}=update_failed`, request.url)
       );
@@ -103,7 +104,7 @@ export async function GET(request: NextRequest) {
       new URL(successUrl, request.url)
     );
   } catch (err) {
-    console.error('Strava OAuth error:', err);
+    logger.error('Strava OAuth error:', err);
     return NextResponse.redirect(
       new URL(`${errorBase}=exchange_failed`, request.url)
     );

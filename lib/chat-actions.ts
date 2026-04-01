@@ -1,4 +1,5 @@
 'use server';
+import { logger } from '@/lib/logger';
 
 import { getCurrentUser, getServerSupabaseClient } from './supabase-auth';
 import type { Conversation, Message, ConversationParticipant } from './types';
@@ -137,7 +138,7 @@ export async function getUserConversations(): Promise<ConversationsResult> {
 
     return { success: true, conversations: enrichedConversations };
   } catch (error) {
-    console.error('Error in getUserConversations:', error);
+    logger.error('Error in getUserConversations:', error);
     return { success: false, error: 'Une erreur est survenue' };
   }
 }
@@ -193,7 +194,7 @@ export async function getConversationMessages(
     const { data: messages, error } = await query;
 
     if (error) {
-      console.error('Error fetching messages:', error);
+      logger.error('Error fetching messages:', error);
       return { success: false, error: 'Erreur lors de la récupération' };
     }
 
@@ -206,7 +207,7 @@ export async function getConversationMessages(
 
     return { success: true, messages: resultMessages, hasMore };
   } catch (error) {
-    console.error('Error in getConversationMessages:', error);
+    logger.error('Error in getConversationMessages:', error);
     return { success: false, error: 'Une erreur est survenue' };
   }
 }
@@ -256,7 +257,7 @@ export async function sendMessage(
       .single();
 
     if (error) {
-      console.error('Error sending message:', error);
+      logger.error('Error sending message:', error);
       return { success: false, error: 'Erreur lors de l\'envoi' };
     }
 
@@ -269,7 +270,7 @@ export async function sendMessage(
 
     return { success: true, message };
   } catch (error) {
-    console.error('Error in sendMessage:', error);
+    logger.error('Error in sendMessage:', error);
     return { success: false, error: 'Une erreur est survenue' };
   }
 }
@@ -303,13 +304,13 @@ export async function editMessage(messageId: string, newContent: string): Promis
       .single();
 
     if (error) {
-      console.error('Error editing message:', error);
+      logger.error('Error editing message:', error);
       return { success: false, error: 'Erreur lors de la modification' };
     }
 
     return { success: true, message };
   } catch (error) {
-    console.error('Error in editMessage:', error);
+    logger.error('Error in editMessage:', error);
     return { success: false, error: 'Une erreur est survenue' };
   }
 }
@@ -333,13 +334,13 @@ export async function deleteMessage(messageId: string): Promise<ActionResult> {
       .eq('sender_id', user.id);
 
     if (error) {
-      console.error('Error deleting message:', error);
+      logger.error('Error deleting message:', error);
       return { success: false, error: 'Erreur lors de la suppression' };
     }
 
     return { success: true };
   } catch (error) {
-    console.error('Error in deleteMessage:', error);
+    logger.error('Error in deleteMessage:', error);
     return { success: false, error: 'Une erreur est survenue' };
   }
 }
@@ -363,13 +364,13 @@ export async function markConversationAsRead(conversationId: string): Promise<Ac
       .eq('user_id', user.id);
 
     if (error) {
-      console.error('Error marking as read:', error);
+      logger.error('Error marking as read:', error);
       return { success: false, error: 'Erreur' };
     }
 
     return { success: true };
   } catch (error) {
-    console.error('Error in markConversationAsRead:', error);
+    logger.error('Error in markConversationAsRead:', error);
     return { success: false, error: 'Une erreur est survenue' };
   }
 }
@@ -404,7 +405,7 @@ export async function getOrCreateDirectConversation(friendId: string): Promise<C
       .rpc('create_direct_conversation', { friend_id: friendId });
 
     if (rpcError) {
-      console.error('Error in create_direct_conversation RPC:', rpcError);
+      logger.error('Error in create_direct_conversation RPC:', rpcError);
 
       // Fallback: essayer de trouver une conversation existante
       const { data: existingConvs } = await supabase
@@ -463,7 +464,7 @@ export async function getOrCreateDirectConversation(friendId: string): Promise<C
       .single();
 
     if (convError) {
-      console.error('Error fetching conversation:', convError);
+      logger.error('Error fetching conversation:', convError);
       return { success: false, error: 'Erreur lors de la récupération' };
     }
 
@@ -482,7 +483,7 @@ export async function getOrCreateDirectConversation(friendId: string): Promise<C
       }
     };
   } catch (error) {
-    console.error('Error in getOrCreateDirectConversation:', error);
+    logger.error('Error in getOrCreateDirectConversation:', error);
     return { success: false, error: 'Une erreur est survenue' };
   }
 }
@@ -507,7 +508,7 @@ export async function getTeamConversation(teamId: string): Promise<ConversationR
       .single();
 
     if (error) {
-      console.error('Error fetching team conversation:', error);
+      logger.error('Error fetching team conversation:', error);
       return { success: false, error: 'Conversation non trouvée' };
     }
 
@@ -525,7 +526,7 @@ export async function getTeamConversation(teamId: string): Promise<ConversationR
 
     return { success: true, conversation };
   } catch (error) {
-    console.error('Error in getTeamConversation:', error);
+    logger.error('Error in getTeamConversation:', error);
     return { success: false, error: 'Une erreur est survenue' };
   }
 }
@@ -550,7 +551,7 @@ export async function getSessionConversation(sessionId: string): Promise<Convers
       .single();
 
     if (error) {
-      console.error('Error fetching session conversation:', error);
+      logger.error('Error fetching session conversation:', error);
       return { success: false, error: 'Conversation non trouvée' };
     }
 
@@ -579,7 +580,7 @@ export async function getSessionConversation(sessionId: string): Promise<Convers
 
     return { success: true, conversation };
   } catch (error) {
-    console.error('Error in getSessionConversation:', error);
+    logger.error('Error in getSessionConversation:', error);
     return { success: false, error: 'Une erreur est survenue' };
   }
 }
@@ -628,7 +629,7 @@ export async function getTotalUnreadCount(): Promise<UnreadCountResult> {
 
     return { success: true, count: totalUnread };
   } catch (error) {
-    console.error('Error in getTotalUnreadCount:', error);
+    logger.error('Error in getTotalUnreadCount:', error);
     return { success: false, count: 0, error: 'Une erreur est survenue' };
   }
 }
@@ -652,13 +653,13 @@ export async function toggleMuteConversation(conversationId: string, muted: bool
       .eq('user_id', user.id);
 
     if (error) {
-      console.error('Error toggling mute:', error);
+      logger.error('Error toggling mute:', error);
       return { success: false, error: 'Erreur' };
     }
 
     return { success: true };
   } catch (error) {
-    console.error('Error in toggleMuteConversation:', error);
+    logger.error('Error in toggleMuteConversation:', error);
     return { success: false, error: 'Une erreur est survenue' };
   }
 }
@@ -695,13 +696,13 @@ export async function getConversationParticipants(
       .eq('conversation_id', conversationId);
 
     if (error) {
-      console.error('Error fetching participants:', error);
+      logger.error('Error fetching participants:', error);
       return { success: false, error: 'Erreur' };
     }
 
     return { success: true, participants };
   } catch (error) {
-    console.error('Error in getConversationParticipants:', error);
+    logger.error('Error in getConversationParticipants:', error);
     return { success: false, error: 'Une erreur est survenue' };
   }
 }

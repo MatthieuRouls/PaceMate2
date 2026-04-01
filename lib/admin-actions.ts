@@ -1,4 +1,5 @@
 'use server';
+import { logger } from '@/lib/logger';
 
 import { getCurrentUser, getServerSupabaseClient } from './supabase-auth';
 import { getServiceSupabaseClient } from './supabase-service';
@@ -95,7 +96,7 @@ export async function getAdminStats() {
       },
     };
   } catch (error) {
-    console.error('Error fetching admin stats:', error);
+    logger.error('Error fetching admin stats:', error);
     return { success: false, error: 'Erreur statistiques' };
   }
 }
@@ -159,7 +160,7 @@ export async function getAllProfiles(search?: string) {
 
     return { success: true, profiles: profilesWithIdentity };
   } catch (error) {
-    console.error('Error fetching profiles:', error);
+    logger.error('Error fetching profiles:', error);
     return { success: false, error: 'Erreur récupération profils' };
   }
 }
@@ -302,7 +303,7 @@ export async function deleteProfile(id: string) {
     await logAdminAction(validation.userId!, 'delete_profile', 'profile', id);
     return { success: true };
   } catch (error) {
-    console.error('deleteProfile error:', error);
+    logger.error('deleteProfile error:', error);
     return { success: false, error: (error as Error).message || 'Erreur suppression' };
   }
 }

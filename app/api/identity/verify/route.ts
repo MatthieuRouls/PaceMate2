@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 /**
  * API Route: Vérification d'identité
  * POST /api/identity/verify
@@ -228,7 +229,7 @@ Si tu ne détectes pas de visage dans l'une des images, retourne faces_detected:
       .upsert(upsertData, { onConflict: 'user_id' });
 
     if (upsertError) {
-      console.error('Error upserting identity verification:', upsertError);
+      logger.error('Error upserting identity verification:', upsertError);
     }
 
     // Mettre à jour le profil si vérifié
@@ -249,7 +250,7 @@ Si tu ne détectes pas de visage dans l'une des images, retourne faces_detected:
     });
 
   } catch (error) {
-    console.error('Identity verification error:', error);
+    logger.error('Identity verification error:', error);
     return NextResponse.json({ error: 'Erreur interne du serveur' }, { status: 500 });
   }
 }

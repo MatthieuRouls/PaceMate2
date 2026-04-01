@@ -1,4 +1,5 @@
 'use server';
+import { logger } from '@/lib/logger';
 
 import { getCurrentUser, getServerSupabaseClient } from './supabase-auth';
 import type { Friendship, Profile } from './types';
@@ -76,13 +77,13 @@ export async function sendFriendRequest(targetUserId: string): Promise<Friendshi
       .single();
 
     if (error) {
-      console.error('Error sending friend request:', error);
+      logger.error('Error sending friend request:', error);
       return { success: false, error: 'Erreur lors de l\'envoi de la demande' };
     }
 
     return { success: true, friendship: data };
   } catch (error) {
-    console.error('Error in sendFriendRequest:', error);
+    logger.error('Error in sendFriendRequest:', error);
     return { success: false, error: 'Une erreur est survenue' };
   }
 }
@@ -118,13 +119,13 @@ export async function acceptFriendRequest(friendshipId: string): Promise<ActionR
       .eq('id', friendshipId);
 
     if (error) {
-      console.error('Error accepting friend request:', error);
+      logger.error('Error accepting friend request:', error);
       return { success: false, error: 'Erreur lors de l\'acceptation' };
     }
 
     return { success: true };
   } catch (error) {
-    console.error('Error in acceptFriendRequest:', error);
+    logger.error('Error in acceptFriendRequest:', error);
     return { success: false, error: 'Une erreur est survenue' };
   }
 }
@@ -160,13 +161,13 @@ export async function rejectFriendRequest(friendshipId: string): Promise<ActionR
       .eq('id', friendshipId);
 
     if (error) {
-      console.error('Error rejecting friend request:', error);
+      logger.error('Error rejecting friend request:', error);
       return { success: false, error: 'Erreur lors du refus' };
     }
 
     return { success: true };
   } catch (error) {
-    console.error('Error in rejectFriendRequest:', error);
+    logger.error('Error in rejectFriendRequest:', error);
     return { success: false, error: 'Une erreur est survenue' };
   }
 }
@@ -191,13 +192,13 @@ export async function cancelFriendRequest(friendshipId: string): Promise<ActionR
       .eq('status', 'pending');
 
     if (error) {
-      console.error('Error canceling friend request:', error);
+      logger.error('Error canceling friend request:', error);
       return { success: false, error: 'Erreur lors de l\'annulation' };
     }
 
     return { success: true };
   } catch (error) {
-    console.error('Error in cancelFriendRequest:', error);
+    logger.error('Error in cancelFriendRequest:', error);
     return { success: false, error: 'Une erreur est survenue' };
   }
 }
@@ -233,13 +234,13 @@ export async function removeFriend(friendshipId: string): Promise<ActionResult> 
       .eq('id', friendshipId);
 
     if (error) {
-      console.error('Error removing friend:', error);
+      logger.error('Error removing friend:', error);
       return { success: false, error: 'Erreur lors de la suppression' };
     }
 
     return { success: true };
   } catch (error) {
-    console.error('Error in removeFriend:', error);
+    logger.error('Error in removeFriend:', error);
     return { success: false, error: 'Une erreur est survenue' };
   }
 }
@@ -272,13 +273,13 @@ export async function blockUser(targetUserId: string): Promise<ActionResult> {
       });
 
     if (error) {
-      console.error('Error blocking user:', error);
+      logger.error('Error blocking user:', error);
       return { success: false, error: 'Erreur lors du blocage' };
     }
 
     return { success: true };
   } catch (error) {
-    console.error('Error in blockUser:', error);
+    logger.error('Error in blockUser:', error);
     return { success: false, error: 'Une erreur est survenue' };
   }
 }
@@ -303,13 +304,13 @@ export async function unblockUser(targetUserId: string): Promise<ActionResult> {
       .eq('status', 'blocked');
 
     if (error) {
-      console.error('Error unblocking user:', error);
+      logger.error('Error unblocking user:', error);
       return { success: false, error: 'Erreur lors du déblocage' };
     }
 
     return { success: true };
   } catch (error) {
-    console.error('Error in unblockUser:', error);
+    logger.error('Error in unblockUser:', error);
     return { success: false, error: 'Une erreur est survenue' };
   }
 }
@@ -342,7 +343,7 @@ export async function getFriendsList(): Promise<FriendsListResult> {
       .or(`user_id.eq.${user.id},friend_id.eq.${user.id}`);
 
     if (error) {
-      console.error('Error fetching friends:', error);
+      logger.error('Error fetching friends:', error);
       return { success: false, error: 'Erreur lors de la récupération' };
     }
 
@@ -356,7 +357,7 @@ export async function getFriendsList(): Promise<FriendsListResult> {
 
     return { success: true, friends };
   } catch (error) {
-    console.error('Error in getFriendsList:', error);
+    logger.error('Error in getFriendsList:', error);
     return { success: false, error: 'Une erreur est survenue' };
   }
 }
@@ -384,13 +385,13 @@ export async function getPendingRequests(): Promise<FriendRequestsResult> {
       .order('created_at', { ascending: false });
 
     if (error) {
-      console.error('Error fetching pending requests:', error);
+      logger.error('Error fetching pending requests:', error);
       return { success: false, error: 'Erreur lors de la récupération' };
     }
 
     return { success: true, requests };
   } catch (error) {
-    console.error('Error in getPendingRequests:', error);
+    logger.error('Error in getPendingRequests:', error);
     return { success: false, error: 'Une erreur est survenue' };
   }
 }
@@ -418,13 +419,13 @@ export async function getSentRequests(): Promise<FriendRequestsResult> {
       .order('created_at', { ascending: false });
 
     if (error) {
-      console.error('Error fetching sent requests:', error);
+      logger.error('Error fetching sent requests:', error);
       return { success: false, error: 'Erreur lors de la récupération' };
     }
 
     return { success: true, requests };
   } catch (error) {
-    console.error('Error in getSentRequests:', error);
+    logger.error('Error in getSentRequests:', error);
     return { success: false, error: 'Une erreur est survenue' };
   }
 }
@@ -448,13 +449,13 @@ export async function getPendingRequestsCount(): Promise<{ success: boolean; cou
       .eq('status', 'pending');
 
     if (error) {
-      console.error('Error counting pending requests:', error);
+      logger.error('Error counting pending requests:', error);
       return { success: false, count: 0, error: 'Erreur' };
     }
 
     return { success: true, count: count || 0 };
   } catch (error) {
-    console.error('Error in getPendingRequestsCount:', error);
+    logger.error('Error in getPendingRequestsCount:', error);
     return { success: false, count: 0, error: 'Une erreur est survenue' };
   }
 }
@@ -483,13 +484,13 @@ export async function searchUsers(query: string): Promise<SearchUsersResult> {
       .limit(20);
 
     if (error) {
-      console.error('Error searching users:', error);
+      logger.error('Error searching users:', error);
       return { success: false, error: 'Erreur lors de la recherche' };
     }
 
     return { success: true, users };
   } catch (error) {
-    console.error('Error in searchUsers:', error);
+    logger.error('Error in searchUsers:', error);
     return { success: false, error: 'Une erreur est survenue' };
   }
 }
@@ -521,7 +522,7 @@ export async function checkFriendshipStatusBatch(targetUserIds: string[]): Promi
       .or(`user_id.eq.${user.id},friend_id.eq.${user.id}`);
 
     if (error) {
-      console.error('Error fetching friendships:', error);
+      logger.error('Error fetching friendships:', error);
       return { success: false, error: 'Erreur lors de la récupération' };
     }
 
@@ -559,7 +560,7 @@ export async function checkFriendshipStatusBatch(targetUserIds: string[]): Promi
 
     return { success: true, statuses };
   } catch (error) {
-    console.error('Error in checkFriendshipStatusBatch:', error);
+    logger.error('Error in checkFriendshipStatusBatch:', error);
     return { success: false, error: 'Une erreur est survenue' };
   }
 }
@@ -608,7 +609,7 @@ export async function checkFriendshipStatus(targetUserId: string): Promise<Frien
 
     return { success: true, status, friendship };
   } catch (error) {
-    console.error('Error in checkFriendshipStatus:', error);
+    logger.error('Error in checkFriendshipStatus:', error);
     return { success: false, error: 'Une erreur est survenue' };
   }
 }

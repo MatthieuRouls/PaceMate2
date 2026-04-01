@@ -593,9 +593,9 @@ export default function SettingsPage() {
                 </div>
 
                 {phoneProviderDisabled && (
-                  <div className="ml-11 mb-3 px-3 py-2.5 rounded-xl bg-amber-50 border border-amber-200">
-                    <p className="text-xs font-semibold text-amber-800">Provider SMS non configuré</p>
-                    <p className="text-xs text-amber-700 mt-0.5">Active le provider Phone dans Supabase → Auth → Providers → Phone.</p>
+                  <div className="ml-11 mb-3 px-3 py-2.5 rounded-xl bg-dark-800 border border-white/10">
+                    <p className="text-xs font-semibold text-silver-300">Vérification SMS temporairement indisponible</p>
+                    <p className="text-xs text-dark-300 mt-0.5">Réessaie dans quelques instants ou contacte le support si le problème persiste.</p>
                   </div>
                 )}
 

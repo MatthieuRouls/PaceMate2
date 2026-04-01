@@ -1,4 +1,5 @@
 'use server';
+import { logger } from '@/lib/logger';
 
 import { getCurrentUser, getServerSupabaseClient } from './supabase-auth';
 import type { RunnerStats, BadgeType, UserBadge } from './types';
@@ -221,7 +222,7 @@ export async function updateStatsOnRunComplete(sessionId: string): Promise<void>
             })
         );
       } catch (connErr) {
-        console.warn('[stats] runner_connections table may not exist yet:', connErr);
+        logger.warn('[stats] runner_connections table may not exist yet:', connErr);
       }
     }
 
@@ -278,7 +279,7 @@ export async function updateStatsOnRunComplete(sessionId: string): Promise<void>
     await evaluateAndAwardBadges(user.id, statsForBadges);
   } catch (err) {
     // Non-blocking — never crash completeRun
-    console.error('[stats] updateStatsOnRunComplete error:', err);
+    logger.error('[stats] updateStatsOnRunComplete error:', err);
   }
 }
 
@@ -304,7 +305,7 @@ async function evaluateAndAwardBadges(userId: string, stats: ProfileStats): Prom
       }
     }
   } catch (err) {
-    console.warn('[stats] badge evaluation error:', err);
+    logger.warn('[stats] badge evaluation error:', err);
   }
 }
 
@@ -457,7 +458,7 @@ export async function getRunnerStats(): Promise<RunnerStats | null> {
       badgeProgress,
     };
   } catch (err) {
-    console.error('[stats] getRunnerStats error:', err);
+    logger.error('[stats] getRunnerStats error:', err);
     return null;
   }
 }
