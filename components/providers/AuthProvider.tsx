@@ -47,6 +47,18 @@ function translateError(error: string): string {
   return error;
 }
 
+// AbortErrors are expected when a component unmounts mid-request — suppress them
+function isAbortError(err: unknown): boolean {
+  if (err instanceof DOMException && err.name === 'AbortError') return true;
+  if (err && typeof err === 'object') {
+    const msg = (err as { message?: string; details?: string }).message ?? '';
+    const details = (err as { message?: string; details?: string }).details ?? '';
+    if (msg.includes('AbortError') || msg.includes('aborted') ||
+        details.includes('AbortError') || details.includes('aborted')) return true;
+  }
+  return false;
+}
+
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [profile, setProfile] = useState<Profile | null>(null);
@@ -61,6 +73,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   // Récupérer le profil depuis la table profiles avec retry
   const fetchProfile = useCallback(async (userId: string, retries = 3): Promise<Profile | null> => {
     for (let i = 0; i < retries; i++) {
+      // Stop retrying if the component has unmounted
+      if (!isMountedRef.current) return null;
+
       try {
         const { data, error } = await supabase
           .from('profiles')
@@ -69,6 +84,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           .single();
 
         if (error) {
+          // AbortError = component unmounted or request cancelled — not a real error
+          if (isAbortError(error)) return null;
+
           if (i < retries - 1) {
             await new Promise(resolve => setTimeout(resolve, 300 * (i + 1)));
             continue;
@@ -78,12 +96,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         }
 
         return data;
-      } catch (error) {
+      } catch (err) {
+        if (isAbortError(err)) return null;
+
         if (i < retries - 1) {
           await new Promise(resolve => setTimeout(resolve, 300 * (i + 1)));
           continue;
         }
-        console.error('Error fetching profile:', error);
+        console.error('Error fetching profile:', err);
         return null;
       }
     }
