@@ -3,6 +3,9 @@ import { logger } from '@/lib/logger';
 
 import { getCurrentUser, getServerSupabaseClient } from './supabase-auth';
 import { updateStatsOnRunComplete } from './stats-actions';
+import { logActivity } from './activity-actions';
+import { createNotification } from './notification-actions';
+import { sendSessionJoinEmail } from './email';
 import type { Session } from './types';
 
 export interface CreateSessionData {
@@ -112,6 +115,9 @@ export async function createSession(data: CreateSessionData): Promise<CreateSess
       logger.error('Error adding creator as participant:', participantError);
       // On ne bloque pas car la session est créée
     }
+
+    // Log activity (non-blocking)
+    logActivity(user.id, 'session_created', 'session', session.id, sessionData.title as string);
 
     return {
       success: true,
@@ -787,6 +793,47 @@ export async function joinSession(sessionId: string): Promise<ActionResult> {
           error: 'Erreur lors de l\'inscription à la session',
         };
       }
+    }
+
+    // Notify creator + log activity (non-blocking)
+    const { data: sessionInfo } = await supabase
+      .from('sessions')
+      .select('title, creator_id, creator:profiles!sessions_creator_id_fkey(email, username)')
+      .eq('id', sessionId)
+      .single();
+
+    const joinerProfile = await supabase
+      .from('profiles')
+      .select('username')
+      .eq('id', user.id)
+      .single();
+
+    if (sessionInfo) {
+      const joinerName = joinerProfile.data?.username ?? 'Quelqu\'un';
+      const creatorId = sessionInfo.creator_id as string;
+      const creator = sessionInfo.creator as { email: string; username: string } | null;
+
+      // Only notify if joiner ≠ creator
+      if (creatorId !== user.id) {
+        createNotification(
+          creatorId,
+          'session_join',
+          `${joinerName} rejoint votre run`,
+          `"${sessionInfo.title}"`,
+          { session_id: sessionId, joiner_id: user.id }
+        );
+        if (creator?.email) {
+          sendSessionJoinEmail({
+            creatorEmail: creator.email,
+            joinerName,
+            sessionTitle: sessionInfo.title as string,
+            sessionDate: session.start_time as string,
+            sessionId,
+          });
+        }
+      }
+
+      logActivity(user.id, 'session_joined', 'session', sessionId, sessionInfo.title as string);
     }
 
     return {

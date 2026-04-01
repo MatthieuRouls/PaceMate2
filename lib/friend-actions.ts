@@ -2,6 +2,9 @@
 import { logger } from '@/lib/logger';
 
 import { getCurrentUser, getServerSupabaseClient } from './supabase-auth';
+import { createNotification } from './notification-actions';
+import { logActivity } from './activity-actions';
+import { sendFriendRequestEmail } from './email';
 import type { Friendship, Profile } from './types';
 
 export interface ActionResult {
@@ -81,6 +84,30 @@ export async function sendFriendRequest(targetUserId: string): Promise<Friendshi
       return { success: false, error: 'Erreur lors de l\'envoi de la demande' };
     }
 
+    // Notify target + send email (non-blocking)
+    const { data: senderProfile } = await supabase
+      .from('profiles')
+      .select('username')
+      .eq('id', user.id)
+      .single();
+    const { data: targetProfile } = await supabase
+      .from('profiles')
+      .select('email')
+      .eq('id', targetUserId)
+      .single();
+
+    const senderName = senderProfile?.username ?? 'Quelqu\'un';
+    createNotification(
+      targetUserId,
+      'friend_request',
+      `${senderName} veut courir avec vous`,
+      undefined,
+      { friendship_id: data.id, requester_id: user.id }
+    );
+    if (targetProfile?.email) {
+      sendFriendRequestEmail({ recipientEmail: targetProfile.email, requesterName: senderName });
+    }
+
     return { success: true, friendship: data };
   } catch (error) {
     logger.error('Error in sendFriendRequest:', error);
@@ -122,6 +149,23 @@ export async function acceptFriendRequest(friendshipId: string): Promise<ActionR
       logger.error('Error accepting friend request:', error);
       return { success: false, error: 'Erreur lors de l\'acceptation' };
     }
+
+    // Notify the original requester + log activity (non-blocking)
+    const { data: accepterProfile } = await supabase
+      .from('profiles')
+      .select('username')
+      .eq('id', user.id)
+      .single();
+
+    const accepterName = accepterProfile?.username ?? 'Quelqu\'un';
+    createNotification(
+      friendship.user_id,
+      'friend_accepted',
+      `${accepterName} a accepté votre demande`,
+      'Vous pouvez maintenant courir ensemble !',
+      { friendship_id: friendshipId, accepter_id: user.id }
+    );
+    logActivity(user.id, 'friend_accepted', 'user', friendship.user_id, accepterName);
 
     return { success: true };
   } catch (error) {

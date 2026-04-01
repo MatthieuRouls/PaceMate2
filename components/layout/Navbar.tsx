@@ -6,6 +6,7 @@ import { usePathname } from 'next/navigation';
 import { useState, useEffect } from 'react';
 import { Bell, Loader2 } from 'lucide-react';
 import { useAuth } from '../providers/AuthProvider';
+import { getUnreadCount } from '@/lib/notification-actions';
 import AuthDrawer from '../ui/AuthDrawer';
 import DarkModeToggle from '../ui/DarkModeToggle';
 
@@ -20,6 +21,7 @@ export default function Navbar() {
   const [authDrawerOpen, setAuthDrawerOpen] = useState(false);
   const [authMode, setAuthMode] = useState<'login' | 'signup'>('login');
   const [scrolled, setScrolled] = useState(false);
+  const [unreadCount, setUnreadCount] = useState(0);
 
   const isHomepage = pathname === '/';
   const isDashboard = pathname === '/dashboard';
@@ -34,6 +36,14 @@ export default function Navbar() {
       localStorage.setItem('pacemate-theme', 'light');
     }
   }, [loading, profile]);
+
+  // Fetch unread notification count
+  useEffect(() => {
+    if (!profile) return;
+    getUnreadCount().then(setUnreadCount);
+    const interval = setInterval(() => getUnreadCount().then(setUnreadCount), 30_000);
+    return () => clearInterval(interval);
+  }, [profile?.id]);
 
   const handleSignOut = async () => {
     setDropdownOpen(false);
@@ -150,12 +160,16 @@ export default function Navbar() {
               {profile && <DarkModeToggle />}
 
               {/* Notifications */}
-              <button className={`relative w-9 h-9 rounded-full flex items-center justify-center transition-colors ${
+              <Link href="/notifications" className={`relative w-9 h-9 rounded-full flex items-center justify-center transition-colors ${
                 onDarkBg ? 'hover:bg-white/15' : 'hover:bg-text-primary/5'
               }`}>
                 <Bell className={`w-5 h-5 transition-colors ${onDarkBg ? 'text-white' : 'text-text-secondary'}`} />
-                <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-pink-500 rounded-full"></span>
-              </button>
+                {unreadCount > 0 && (
+                  <span className="absolute top-1 right-1 min-w-[16px] h-4 px-0.5 bg-pink-500 rounded-full flex items-center justify-center text-white text-[10px] font-bold leading-none">
+                    {unreadCount > 9 ? '9+' : unreadCount}
+                  </span>
+                )}
+              </Link>
 
               {/* User dropdown */}
               <div className="relative ml-1">

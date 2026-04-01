@@ -10,6 +10,7 @@ const protectedRoutes = [
   '/friends',
   '/messages',
   '/profile',
+  '/notifications',
   '/admin',
 ];
 

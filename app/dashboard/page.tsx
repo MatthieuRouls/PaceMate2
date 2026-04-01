@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useAuth } from '@/components/providers/AuthProvider';
 import { getUpcomingSessions, getUserTeam } from '@/lib/actions';
+import { getFeedEvents, getEventLabel, getEventTimeAgo, type ActivityEvent } from '@/lib/activity-actions';
 import { Session, Team } from '@/lib/types';
 
 interface SessionWithParticipation extends Session {
@@ -50,13 +51,6 @@ const getSessionCover = (session: Session): string => {
 const getSessionTypeLabel = (sessionType: string | null | undefined) =>
   SESSION_TYPE_LABELS[sessionType || 'default'] || SESSION_TYPE_LABELS.default;
 
-// Static social feed (will be real data in a future iteration)
-const SOCIAL_FEED = [
-  { user: 'Marie L.', action: 'a rejoint une sortie', target: 'Sortie matinale Paris 15e', time: 'Il y a 2h', gradient: 'from-pink-400 to-purple-500' },
-  { user: 'Thomas R.', action: 'a créé un run', target: 'Fractionné Vincennes', time: 'Il y a 4h', gradient: 'from-neon-400 to-teal-500' },
-  { user: 'Lucas P.', action: 'cherche un partenaire', target: 'sortie à 7h demain', time: 'Il y a 5h', gradient: 'from-orange-400 to-red-500' },
-  { user: 'Sophie M.', action: 'a rejoint une sortie', target: 'Run Trocadéro', time: 'Hier', gradient: 'from-blue-400 to-indigo-500' },
-];
 
 // Static nearby runners (will be real data in a future iteration)
 const NEARBY_RUNNERS = [
@@ -78,6 +72,7 @@ export default function DashboardPage() {
   const [sessions, setSessions] = useState<SessionWithParticipation[]>([]);
   const [loading, setLoading] = useState(true);
   const [userTeam, setUserTeam] = useState<TeamWithCount | null>(null);
+  const [feedEvents, setFeedEvents] = useState<ActivityEvent[]>([]);
   const [fabHovered, setFabHovered] = useState(false);
   const [showFabTooltip, setShowFabTooltip] = useState(false);
 
@@ -111,12 +106,14 @@ export default function DashboardPage() {
     async function fetchData() {
       try {
         const userLevel = profile?.running_level || 1;
-        const [sessionsData, team] = await Promise.all([
+        const [sessionsData, team, feed] = await Promise.all([
           getUpcomingSessions(20, userLevel + 1),
           getUserTeam(),
+          getFeedEvents(8),
         ]);
         setSessions(sessionsData);
         setUserTeam(team);
+        setFeedEvents(feed);
       } catch (error) {
         console.error('Error fetching data:', error);
       } finally {
@@ -460,24 +457,38 @@ export default function DashboardPage() {
 
             <div className="bg-dark-800/60 rounded-2xl overflow-hidden border border-white/8">
               <div className="divide-y divide-white/6">
-                {SOCIAL_FEED.map((item, i) => (
-                  <div key={i} className="px-5 py-4 flex items-center gap-4 hover:bg-white/4 transition-colors">
-                    <div
-                      className={`w-10 h-10 rounded-xl bg-gradient-to-br ${item.gradient} flex items-center justify-center text-sm font-bold text-white flex-shrink-0`}
-                    >
-                      {item.user.charAt(0)}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm text-dark-200 truncate">
-                        <strong className="font-semibold text-white">{item.user}</strong>{' '}
-                        <span className="text-dark-300">{item.action}</span>{' '}
-                        <strong className="font-semibold text-silver-300">{item.target}</strong>
-                      </p>
-                      <span className="text-xs text-dark-400">{item.time}</span>
-                    </div>
-                    <span className="w-1.5 h-1.5 bg-neon-400/40 rounded-full flex-shrink-0 animate-live-dot" />
+                {feedEvents.length === 0 ? (
+                  <div className="px-5 py-8 text-center text-sm text-dark-400">
+                    Soyez le premier à créer une sortie !
                   </div>
-                ))}
+                ) : feedEvents.map((event) => {
+                  const { action, gradient } = getEventLabel(event);
+                  const actor = event.actor;
+                  const name = actor?.username ?? 'Coureur';
+                  return (
+                    <div key={event.id} className="px-5 py-4 flex items-center gap-4 hover:bg-white/4 transition-colors">
+                      <div
+                        className={`w-10 h-10 rounded-xl bg-gradient-to-br ${gradient} flex items-center justify-center text-sm font-bold text-white flex-shrink-0 overflow-hidden`}
+                      >
+                        {actor?.avatar_url
+                          ? <img src={actor.avatar_url} alt={name} className="w-full h-full object-cover" />
+                          : name.charAt(0).toUpperCase()
+                        }
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm text-dark-200 truncate">
+                          <strong className="font-semibold text-white">{name}</strong>{' '}
+                          <span className="text-dark-300">{action}</span>
+                          {event.target_label && (
+                            <> <strong className="font-semibold text-silver-300">{event.target_label}</strong></>
+                          )}
+                        </p>
+                        <span className="text-xs text-dark-400">{getEventTimeAgo(event.created_at)}</span>
+                      </div>
+                      <span className="w-1.5 h-1.5 bg-neon-400/40 rounded-full flex-shrink-0 animate-live-dot" />
+                    </div>
+                  );
+                })}
               </div>
               <Link
                 href="/sessions"
