@@ -1,7 +1,8 @@
 'use server';
 import { logger } from '@/lib/logger';
 
-import { getCurrentUser, getServerSupabaseClient, getServiceSupabaseClient } from './supabase-auth';
+import { getCurrentUser, getServerSupabaseClient } from './supabase-auth';
+import { getServiceSupabaseClient } from './supabase-service';
 
 export interface ActivityEvent {
   id: string;
