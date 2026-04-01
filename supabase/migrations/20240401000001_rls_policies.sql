@@ -2,7 +2,11 @@
 -- Audit & renforcement des policies RLS
 --
 -- Ce fichier documente et applique les politiques RLS essentielles.
--- Supabase Dashboard → SQL Editor → exécuter après 20240401000000_strava_tokens.sql
+-- Supabase Dashboard → SQL Editor
+-- Ordre d'exécution :
+--   1. 20240401000000_strava_tokens.sql
+--   2. 20240401000002_missing_tables.sql   ← tables user_badges, runner_connections, etc.
+--   3. Ce fichier (20240401000001_rls_policies.sql)
 -- ─────────────────────────────────────────────────────────────────────────────
 
 -- ── profiles ─────────────────────────────────────────────────────────────────

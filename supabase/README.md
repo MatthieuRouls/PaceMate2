@@ -5,9 +5,10 @@
 ### Option A — Supabase Dashboard (recommandé pour le premier déploiement)
 
 1. Ouvre [Supabase Dashboard](https://app.supabase.com) → ton projet → **SQL Editor**
-2. Exécute les fichiers dans l'ordre numérique :
+2. Exécute les fichiers **dans cet ordre** :
    ```
    supabase/migrations/20240401000000_strava_tokens.sql
+   supabase/migrations/20240401000002_missing_tables.sql
    supabase/migrations/20240401000001_rls_policies.sql
    ```
 
@@ -24,6 +25,7 @@ npx supabase db push
 | Fichier | Description |
 |---|---|
 | `20240401000000_strava_tokens.sql` | Isole les tokens OAuth Strava dans une table dédiée avec RLS stricte. Migre les données existantes et supprime les colonnes sensibles de `profiles`. |
+| `20240401000002_missing_tables.sql` | Crée les tables `user_badges`, `runner_connections`, `admin_activity_log`, `teams` si elles n'existent pas encore. **À exécuter avant les policies RLS.** |
 | `20240401000001_rls_policies.sql` | Renforce les policies RLS sur toutes les tables critiques (profiles, sessions, strava_tokens, identity_verifications, badges, etc.). |
 
 ---
