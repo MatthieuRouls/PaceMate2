@@ -94,7 +94,7 @@ export async function getFeedEvents(limit = 20): Promise<ActivityEvent[]> {
       return [];
     }
 
-    return (data || []) as ActivityEvent[];
+    return (data || []) as unknown as ActivityEvent[];
   } catch (err) {
     logger.error('[activity] getFeedEvents unexpected error:', err);
     return [];

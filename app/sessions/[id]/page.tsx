@@ -14,7 +14,7 @@ import {
 } from '@/lib/actions';
 import PostRunWizard from '@/components/overlays/PostRunWizard';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
-import { ArrowLeft, Calendar, MapPin, Users, Clock, Target, Zap, Trash2, MessageCircle } from 'lucide-react';
+import { ArrowLeft, Calendar, MapPin, Users, Clock, Target, Zap, Trash2, MessageCircle, Share2 } from 'lucide-react';
 import { useAuth } from '@/components/providers/AuthProvider';
 import { getSessionConversation } from '@/lib/chat-actions';
 import { useChat } from '@/components/chat';
@@ -203,6 +203,30 @@ export default function SessionDetailsPage() {
     setActionLoading(false);
   };
 
+  // Share session
+  const handleShare = async () => {
+    const url = window.location.href;
+    const title = session?.title || 'Sortie running';
+    const text = session
+      ? `${session.distance_km} km · ${session.location_name}`
+      : 'Rejoins cette sortie running sur PaceMate !';
+
+    if (navigator.share) {
+      try {
+        await navigator.share({ title, text, url });
+      } catch {
+        // User cancelled or API unavailable — fall through to clipboard
+      }
+    } else {
+      try {
+        await navigator.clipboard.writeText(url);
+        alert('Lien copié dans le presse-papiers !');
+      } catch {
+        // ignore
+      }
+    }
+  };
+
   // Check if current user is the creator
   const isCreator = profile && session && session.creator_id === profile.id;
 
@@ -239,6 +263,15 @@ export default function SessionDetailsPage() {
             <span className="px-4 py-2 rounded-lg bg-pink-500/10 text-pink-500 text-sm font-semibold border border-pink-500/20">
               Mode Test Notation
             </span>
+          )}
+          {session && (
+            <button
+              onClick={handleShare}
+              className="ml-auto inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-white border border-silver-400 text-dark-800 font-medium hover:border-neon-500 hover:bg-silver-100 transition-all"
+            >
+              <Share2 className="w-4 h-4" />
+              Partager
+            </button>
           )}
         </div>
 

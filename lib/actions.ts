@@ -811,7 +811,8 @@ export async function joinSession(sessionId: string): Promise<ActionResult> {
     if (sessionInfo) {
       const joinerName = joinerProfile.data?.username ?? 'Quelqu\'un';
       const creatorId = sessionInfo.creator_id as string;
-      const creator = sessionInfo.creator as { email: string; username: string } | null;
+      const creatorRaw = sessionInfo.creator as unknown;
+      const creator = (Array.isArray(creatorRaw) ? creatorRaw[0] : creatorRaw) as { email: string; username: string } | null;
 
       // Only notify if joiner ≠ creator
       if (creatorId !== user.id) {
