@@ -4,7 +4,8 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useAuth } from '@/components/providers/AuthProvider';
 import { getUpcomingSessions, getUserTeam } from '@/lib/actions';
-import { getFeedEvents, getEventLabel, getEventTimeAgo, type ActivityEvent } from '@/lib/activity-actions';
+import { getFeedEvents, type ActivityEvent } from '@/lib/activity-actions';
+import { getEventLabel, getEventTimeAgo } from '@/lib/activity-utils';
 import { Session, Team } from '@/lib/types';
 
 interface SessionWithParticipation extends Session {
