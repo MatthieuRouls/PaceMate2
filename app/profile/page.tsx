@@ -4,14 +4,14 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useAuth } from '@/components/providers/AuthProvider';
 import { Session, SessionParticipant, BadgeType } from '@/lib/types';
-import { calculateLevel } from '@/lib/constants';
-import ProgressBar from '@/components/ui/ProgressBar';
 import SessionCard from '@/components/ui/SessionCard';
 import {
   getUserUpcomingSessions,
   getUserSessionHistory,
   updateProfileLocation,
 } from '@/lib/actions';
+import { getLevelConfig } from '@/lib/strava';
+import { getLevelBandProgress } from '@/lib/level-manual';
 import { getRunnerStats } from '@/lib/stats-actions';
 import type { RunnerStats } from '@/lib/types';
 import {
@@ -155,8 +155,6 @@ export default function ProfilePage() {
     fetchData();
   }, [profile, authLoading]);
 
-  const levelInfo = profile ? calculateLevel(profile.xp_points || 0) : null;
-
   const getInitials = (username: string) => {
     const parts = username.split(' ');
     if (parts.length >= 2) {
@@ -239,26 +237,51 @@ export default function ProfilePage() {
                     <p className="text-dark-500 mb-4">{profile.bio}</p>
                   )}
 
-                  {/* Level progression */}
-                  {levelInfo && (
-                    <div className="mb-4">
-                      <div className="flex items-center justify-between mb-2">
-                        <span className="font-semibold text-dark-800">
-                          Niveau {levelInfo.currentLevel} - {levelInfo.levelName}
-                        </span>
-                        {levelInfo.currentLevel < 5 && (
-                          <span className="text-sm text-dark-500">
-                            Niveau {levelInfo.currentLevel + 1} a {levelInfo.nextLevelXP} XP
+                  {/* Level — source unique : running_level */}
+                  {(() => {
+                    const level = profile.running_level || 1;
+                    const score = profile.level_score || 0;
+                    const source = profile.level_source || 'default';
+                    const cfg = getLevelConfig(level);
+                    const pct = getLevelBandProgress(score, level);
+                    return (
+                      <div className="mb-4">
+                        <div className="flex items-center gap-3 mb-2">
+                          <span className={`inline-flex items-center px-3 py-1 rounded-lg border font-semibold text-sm ${cfg.textClass} ${cfg.bgClass} ${cfg.borderClass}`}>
+                            Niveau {level} — {cfg.label}
                           </span>
+                          <span className="text-xs text-dark-400">
+                            {source === 'strava' ? '⚡ Strava' : source === 'manual' ? '✏️ Manuel' : '⬜ Par défaut'}
+                          </span>
+                        </div>
+                        {/* Progression dans la tranche */}
+                        <div className="w-full h-2 rounded-full bg-silver-200 overflow-hidden">
+                          <div
+                            className="h-full rounded-full transition-all duration-700"
+                            style={{
+                              width: `${pct}%`,
+                              background: source === 'strava'
+                                ? 'linear-gradient(90deg, #FC4C02, #ff7a45)'
+                                : 'linear-gradient(90deg, #b5ff2d, #8bcc00)',
+                            }}
+                          />
+                        </div>
+                        {source === 'default' && (
+                          <Link
+                            href="/onboarding"
+                            className="inline-block mt-2 text-xs text-neon-700 hover:underline font-medium"
+                          >
+                            Compléter mon profil de runner →
+                          </Link>
+                        )}
+                        {source === 'manual' && !profile.strava_connected && (
+                          <p className="mt-1 text-xs text-dark-400">
+                            Connecte Strava pour un niveau plus précis
+                          </p>
                         )}
                       </div>
-                      <ProgressBar
-                        current={levelInfo.currentXP}
-                        max={levelInfo.nextLevelXP}
-                        level={levelInfo.currentLevel}
-                      />
-                    </div>
-                  )}
+                    );
+                  })()}
 
                   {/* Team badge */}
                   {profile.team && (
@@ -304,7 +327,7 @@ export default function ProfilePage() {
                   <div className="text-sm text-dark-500">sorties</div>
                 </div>
 
-                {/* XP */}
+                {/* Fiabilité */}
                 <div className="card p-6">
                   <div className="flex items-center justify-between mb-4">
                     <div className="w-12 h-12 rounded-xl bg-yellow-100 flex items-center justify-center">
@@ -312,9 +335,9 @@ export default function ProfilePage() {
                     </div>
                   </div>
                   <div className="text-3xl font-bold text-dark-800 mb-1">
-                    {profile.xp_points || 0}
+                    {profile.reliability_score ?? 100}%
                   </div>
-                  <div className="text-sm text-dark-500">points XP</div>
+                  <div className="text-sm text-dark-500">fiabilité</div>
                 </div>
 
                 {/* Best time */}

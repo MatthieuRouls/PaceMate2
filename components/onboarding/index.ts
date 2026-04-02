@@ -9,5 +9,6 @@ export { default as StepProfile } from './StepProfile';
 export { default as StepPhone } from './StepPhone';
 export { default as StepSafety } from './StepSafety';
 export { default as StepTrustedContact } from './StepTrustedContact';
+export { default as StepLevel } from './StepLevel';
 
 export * from './onboarding.types';

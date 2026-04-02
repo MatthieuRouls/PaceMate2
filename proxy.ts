@@ -12,6 +12,7 @@ const protectedRoutes = [
   '/profile',
   '/notifications',
   '/admin',
+  '/onboarding',
 ];
 
 export async function proxy(request: NextRequest) {

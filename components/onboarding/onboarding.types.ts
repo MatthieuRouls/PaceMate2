@@ -9,9 +9,9 @@
  * 5. Strava connection (optional, enhances matching)
  */
 
-export type OnboardingStep = 1 | 2 | 3 | 4 | 5;
+export type OnboardingStep = 1 | 2 | 3 | 4 | 5 | 6;
 
-export const TOTAL_STEPS = 5;
+export const TOTAL_STEPS = 6;
 
 export interface OnboardingData {
   // Step 1 - Profile
@@ -34,7 +34,17 @@ export interface OnboardingData {
   trustedContactPhone: string;
   trustedContactRelation: string;
 
-  // Step 5 - Strava
+  // Step 5 - Niveau running
+  levelIsRunner: boolean | null; // null = not answered yet
+  levelFrequency: string;
+  levelPace: string;
+  levelLongestRun: string;
+  levelBestTime5k: string;
+  levelBestTime10k: string;
+  levelBestTimeSemi: string;
+  levelBestTimeMarathon: string;
+
+  // Step 6 - Strava
   stravaConnected: boolean;
 }
 
@@ -51,6 +61,14 @@ export const INITIAL_ONBOARDING_DATA: OnboardingData = {
   trustedContactName: '',
   trustedContactPhone: '',
   trustedContactRelation: '',
+  levelIsRunner: null,
+  levelFrequency: '',
+  levelPace: '',
+  levelLongestRun: '',
+  levelBestTime5k: '',
+  levelBestTime10k: '',
+  levelBestTimeSemi: '',
+  levelBestTimeMarathon: '',
   stravaConnected: false,
 };
 
@@ -74,7 +92,8 @@ export const STEP_TITLES: Record<OnboardingStep, string> = {
   2: 'Téléphone',
   3: 'Sécurité',
   4: 'Contact',
-  5: 'Strava',
+  5: 'Niveau',
+  6: 'Strava',
 };
 
 export function validateStep1(data: OnboardingData): StepValidation {
@@ -139,5 +158,5 @@ export function validateCurrentStep(step: OnboardingStep, data: OnboardingData):
 }
 
 export function canSkipStep(step: OnboardingStep): boolean {
-  return step === 2 || step === 4 || step === 5;
+  return step === 2 || step === 4 || step === 5 || step === 6;
 }

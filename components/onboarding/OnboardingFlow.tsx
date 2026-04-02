@@ -16,6 +16,7 @@ import StepProfile from './StepProfile';
 import StepPhone from './StepPhone';
 import StepSafety from './StepSafety';
 import StepTrustedContact from './StepTrustedContact';
+import StepLevel from './StepLevel';
 import StepStrava from './StepStrava';
 
 interface OnboardingFlowProps {
@@ -39,7 +40,7 @@ export default function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
         setIsLoading(true);
         try {
           if (onComplete) {
-            await onComplete({ ...INITIAL_ONBOARDING_DATA, stravaConnected: true });
+            await onComplete({ ...data, stravaConnected: true });
           }
           router.push('/dashboard?strava_connected=true');
         } catch (error) {
@@ -141,7 +142,8 @@ export default function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
               {currentStep === 2 && <StepPhone {...stepProps} />}
               {currentStep === 3 && <StepSafety {...stepProps} />}
               {currentStep === 4 && <StepTrustedContact {...stepProps} />}
-              {currentStep === 5 && <StepStrava {...stepProps} />}
+              {currentStep === 5 && <StepLevel {...stepProps} />}
+              {currentStep === 6 && <StepStrava {...stepProps} />}
             </>
           )}
         </div>

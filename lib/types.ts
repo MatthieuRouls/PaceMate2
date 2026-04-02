@@ -27,6 +27,12 @@ export interface Profile {
   trusted_contact_phone?: string;
   trusted_contact_relation?: string;
 
+  // Niveau : source et score brut
+  level_source?: 'strava' | 'manual' | 'default';
+  level_score?: number;
+  manual_level_data?: import('./level-manual').ManualLevelAnswers;
+  onboarding_completed?: boolean;
+
   // Strava integration
   strava_connected?: boolean;
   strava_athlete_id?: number;

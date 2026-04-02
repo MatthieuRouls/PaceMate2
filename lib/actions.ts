@@ -7,6 +7,7 @@ import { logActivity } from './activity-actions';
 import { createNotification } from './notification-actions';
 import { sendSessionJoinEmail } from './email';
 import type { Session } from './types';
+import type { ManualLevelAnswers } from './level-manual';
 
 export interface CreateSessionData {
   title: string;
@@ -2136,4 +2137,61 @@ export async function getDiscoverySessions(options?: {
     logger.error('Error in getDiscoverySessions:', error);
     return [];
   }
+}
+
+// ─── Niveau manuel ────────────────────────────────────────────────────────────
+
+/**
+ * Sauvegarde les réponses au questionnaire de niveau et met à jour running_level.
+ */
+export async function saveManualLevel(
+  answers: ManualLevelAnswers
+): Promise<{ success: boolean; level: number; error?: string }> {
+  const user = await getCurrentUser();
+  if (!user) return { success: false, level: 1, error: 'Non connecté' };
+
+  const { calculateManualScore, scoreToLevel } = await import('./level-manual');
+  const score = calculateManualScore(answers);
+  const level = scoreToLevel(score);
+
+  const supabase = await getServerSupabaseClient();
+  const { error } = await supabase
+    .from('profiles')
+    .update({
+      running_level: level,
+      level_source: 'manual',
+      level_score: score,
+      manual_level_data: answers,
+      onboarding_completed: true,
+    })
+    .eq('id', user.id);
+
+  if (error) {
+    logger.error('saveManualLevel error:', error);
+    return { success: false, level: 1, error: error.message };
+  }
+
+  return { success: true, level };
+}
+
+/**
+ * Marque l'onboarding comme terminé (pour les débutants sans données de niveau).
+ */
+export async function completeOnboarding(): Promise<{ success: boolean }> {
+  const user = await getCurrentUser();
+  if (!user) return { success: false };
+
+  const supabase = await getServerSupabaseClient();
+  const { error } = await supabase
+    .from('profiles')
+    .update({
+      running_level: 1,
+      level_source: 'manual',
+      level_score: 0,
+      onboarding_completed: true,
+    })
+    .eq('id', user.id);
+
+  if (error) logger.error('completeOnboarding error:', error);
+  return { success: !error };
 }

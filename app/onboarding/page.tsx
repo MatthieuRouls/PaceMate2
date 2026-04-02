@@ -5,6 +5,8 @@ import { useAuth } from '@/components/providers/AuthProvider';
 import OnboardingFlow from '@/components/onboarding/OnboardingFlow';
 import type { OnboardingData } from '@/components/onboarding/onboarding.types';
 import { supabase } from '@/lib/supabase';
+import { saveManualLevel, completeOnboarding } from '@/lib/actions';
+import type { ManualLevelAnswers } from '@/lib/level-manual';
 
 export default function OnboardingPage() {
   const router = useRouter();
@@ -62,6 +64,24 @@ export default function OnboardingPage() {
       .from('profiles')
       .update(updatePayload)
       .eq('id', user.id);
+
+    // Save level from questionnaire (step 5)
+    if (data.levelIsRunner === true && data.levelFrequency && data.levelPace && data.levelLongestRun) {
+      const levelAnswers: ManualLevelAnswers = {
+        isRunner: true,
+        frequency: data.levelFrequency as ManualLevelAnswers['frequency'],
+        pace: data.levelPace as ManualLevelAnswers['pace'],
+        longestRun: data.levelLongestRun as ManualLevelAnswers['longestRun'],
+        bestTime5k: data.levelBestTime5k || undefined,
+        bestTime10k: data.levelBestTime10k || undefined,
+        bestTimeSemi: data.levelBestTimeSemi || undefined,
+        bestTimeMarathon: data.levelBestTimeMarathon || undefined,
+      };
+      await saveManualLevel(levelAnswers);
+    } else {
+      // Débutant ou étape skippée — marque l'onboarding comme terminé
+      await completeOnboarding();
+    }
 
     await refreshProfile();
   };
