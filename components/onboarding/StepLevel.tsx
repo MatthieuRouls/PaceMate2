@@ -16,6 +16,73 @@ import { getLevelConfig } from '@/lib/strava';
 
 type SubStep = 'choice' | 'habits' | 'times';
 
+// ─── Tableau des niveaux ──────────────────────────────────────────────────────
+
+const LEVEL_TABLE = [
+  { level: 1, emoji: '🌱', allure: '> 7:00 /km',       km: '< 20 km/sem',  profil: 'Premières sorties, pas de référence' },
+  { level: 2, emoji: '🚶', allure: '6:30 – 7:00 /km',  km: '20 – 35 km',   profil: '1-2x/sem, objectif finisher' },
+  { level: 3, emoji: '🏃', allure: '5:30 – 6:30 /km',  km: '35 – 55 km',   profil: '3x/sem, 10K confortablement' },
+  { level: 4, emoji: '💪', allure: '5:00 – 5:30 /km',  km: '55 – 75 km',   profil: 'Semi-marathon régulier' },
+  { level: 5, emoji: '🎯', allure: '4:30 – 5:00 /km',  km: '55 – 75 km',   profil: 'Compétitions, performances' },
+  { level: 6, emoji: '⚡', allure: '4:00 – 4:30 /km',  km: '75+ km',       profil: 'Entraînement structuré, podiums' },
+  { level: 7, emoji: '🔥', allure: '< 4:00 /km',       km: '75+ km',       profil: 'Compétition sérieuse (Strava requis)' },
+  { level: 8, emoji: '🏆', allure: 'Semi < 1h30',      km: '80+ km',       profil: 'Élite amateur (Strava requis)' },
+  { level: 9, emoji: '🌟', allure: 'Semi < 1h15',      km: '100+ km',      profil: 'Niveau national (Strava requis)' },
+];
+
+function LevelTableSection() {
+  const [open, setOpen] = useState(false);
+
+  return (
+    <div className="rounded-xl border border-silver-200 overflow-hidden">
+      <button
+        onClick={() => setOpen(o => !o)}
+        className="w-full flex items-center justify-between px-4 py-3 bg-silver-50 hover:bg-silver-100 transition-colors text-left"
+      >
+        <span className="text-sm font-semibold text-dark-700">📊 Voir tous les niveaux</span>
+        <span className="text-dark-400 text-sm">{open ? '▲' : '▼'}</span>
+      </button>
+
+      {open && (
+        <div className="overflow-x-auto">
+          <table className="w-full text-xs">
+            <thead>
+              <tr className="bg-silver-100 text-dark-500 uppercase tracking-wider">
+                <th className="px-3 py-2 text-left font-semibold">Niveau</th>
+                <th className="px-3 py-2 text-left font-semibold">Allure</th>
+                <th className="px-3 py-2 text-left font-semibold">Volume</th>
+                <th className="px-3 py-2 text-left font-semibold hidden sm:table-cell">Profil type</th>
+              </tr>
+            </thead>
+            <tbody>
+              {LEVEL_TABLE.map(({ level, emoji, allure, km, profil }) => {
+                const cfg = getLevelConfig(level);
+                return (
+                  <tr key={level} className="border-t border-silver-100 hover:bg-silver-50 transition-colors">
+                    <td className="px-3 py-2.5 whitespace-nowrap">
+                      <span className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md border font-semibold ${cfg.textClass} ${cfg.bgClass} ${cfg.borderClass}`}>
+                        {emoji} {cfg.shortLabel}
+                      </span>
+                    </td>
+                    <td className="px-3 py-2.5 text-dark-600 whitespace-nowrap font-mono">{allure}</td>
+                    <td className="px-3 py-2.5 text-dark-600 whitespace-nowrap">{km}</td>
+                    <td className="px-3 py-2.5 text-dark-400 hidden sm:table-cell">{profil}</td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+          <p className="px-3 py-2 text-[10px] text-dark-400 border-t border-silver-100 bg-silver-50">
+            Les niveaux 7 à 9 sont accessibles uniquement via la connexion Strava (données réelles).
+          </p>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ─── Composant principal ──────────────────────────────────────────────────────
+
 export default function StepLevel({ data, updateData, onNext, onBack }: StepProps) {
   const [subStep, setSubStep] = useState<SubStep>(
     data.levelIsRunner === null ? 'choice' : data.levelIsRunner ? 'habits' : 'choice'
@@ -56,6 +123,8 @@ export default function StepLevel({ data, updateData, onNext, onBack }: StepProp
               Pour te matcher avec des runners compatibles, on a besoin d'estimer ton niveau.
             </p>
           </div>
+
+          <LevelTableSection />
 
           <div className="space-y-3">
             <button
