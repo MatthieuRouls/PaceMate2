@@ -1,18 +1,18 @@
 /**
  * Calcul du niveau de running via questionnaire manuel.
- * Même algorithme que l'analyse Strava, plafonné à niveau 8 (niveau 9 = Strava uniquement).
+ * Même algorithme que l'analyse Strava, plafonné à niveau 7 (niveau 8-9 = Strava uniquement).
  * Fichier pur (pas de 'use server') — importable côté client et serveur.
  */
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
-export type RunnerFrequency = 'never' | 'once' | '2-3' | '4-5' | '5plus';
-export type RunnerPace = 'above_7' | '6_7' | '5_6' | '4h30_5' | '4_4h30' | 'below_4';
+export type WeeklyKm = 'below_20' | '20_35' | '35_55' | '55_75' | 'above_75';
+export type RunnerPace = 'above_7' | '6h30_7' | '5h30_6h30' | '5_5h30' | '4h30_5' | '4_4h30' | 'below_4';
 export type LongestRun = 'below_5' | '5_10' | '10_15' | '15_21' | '21_30' | 'above_30';
 
 export interface ManualLevelAnswers {
   isRunner: boolean;
-  frequency?: RunnerFrequency;
+  weeklyKm?: WeeklyKm;
   pace?: RunnerPace;
   longestRun?: LongestRun;
   bestTime5k?: string;       // "mm:ss"
@@ -23,23 +23,28 @@ export interface ManualLevelAnswers {
 
 // ─── Score tables (alignées avec l'algo Strava) ───────────────────────────────
 
-const FREQ_SCORES: Record<RunnerFrequency, number> = {
-  never:  1,
-  once:   3,
-  '2-3':  9,
-  '4-5':  12,
-  '5plus': 15,
+// Kilométrage hebdomadaire — remplace la fréquence (30 pts max, comme Strava)
+const WEEKLY_KM_SCORES: Record<WeeklyKm, number> = {
+  below_20:  5,
+  '20_35':   12,
+  '35_55':   20,
+  '55_75':   26,
+  above_75:  30,
 };
 
+// Allure — corrigée pour compenser le biais déclaratif :
+// les gens donnent leur allure confortable/tempo, ~20-30s/km plus rapide que la moyenne Strava
 const PACE_SCORES: Record<RunnerPace, number> = {
-  above_7:   2,
-  '6_7':     5,
-  '5_6':     10,
-  '4h30_5':  15,
-  '4_4h30':  25,
-  below_4:   30,
+  above_7:     2,
+  '6h30_7':    5,
+  '5h30_6h30': 10,
+  '5_5h30':    15,
+  '4h30_5':    20,  // était 15 — corrigé
+  '4_4h30':    26,
+  below_4:     30,
 };
 
+// Plus longue sortie (25 pts max)
 const LONGEST_SCORES: Record<LongestRun, number> = {
   below_5:  2,
   '5_10':   5,
@@ -72,6 +77,8 @@ function calcPerfBonus(answers: ManualLevelAnswers): number {
       else if (m < 195) bonus = Math.max(bonus, 12);
       else if (m < 210) bonus = Math.max(bonus, 9);
       else if (m < 225) bonus = Math.max(bonus, 6);
+      else if (m < 240) bonus = Math.max(bonus, 4);
+      else if (m < 270) bonus = Math.max(bonus, 2);
     }
   }
 
@@ -85,7 +92,8 @@ function calcPerfBonus(answers: ManualLevelAnswers): number {
       else if (m < 90)  bonus = Math.max(bonus, 6);
       else if (m < 95)  bonus = Math.max(bonus, 5);
       else if (m < 100) bonus = Math.max(bonus, 4);
-      else if (m < 110) bonus = Math.max(bonus, 2);
+      else if (m < 110) bonus = Math.max(bonus, 3);
+      else if (m < 120) bonus = Math.max(bonus, 2);
     }
   }
 
@@ -93,13 +101,13 @@ function calcPerfBonus(answers: ManualLevelAnswers): number {
     const secs = parseTimeToSeconds(answers.bestTime10k);
     if (secs) {
       const m = secs / 60;
-      if (m < 32) bonus = Math.max(bonus, 10);
+      if (m < 32)  bonus = Math.max(bonus, 10);
       else if (m < 35) bonus = Math.max(bonus, 8);
       else if (m < 38) bonus = Math.max(bonus, 6);
       else if (m < 40) bonus = Math.max(bonus, 5);
-      else if (m < 45) bonus = Math.max(bonus, 4);
-      else if (m < 50) bonus = Math.max(bonus, 3);
-      else if (m < 55) bonus = Math.max(bonus, 2);
+      else if (m < 43) bonus = Math.max(bonus, 4);
+      else if (m < 47) bonus = Math.max(bonus, 3);
+      else if (m < 52) bonus = Math.max(bonus, 2);
       else if (m < 60) bonus = Math.max(bonus, 1);
     }
   }
@@ -108,12 +116,13 @@ function calcPerfBonus(answers: ManualLevelAnswers): number {
     const secs = parseTimeToSeconds(answers.bestTime5k);
     if (secs) {
       const m = secs / 60;
-      if (m < 15) bonus = Math.max(bonus, 8);
-      else if (m < 16) bonus = Math.max(bonus, 6);
-      else if (m < 17) bonus = Math.max(bonus, 5);
-      else if (m < 18) bonus = Math.max(bonus, 4);
-      else if (m < 19) bonus = Math.max(bonus, 3);
-      else if (m < 20) bonus = Math.max(bonus, 2);
+      if (m < 15)  bonus = Math.max(bonus, 8);
+      else if (m < 16) bonus = Math.max(bonus, 7);
+      else if (m < 17) bonus = Math.max(bonus, 6);
+      else if (m < 18) bonus = Math.max(bonus, 5);
+      else if (m < 19) bonus = Math.max(bonus, 4);  // 18min → 4 pts (était 3)
+      else if (m < 20) bonus = Math.max(bonus, 3);
+      else if (m < 22) bonus = Math.max(bonus, 2);
       else if (m < 25) bonus = Math.max(bonus, 1);
     }
   }
@@ -124,24 +133,25 @@ function calcPerfBonus(answers: ManualLevelAnswers): number {
 // ─── API publique ─────────────────────────────────────────────────────────────
 
 /**
- * Calcule le score brut (0-90) à partir des réponses au questionnaire.
- * Plafonné à ~90 pour que le niveau 9 (≥118) soit inaccessible sans Strava.
+ * Calcule le score brut à partir des réponses au questionnaire.
+ * Max théorique : 30 (km) + 30 (allure) + 25 (sortie) + 20 (perf) = 105 pts → niveau 7 max.
+ * Niveau 8-9 inaccessible sans Strava.
  */
 export function calculateManualScore(answers: ManualLevelAnswers): number {
   if (!answers.isRunner) return 0;
 
   let score = 0;
-  score += FREQ_SCORES[answers.frequency ?? 'never'];
+  score += WEEKLY_KM_SCORES[answers.weeklyKm ?? 'below_20'];
   score += PACE_SCORES[answers.pace ?? 'above_7'];
   score += LONGEST_SCORES[answers.longestRun ?? 'below_5'];
   score += calcPerfBonus(answers);
 
-  return score; // max théorique : 15 + 30 + 25 + 20 = 90
+  return score;
 }
 
 /**
  * Convertit un score (0-120) en niveau (1-9).
- * Pour le questionnaire manuel, le score est capé à 90 donc niveau max = 7.
+ * Pour le questionnaire manuel, le score est capé à ~105 donc niveau max = 7.
  */
 export function scoreToLevel(score: number): number {
   if (score >= 118) return 9;
@@ -170,7 +180,6 @@ const LEVEL_BANDS = [
 
 /**
  * Retourne le pourcentage de progression dans la tranche du niveau courant.
- * Ex : score 57 → niveau 4 (50-64) → (57-50)/(64-50) = 50%
  */
 export function getLevelBandProgress(score: number, level: number): number {
   const band = LEVEL_BANDS[level - 1];
@@ -179,22 +188,24 @@ export function getLevelBandProgress(score: number, level: number): number {
   return Math.min(100, Math.max(0, Math.round(pct)));
 }
 
-// Labels affichés dans le questionnaire
-export const FREQUENCY_OPTIONS: { value: RunnerFrequency; label: string }[] = [
-  { value: 'never',  label: 'Je ne cours pas encore' },
-  { value: 'once',   label: 'Moins d\'une fois par semaine' },
-  { value: '2-3',    label: '2 à 3 fois par semaine' },
-  { value: '4-5',    label: '4 à 5 fois par semaine' },
-  { value: '5plus',  label: '5 fois ou plus par semaine' },
+// ─── Labels questionnaire ─────────────────────────────────────────────────────
+
+export const WEEKLY_KM_OPTIONS: { value: WeeklyKm; label: string }[] = [
+  { value: 'below_20',  label: 'Moins de 20 km' },
+  { value: '20_35',     label: '20 – 35 km' },
+  { value: '35_55',     label: '35 – 55 km' },
+  { value: '55_75',     label: '55 – 75 km' },
+  { value: 'above_75',  label: 'Plus de 75 km' },
 ];
 
 export const PACE_OPTIONS: { value: RunnerPace; label: string }[] = [
-  { value: 'above_7',  label: 'Plus de 7:00 /km  (débutant)' },
-  { value: '6_7',      label: '6:00 – 7:00 /km' },
-  { value: '5_6',      label: '5:00 – 6:00 /km' },
-  { value: '4h30_5',   label: '4:30 – 5:00 /km' },
-  { value: '4_4h30',   label: '4:00 – 4:30 /km' },
-  { value: 'below_4',  label: 'Moins de 4:00 /km  (élite)' },
+  { value: 'above_7',      label: 'Plus de 7:00 /km  (débutant)' },
+  { value: '6h30_7',       label: '6:30 – 7:00 /km' },
+  { value: '5h30_6h30',    label: '5:30 – 6:30 /km' },
+  { value: '5_5h30',       label: '5:00 – 5:30 /km' },
+  { value: '4h30_5',       label: '4:30 – 5:00 /km' },
+  { value: '4_4h30',       label: '4:00 – 4:30 /km' },
+  { value: 'below_4',      label: 'Moins de 4:00 /km  (élite)' },
 ];
 
 export const LONGEST_RUN_OPTIONS: { value: LongestRun; label: string }[] = [

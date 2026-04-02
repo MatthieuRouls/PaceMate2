@@ -3,12 +3,12 @@
 import { useState } from 'react';
 import { StepProps } from './onboarding.types';
 import {
-  FREQUENCY_OPTIONS,
+  WEEKLY_KM_OPTIONS,
   PACE_OPTIONS,
   LONGEST_RUN_OPTIONS,
   calculateManualScore,
   scoreToLevel,
-  type RunnerFrequency,
+  type WeeklyKm,
   type RunnerPace,
   type LongestRun,
 } from '@/lib/level-manual';
@@ -21,20 +21,21 @@ export default function StepLevel({ data, updateData, onNext, onBack }: StepProp
     data.levelIsRunner === null ? 'choice' : data.levelIsRunner ? 'habits' : 'choice'
   );
 
-  const freq = data.levelFrequency as RunnerFrequency | '';
+  const weeklyKm = data.levelWeeklyKm as WeeklyKm | '';
   const pace = data.levelPace as RunnerPace | '';
   const longest = data.levelLongestRun as LongestRun | '';
 
-  const canProceedHabits = freq !== '' && pace !== '' && longest !== '';
+  const canProceedHabits = weeklyKm !== '' && pace !== '' && longest !== '';
 
-  // Compute preview level
-  const previewAnswers = {
-    isRunner: true,
-    frequency: freq || undefined,
-    pace: pace || undefined,
-    longestRun: longest || undefined,
-  };
-  const previewScore = canProceedHabits ? calculateManualScore(previewAnswers as Parameters<typeof calculateManualScore>[0]) : 0;
+  // Prévisualisation niveau en temps réel
+  const previewScore = canProceedHabits
+    ? calculateManualScore({
+        isRunner: true,
+        weeklyKm: weeklyKm as WeeklyKm,
+        pace: pace as RunnerPace,
+        longestRun: longest as LongestRun,
+      })
+    : 0;
   const previewLevel = canProceedHabits ? scoreToLevel(previewScore) : null;
   const previewCfg = previewLevel ? getLevelConfig(previewLevel) : null;
 
@@ -43,12 +44,9 @@ export default function StepLevel({ data, updateData, onNext, onBack }: StepProp
     onNext();
   };
 
-  const handleSkipTimes = () => {
-    onNext();
-  };
-
   return (
     <div className="space-y-5">
+
       {/* ── Choice ──────────────────────────────────────── */}
       {subStep === 'choice' && (
         <>
@@ -102,16 +100,18 @@ export default function StepLevel({ data, updateData, onNext, onBack }: StepProp
             <p className="text-dark-500 text-sm">Choisis l'option qui te correspond le mieux.</p>
           </div>
 
-          {/* Fréquence */}
+          {/* Kilométrage hebdomadaire */}
           <div>
-            <p className="text-xs font-semibold text-dark-500 uppercase tracking-wider mb-2">Fréquence par semaine</p>
+            <p className="text-xs font-semibold text-dark-500 uppercase tracking-wider mb-2">
+              Kilométrage hebdomadaire moyen
+            </p>
             <div className="space-y-1.5">
-              {FREQUENCY_OPTIONS.filter(o => o.value !== 'never').map(opt => (
+              {WEEKLY_KM_OPTIONS.map(opt => (
                 <button
                   key={opt.value}
-                  onClick={() => updateData({ levelFrequency: opt.value })}
+                  onClick={() => updateData({ levelWeeklyKm: opt.value })}
                   className={`w-full text-left px-3 py-2 rounded-lg border text-sm font-medium transition-all ${
-                    freq === opt.value
+                    weeklyKm === opt.value
                       ? 'border-neon-500 bg-neon-50 text-neon-800'
                       : 'border-silver-300 text-dark-700 hover:border-neon-300'
                   }`}
@@ -124,7 +124,9 @@ export default function StepLevel({ data, updateData, onNext, onBack }: StepProp
 
           {/* Allure */}
           <div>
-            <p className="text-xs font-semibold text-dark-500 uppercase tracking-wider mb-2">Allure habituelle</p>
+            <p className="text-xs font-semibold text-dark-500 uppercase tracking-wider mb-2">
+              Ton allure habituelle (sortie facile/tempo)
+            </p>
             <div className="space-y-1.5">
               {PACE_OPTIONS.map(opt => (
                 <button
@@ -144,7 +146,9 @@ export default function StepLevel({ data, updateData, onNext, onBack }: StepProp
 
           {/* Plus longue sortie */}
           <div>
-            <p className="text-xs font-semibold text-dark-500 uppercase tracking-wider mb-2">Plus longue sortie</p>
+            <p className="text-xs font-semibold text-dark-500 uppercase tracking-wider mb-2">
+              Ta plus longue sortie
+            </p>
             <div className="space-y-1.5">
               {LONGEST_RUN_OPTIONS.map(opt => (
                 <button
@@ -226,12 +230,6 @@ export default function StepLevel({ data, updateData, onNext, onBack }: StepProp
               className="px-4 py-2.5 rounded-lg border border-silver-300 text-dark-600 font-medium hover:bg-silver-100 transition-colors text-sm"
             >
               Retour
-            </button>
-            <button
-              onClick={handleSkipTimes}
-              className="px-4 py-2.5 rounded-lg border border-silver-300 text-dark-500 hover:bg-silver-100 transition-colors text-sm"
-            >
-              Passer
             </button>
             <button
               onClick={onNext}

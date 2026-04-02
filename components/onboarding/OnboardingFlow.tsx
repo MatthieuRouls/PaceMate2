@@ -22,7 +22,7 @@ import { getLevelConfig } from '@/lib/strava';
 import {
   calculateManualScore,
   scoreToLevel,
-  type RunnerFrequency,
+  type WeeklyKm,
   type RunnerPace,
   type LongestRun,
 } from '@/lib/level-manual';
@@ -57,14 +57,14 @@ function RecapModal({ completedData, onStart }: RecapModalProps) {
     level = 1;
   } else if (
     completedData.levelIsRunner === true &&
-    completedData.levelFrequency &&
+    completedData.levelWeeklyKm &&
     completedData.levelPace &&
     completedData.levelLongestRun
   ) {
     source = 'manual';
     const score = calculateManualScore({
       isRunner: true,
-      frequency: completedData.levelFrequency as RunnerFrequency,
+      weeklyKm: completedData.levelWeeklyKm as WeeklyKm,
       pace: completedData.levelPace as RunnerPace,
       longestRun: completedData.levelLongestRun as LongestRun,
       bestTime5k: completedData.levelBestTime5k || undefined,

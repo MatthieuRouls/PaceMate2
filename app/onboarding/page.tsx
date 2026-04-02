@@ -66,10 +66,10 @@ export default function OnboardingPage() {
       .eq('id', user.id);
 
     // Save level from questionnaire (step 5)
-    if (data.levelIsRunner === true && data.levelFrequency && data.levelPace && data.levelLongestRun) {
+    if (data.levelIsRunner === true && data.levelWeeklyKm && data.levelPace && data.levelLongestRun) {
       const levelAnswers: ManualLevelAnswers = {
         isRunner: true,
-        frequency: data.levelFrequency as ManualLevelAnswers['frequency'],
+        weeklyKm: data.levelWeeklyKm as ManualLevelAnswers['weeklyKm'],
         pace: data.levelPace as ManualLevelAnswers['pace'],
         longestRun: data.levelLongestRun as ManualLevelAnswers['longestRun'],
         bestTime5k: data.levelBestTime5k || undefined,

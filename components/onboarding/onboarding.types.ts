@@ -36,7 +36,7 @@ export interface OnboardingData {
 
   // Step 5 - Niveau running
   levelIsRunner: boolean | null; // null = not answered yet
-  levelFrequency: string;
+  levelWeeklyKm: string;
   levelPace: string;
   levelLongestRun: string;
   levelBestTime5k: string;
@@ -62,7 +62,7 @@ export const INITIAL_ONBOARDING_DATA: OnboardingData = {
   trustedContactPhone: '',
   trustedContactRelation: '',
   levelIsRunner: null,
-  levelFrequency: '',
+  levelWeeklyKm: '',
   levelPace: '',
   levelLongestRun: '',
   levelBestTime5k: '',
