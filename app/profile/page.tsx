@@ -268,15 +268,23 @@ export default function ProfilePage() {
                         </div>
                         {source === 'default' && (
                           <Link
-                            href="/onboarding"
+                            href="/profile/niveau"
                             className="inline-block mt-2 text-xs text-neon-700 hover:underline font-medium"
                           >
                             Compléter mon profil de runner →
                           </Link>
                         )}
                         {source === 'manual' && !profile.strava_connected && (
+                          <Link
+                            href="/profile/niveau"
+                            className="inline-block mt-1 text-xs text-dark-400 hover:text-dark-600 transition-colors"
+                          >
+                            Mettre à jour mes réponses →
+                          </Link>
+                        )}
+                        {source === 'strava' && (
                           <p className="mt-1 text-xs text-dark-400">
-                            Connecte Strava pour un niveau plus précis
+                            Niveau calculé depuis tes activités Strava
                           </p>
                         )}
                       </div>
