@@ -1793,6 +1793,16 @@ import {
  */
 export async function getStravaConnectUrl(): Promise<{ url: string } | { error: string }> {
   try {
+    // Vérifier que les variables d'environnement Strava sont configurées
+    if (!process.env.NEXT_PUBLIC_STRAVA_CLIENT_ID) {
+      logger.error('NEXT_PUBLIC_STRAVA_CLIENT_ID manquant dans .env.local');
+      return { error: 'Strava non configuré — variable NEXT_PUBLIC_STRAVA_CLIENT_ID manquante dans .env.local' };
+    }
+    if (!process.env.NEXT_PUBLIC_STRAVA_REDIRECT_URI) {
+      logger.error('NEXT_PUBLIC_STRAVA_REDIRECT_URI manquant dans .env.local');
+      return { error: 'Strava non configuré — variable NEXT_PUBLIC_STRAVA_REDIRECT_URI manquante dans .env.local' };
+    }
+
     const user = await getCurrentUser();
     if (!user) return { error: 'Non authentifie' };
 
@@ -1811,6 +1821,16 @@ export async function getStravaConnectUrl(): Promise<{ url: string } | { error: 
  */
 export async function getStravaConnectUrlForOnboarding(): Promise<{ url: string } | { error: string }> {
   try {
+    // Vérifier que les variables d'environnement Strava sont configurées
+    if (!process.env.NEXT_PUBLIC_STRAVA_CLIENT_ID) {
+      logger.error('NEXT_PUBLIC_STRAVA_CLIENT_ID manquant dans .env.local');
+      return { error: 'Strava non configuré — variable NEXT_PUBLIC_STRAVA_CLIENT_ID manquante dans .env.local' };
+    }
+    if (!process.env.NEXT_PUBLIC_STRAVA_REDIRECT_URI) {
+      logger.error('NEXT_PUBLIC_STRAVA_REDIRECT_URI manquant dans .env.local');
+      return { error: 'Strava non configuré — variable NEXT_PUBLIC_STRAVA_REDIRECT_URI manquante dans .env.local' };
+    }
+
     const user = await getCurrentUser();
     if (!user) return { error: 'Non authentifie' };
 

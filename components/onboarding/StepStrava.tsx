@@ -33,7 +33,7 @@ export default function StepStrava({ onNext, onBack, isLoading }: StepProps) {
     try {
       const result = await getStravaConnectUrlForOnboarding();
       if ('error' in result) {
-        setConnectError('Impossible de se connecter à Strava. Réessaie plus tard.');
+        setConnectError(result.error || 'Impossible de se connecter à Strava. Réessaie plus tard.');
         setIsConnecting(false);
         return;
       }

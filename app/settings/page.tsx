@@ -262,9 +262,18 @@ export default function SettingsPage() {
 
   const handleConnectStrava = async () => {
     setConnectingStrava(true);
-    const result = await getStravaConnectUrl();
-    if ('url' in result) window.location.href = result.url;
-    else { setError(result.error); setConnectingStrava(false); }
+    try {
+      const result = await getStravaConnectUrl();
+      if ('url' in result) {
+        window.location.href = result.url;
+      } else {
+        setError(result.error);
+        setConnectingStrava(false);
+      }
+    } catch (err) {
+      setError('Erreur inattendue lors de la connexion Strava');
+      setConnectingStrava(false);
+    }
   };
 
   const handleSyncStrava = async () => {
