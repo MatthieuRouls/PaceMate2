@@ -2,12 +2,7 @@ import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import { createServerClient } from '@supabase/ssr';
-import {
-  exchangeStravaCode,
-  fetchStravaActivities,
-  calculateStravaStats,
-  calculateRunningLevel,
-} from '@/lib/strava';
+import { exchangeStravaCode } from '@/lib/strava';
 
 export async function GET(request: NextRequest) {
   const searchParams = request.nextUrl.searchParams;
@@ -34,7 +29,7 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    // 1. Echanger le code contre des tokens
+    // 1. Echanger le code contre des tokens (rapide — appel Strava OAuth)
     const tokens = await exchangeStravaCode(code);
 
     // 2. Creer le client Supabase
@@ -64,19 +59,7 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // 4. Recuperer les activites et calculer le niveau
-    const activities = await fetchStravaActivities(tokens.access_token);
-    const stats = calculateStravaStats(activities);
-    const rawLevel = calculateRunningLevel(stats);
-    // Clamp défensif — garantit que running_level respecte la contrainte DB (1-9)
-    const calculatedLevel = Math.min(9, Math.max(1, rawLevel));
-
-    // 5. Convertir l'allure en format interval PostgreSQL
-    const avgPaceMinutes = Math.floor(stats.avgPaceSeconds / 60);
-    const avgPaceSeconds = Math.round(stats.avgPaceSeconds % 60);
-    const paceInterval = `00:${avgPaceMinutes.toString().padStart(2, '0')}:${avgPaceSeconds.toString().padStart(2, '0')}`;
-
-    // 6a. Stocker les tokens OAuth dans la table dédiée (isolée de profiles)
+    // 4. Stocker les tokens OAuth dans la table dédiée (opération rapide)
     const { error: tokenError } = await supabase
       .from('strava_tokens')
       .upsert({
@@ -92,19 +75,14 @@ export async function GET(request: NextRequest) {
       return NextResponse.redirect(new URL(`${errorBase}=update_failed`, request.url));
     }
 
-    // 6b. Mettre a jour les métadonnées non-sensibles dans profiles
+    // 5. Marquer le compte comme connecté à Strava (sans calcul de niveau — fait en background)
     const { error: updateError } = await supabase
       .from('profiles')
       .update({
         strava_athlete_id: tokens.athlete.id,
         strava_connected: true,
         strava_last_sync: new Date().toISOString(),
-        running_level: calculatedLevel,
         level_source: 'strava',
-        calculated_avg_pace: paceInterval,
-        calculated_weekly_km: Math.round(stats.weeklyKm * 10) / 10,
-        calculated_longest_run: Math.round(stats.longestRunKm * 10) / 10,
-        calculated_total_runs: stats.totalRuns,
       })
       .eq('id', user.id);
 
@@ -113,7 +91,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.redirect(new URL(`${errorBase}=update_failed`, request.url));
     }
 
-    // 7. Rediriger vers la destination appropriee
+    // 6. Rediriger immédiatement — le calcul de niveau se fait en background depuis la page
     return NextResponse.redirect(
       new URL(successUrl, request.url)
     );

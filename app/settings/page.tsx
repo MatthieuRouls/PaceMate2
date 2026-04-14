@@ -128,8 +128,22 @@ export default function SettingsPage() {
     const stravaSuccess = searchParams.get('strava_success');
     const stravaError = searchParams.get('strava_error');
     if (stravaSuccess === 'true') {
-      setSuccess('Compte Strava connecté avec succès ! Ton niveau a été calculé.');
+      // Nettoyer l'URL immédiatement
       router.replace('/settings');
+      // Rafraîchir le profil pour afficher strava_connected=true
+      refreshProfile();
+      // Déclencher la sync Strava en background (calcul de niveau)
+      setSuccess('Compte Strava connecté ! Calcul de ton niveau en cours...');
+      syncStravaData().then((result) => {
+        if (result.success) {
+          refreshProfile();
+          setSuccess('Compte Strava connecté avec succès ! Ton niveau a été calculé.');
+        } else {
+          setSuccess('Compte Strava connecté. Clique "Synchroniser" pour calculer ton niveau.');
+        }
+      }).catch(() => {
+        setSuccess('Compte Strava connecté. Clique "Synchroniser" pour calculer ton niveau.');
+      });
     } else if (stravaError) {
       const msgs: Record<string, string> = {
         access_denied: 'Accès refusé. Tu as annulé la connexion.',
@@ -141,7 +155,7 @@ export default function SettingsPage() {
       setError(msgs[stravaError] || 'Erreur Strava inconnue.');
       router.replace('/settings');
     }
-  }, [searchParams, router]);
+  }, [searchParams, router, refreshProfile]);
 
   useEffect(() => {
     if (profile) {
@@ -278,18 +292,36 @@ export default function SettingsPage() {
 
   const handleSyncStrava = async () => {
     setSyncingStrava(true);
-    const result = await syncStravaData();
-    if (result.success) { showSuccess(`Synchronisé ! Niveau : ${getLevelName(result.level || 1)}`); setTimeout(() => refreshProfile(), 2000); }
-    else setError(result.error || 'Erreur');
-    setSyncingStrava(false);
+    try {
+      const result = await syncStravaData();
+      if (result.success) {
+        showSuccess(`Synchronisé ! Niveau : ${getLevelName(result.level || 1)}`);
+        await refreshProfile();
+      } else {
+        setError(result.error || 'Erreur lors de la synchronisation');
+      }
+    } catch {
+      setError('Erreur inattendue lors de la synchronisation');
+    } finally {
+      setSyncingStrava(false);
+    }
   };
 
   const handleDisconnectStrava = async () => {
     setDisconnectingStrava(true);
-    const result = await disconnectStrava();
-    if (result.success) { showSuccess('Strava déconnecté'); setTimeout(() => refreshProfile(), 2000); }
-    else setError(result.error || 'Erreur');
-    setDisconnectingStrava(false);
+    try {
+      const result = await disconnectStrava();
+      if (result.success) {
+        showSuccess('Strava déconnecté');
+        await refreshProfile();
+      } else {
+        setError(result.error || 'Erreur lors de la déconnexion');
+      }
+    } catch {
+      setError('Erreur inattendue lors de la déconnexion');
+    } finally {
+      setDisconnectingStrava(false);
+    }
   };
 
   const handleDeleteAccount = async () => {
