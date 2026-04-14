@@ -67,7 +67,9 @@ export async function GET(request: NextRequest) {
     // 4. Recuperer les activites et calculer le niveau
     const activities = await fetchStravaActivities(tokens.access_token);
     const stats = calculateStravaStats(activities);
-    const calculatedLevel = calculateRunningLevel(stats);
+    const rawLevel = calculateRunningLevel(stats);
+    // Clamp défensif — garantit que running_level respecte la contrainte DB (1-9)
+    const calculatedLevel = Math.min(9, Math.max(1, rawLevel));
 
     // 5. Convertir l'allure en format interval PostgreSQL
     const avgPaceMinutes = Math.floor(stats.avgPaceSeconds / 60);
@@ -98,6 +100,7 @@ export async function GET(request: NextRequest) {
         strava_connected: true,
         strava_last_sync: new Date().toISOString(),
         running_level: calculatedLevel,
+        level_source: 'strava',
         calculated_avg_pace: paceInterval,
         calculated_weekly_km: Math.round(stats.weeklyKm * 10) / 10,
         calculated_longest_run: Math.round(stats.longestRunKm * 10) / 10,
