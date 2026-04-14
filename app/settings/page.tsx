@@ -128,22 +128,10 @@ export default function SettingsPage() {
     const stravaSuccess = searchParams.get('strava_success');
     const stravaError = searchParams.get('strava_error');
     if (stravaSuccess === 'true') {
-      // Nettoyer l'URL immédiatement
-      router.replace('/settings');
-      // Rafraîchir le profil pour afficher strava_connected=true
+      // Nettoyer l'URL sans déclencher de refetch RSC côté Next.js
+      window.history.replaceState({}, '', '/settings');
       refreshProfile();
-      // Déclencher la sync Strava en background (calcul de niveau)
-      setSuccess('Compte Strava connecté ! Calcul de ton niveau en cours...');
-      syncStravaData().then((result) => {
-        if (result.success) {
-          refreshProfile();
-          setSuccess('Compte Strava connecté avec succès ! Ton niveau a été calculé.');
-        } else {
-          setSuccess('Compte Strava connecté. Clique "Synchroniser" pour calculer ton niveau.');
-        }
-      }).catch(() => {
-        setSuccess('Compte Strava connecté. Clique "Synchroniser" pour calculer ton niveau.');
-      });
+      setSuccess('Compte Strava connecté ! Clique "Synchroniser" pour calculer ton niveau.');
     } else if (stravaError) {
       const msgs: Record<string, string> = {
         access_denied: 'Accès refusé. Tu as annulé la connexion.',
@@ -153,7 +141,7 @@ export default function SettingsPage() {
         exchange_failed: 'Erreur de communication avec Strava.',
       };
       setError(msgs[stravaError] || 'Erreur Strava inconnue.');
-      router.replace('/settings');
+      window.history.replaceState({}, '', '/settings');
     }
   }, [searchParams, router, refreshProfile]);
 
@@ -755,14 +743,23 @@ export default function SettingsPage() {
                         Sync : {new Date(profile.strava_last_sync).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' })}
                       </p>
                     )}
+                    {!profile.calculated_avg_pace && (
+                      <p className="text-xs text-orange-700 font-medium bg-orange-100 rounded-lg px-3 py-2">
+                        ⚡ Clique "Synchroniser" pour calculer ton niveau depuis Strava
+                      </p>
+                    )}
                     <div className="flex gap-2">
                       <button
                         onClick={handleSyncStrava}
                         disabled={syncingStrava}
-                        className="flex-1 inline-flex items-center justify-center gap-1.5 py-2 rounded-xl bg-orange-500 text-white text-xs font-semibold hover:bg-orange-600 transition-colors disabled:opacity-50 btn-lift"
+                        className={`flex-1 inline-flex items-center justify-center gap-1.5 py-2 rounded-xl text-white text-xs font-semibold transition-colors disabled:opacity-50 btn-lift ${
+                          !profile.calculated_avg_pace
+                            ? 'bg-orange-600 hover:bg-orange-700 ring-2 ring-orange-400 ring-offset-1'
+                            : 'bg-orange-500 hover:bg-orange-600'
+                        }`}
                       >
                         <RefreshCw className={`w-3.5 h-3.5 ${syncingStrava ? 'animate-spin' : ''}`} />
-                        {syncingStrava ? 'Sync...' : 'Synchroniser'}
+                        {syncingStrava ? 'Calcul en cours...' : 'Synchroniser'}
                       </button>
                       <button
                         onClick={handleDisconnectStrava}

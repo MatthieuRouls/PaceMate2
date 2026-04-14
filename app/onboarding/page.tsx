@@ -5,7 +5,7 @@ import { useAuth } from '@/components/providers/AuthProvider';
 import OnboardingFlow from '@/components/onboarding/OnboardingFlow';
 import type { OnboardingData } from '@/components/onboarding/onboarding.types';
 import { supabase } from '@/lib/supabase';
-import { saveManualLevel, completeOnboarding, syncStravaData } from '@/lib/actions';
+import { saveManualLevel, completeOnboarding } from '@/lib/actions';
 import type { ManualLevelAnswers } from '@/lib/level-manual';
 
 export default function OnboardingPage() {
@@ -65,11 +65,10 @@ export default function OnboardingPage() {
       .update(updatePayload)
       .eq('id', user.id);
 
-    // Si Strava est connecté, déclencher la sync pour calculer le niveau
+    // Si Strava est connecté, marquer l'onboarding comme terminé
+    // Le calcul de niveau se fait via le bouton "Synchroniser" dans Settings
     if (data.stravaConnected) {
       await completeOnboarding();
-      // Sync en background — pas d'await pour ne pas bloquer le récap
-      syncStravaData().catch(() => {});
     } else if (data.levelIsRunner === true && data.levelWeeklyKm && data.levelPace && data.levelLongestRun) {
       // Save level from questionnaire (step 5)
       const levelAnswers: ManualLevelAnswers = {
