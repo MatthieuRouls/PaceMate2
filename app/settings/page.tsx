@@ -128,8 +128,7 @@ export default function SettingsPage() {
     const stravaSuccess = searchParams.get('strava_success');
     const stravaError = searchParams.get('strava_error');
     if (stravaSuccess === 'true') {
-      // Nettoyer l'URL sans déclencher de refetch RSC côté Next.js
-      window.history.replaceState({}, '', '/settings');
+      router.replace('/settings');
       refreshProfile();
       setSuccess('Compte Strava connecté ! Clique "Synchroniser" pour calculer ton niveau.');
     } else if (stravaError) {
@@ -141,7 +140,7 @@ export default function SettingsPage() {
         exchange_failed: 'Erreur de communication avec Strava.',
       };
       setError(msgs[stravaError] || 'Erreur Strava inconnue.');
-      window.history.replaceState({}, '', '/settings');
+      router.replace('/settings');
     }
   }, [searchParams, router, refreshProfile]);
 
