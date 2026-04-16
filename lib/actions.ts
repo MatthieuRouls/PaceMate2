@@ -438,6 +438,58 @@ export async function getUserTeam() {
 // ============================================
 
 /**
+ * Récupérer le profil public d'un utilisateur par son username
+ * Retourne uniquement les informations non-sensibles
+ */
+export async function getPublicProfile(username: string): Promise<{
+  id: string;
+  username: string;
+  avatar_url?: string;
+  bio?: string;
+  home_city?: string;
+  running_level: number;
+  level_source?: 'strava' | 'manual' | 'default';
+  strava_connected?: boolean;
+  calculated_avg_pace?: string;
+  calculated_weekly_km?: number;
+  calculated_longest_run?: number;
+  calculated_total_runs?: number;
+  runs_completed?: number;
+  runs_hosted?: number;
+  total_distance_km?: number;
+  reliability_score?: number;
+  phone_verified?: boolean;
+  created_at?: string;
+  completed_sessions_count: number;
+} | null> {
+  try {
+    const supabase = await getServerSupabaseClient();
+
+    const { data: profileRaw, error } = await supabase
+      .from('profiles')
+      .select('id, username, avatar_url, bio, home_city, running_level, level_source, strava_connected, calculated_avg_pace, calculated_weekly_km, calculated_longest_run, calculated_total_runs, runs_completed, runs_hosted, total_distance_km, reliability_score, phone_verified, created_at')
+      .eq('username', username)
+      .single();
+
+    if (error || !profileRaw) return null;
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const profile = profileRaw as any;
+
+    const { count } = await supabase
+      .from('session_participants')
+      .select('*', { count: 'exact', head: true })
+      .eq('user_id', profile.id)
+      .eq('status', 'completed');
+
+    return { ...profile, completed_sessions_count: count || 0 };
+  } catch (error) {
+    logger.error('Error in getPublicProfile:', error);
+    return null;
+  }
+}
+
+/**
  * Récupérer le profil complet de l'utilisateur avec ses statistiques
  */
 export async function getUserProfile() {
