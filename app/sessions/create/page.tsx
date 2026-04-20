@@ -270,7 +270,7 @@ export default function CreateSessionPage() {
                           ? 'bg-neon-700 text-white shadow-lg shadow-neon-700/30'
                           : isActive
                           ? 'bg-pink-500 text-white ring-4 ring-pink-500/25 shadow-lg shadow-pink-500/20'
-                          : 'bg-silver-200 text-dark-400 dark:bg-dark-600 dark:text-dark-400'
+                          : 'bg-silver-200 text-dark-400'
                       }`}
                     >
                       {isCompleted ? (
@@ -287,7 +287,7 @@ export default function CreateSessionPage() {
                   </div>
                   {idx < STEP_META.length - 1 && (
                     <div className={`h-0.5 flex-1 rounded-full transition-all duration-500 mx-1 ${
-                      currentStep > step.num ? 'bg-neon-700' : 'bg-silver-300 dark:bg-dark-600'
+                      currentStep > step.num ? 'bg-neon-700' : 'bg-silver-300'
                     }`} />
                   )}
                 </div>
@@ -309,7 +309,7 @@ export default function CreateSessionPage() {
         <div className="flex gap-8 items-start">
           {/* LEFT COLUMN — Step content */}
           <div className="flex-1 min-w-0 lg:max-w-[65%]">
-            <div className="bg-white dark:bg-dark-700 rounded-2xl border border-silver-300 dark:border-dark-600 p-6 md:p-8 shadow-sm">
+            <div className="bg-white rounded-2xl border border-silver-300 p-6 md:p-8 shadow-sm">
               <form onSubmit={handleSubmit}>
                 {/* Animated step wrapper */}
                 <div
@@ -331,7 +331,7 @@ export default function CreateSessionPage() {
                           value={formData.title}
                           onChange={handleChange}
                           placeholder="Donne un nom accrocheur..."
-                          className="w-full px-4 py-3.5 rounded-xl border border-silver-300 bg-silver-50 dark:bg-dark-800 dark:border-dark-600 focus:border-neon-700 focus:ring-2 focus:ring-neon-700/20 outline-none transition-all text-dark-800 placeholder:text-dark-400"
+                          className="w-full px-4 py-3.5 rounded-xl border border-silver-300 bg-silver-50 focus:border-neon-700 focus:ring-2 focus:ring-neon-700/20 outline-none transition-all text-dark-800 placeholder:text-dark-400"
                           required
                           autoFocus
                         />
@@ -345,7 +345,7 @@ export default function CreateSessionPage() {
                               className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all border ${
                                 formData.title === s
                                   ? 'bg-neon-700 text-white border-neon-700'
-                                  : 'bg-silver-100 text-dark-600 border-silver-300 hover:border-neon-500 hover:bg-neon-50 dark:bg-dark-600 dark:text-silver-300 dark:border-dark-500 dark:hover:border-neon-600'
+                                  : 'bg-silver-100 text-dark-600 border-silver-300 hover:border-neon-500 hover:bg-neon-50:border-neon-600'
                               }`}
                               aria-label={`Suggestion : ${s}`}
                             >
@@ -366,7 +366,7 @@ export default function CreateSessionPage() {
                           onChange={handleChange}
                           placeholder="Decris l'ambiance, le parcours, les points de passage..."
                           rows={3}
-                          className="w-full px-4 py-3 rounded-xl border border-silver-300 bg-silver-50 dark:bg-dark-800 dark:border-dark-600 focus:border-neon-700 focus:ring-2 focus:ring-neon-700/20 outline-none transition-all resize-none text-dark-800 placeholder:text-dark-400"
+                          className="w-full px-4 py-3 rounded-xl border border-silver-300 bg-silver-50 focus:border-neon-700 focus:ring-2 focus:ring-neon-700/20 outline-none transition-all resize-none text-dark-800 placeholder:text-dark-400"
                         />
                       </div>
 
@@ -395,7 +395,7 @@ export default function CreateSessionPage() {
                                 className={`px-4 py-2 rounded-xl text-sm font-medium transition-all border ${
                                   isInDesc
                                     ? 'bg-pink-500/10 text-pink-600 border-pink-500/40'
-                                    : 'bg-silver-50 text-dark-600 border-silver-300 hover:border-pink-400 hover:bg-pink-50 dark:bg-dark-600 dark:text-silver-300 dark:border-dark-500'
+                                    : 'bg-silver-50 text-dark-600 border-silver-300 hover:border-pink-400 hover:bg-pink-50'
                                 }`}
                               >
                                 {a.emoji} {a.label}
@@ -421,7 +421,7 @@ export default function CreateSessionPage() {
                               key={qp.label}
                               type="button"
                               onClick={() => setFormData(prev => ({ ...prev, start_time: qp.getDate() }))}
-                              className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-medium border border-silver-300 bg-silver-50 text-dark-600 hover:border-neon-500 hover:bg-neon-50 hover:text-neon-700 transition-all dark:bg-dark-600 dark:text-silver-300 dark:border-dark-500 dark:hover:border-neon-600"
+                              className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-medium border border-silver-300 bg-silver-50 text-dark-600 hover:border-neon-500 hover:bg-neon-50 hover:text-neon-700 transition-all:border-neon-600"
                               aria-label={`Programmer pour ${qp.label}`}
                             >
                               {qp.icon}
@@ -441,7 +441,7 @@ export default function CreateSessionPage() {
                           name="start_time"
                           value={formData.start_time}
                           onChange={handleChange}
-                          className="w-full px-4 py-3.5 rounded-xl border border-silver-300 bg-silver-50 dark:bg-dark-800 dark:border-dark-600 focus:border-neon-700 focus:ring-2 focus:ring-neon-700/20 outline-none transition-all text-dark-800"
+                          className="w-full px-4 py-3.5 rounded-xl border border-silver-300 bg-silver-50 focus:border-neon-700 focus:ring-2 focus:ring-neon-700/20 outline-none transition-all text-dark-800"
                           required
                         />
                       </div>
@@ -466,7 +466,7 @@ export default function CreateSessionPage() {
                             step="0.5"
                             value={formData.distance_km}
                             onChange={handleChange}
-                            className="w-full h-2 rounded-full appearance-none cursor-pointer bg-silver-300 dark:bg-dark-600 accent-neon-700"
+                            className="w-full h-2 rounded-full appearance-none cursor-pointer bg-silver-300 accent-neon-700"
                             style={{
                               background: `linear-gradient(to right, var(--color-neon-700, #00A86B) 0%, var(--color-neon-700, #00A86B) ${((formData.distance_km - 1) / 49) * 100}%, var(--color-silver-300, #d1d5db) ${((formData.distance_km - 1) / 49) * 100}%, var(--color-silver-300, #d1d5db) 100%)`,
                             }}
@@ -490,7 +490,7 @@ export default function CreateSessionPage() {
                           value={formData.target_pace}
                           onChange={handleChange}
                           placeholder="Ex: 5:30"
-                          className="w-full px-4 py-3 rounded-xl border border-silver-300 bg-silver-50 dark:bg-dark-800 dark:border-dark-600 focus:border-neon-700 focus:ring-2 focus:ring-neon-700/20 outline-none transition-all text-dark-800 placeholder:text-dark-400"
+                          className="w-full px-4 py-3 rounded-xl border border-silver-300 bg-silver-50 focus:border-neon-700 focus:ring-2 focus:ring-neon-700/20 outline-none transition-all text-dark-800 placeholder:text-dark-400"
                         />
                         <div className="flex flex-wrap gap-2 mt-2">
                           {PACE_SUGGESTIONS.map((p) => (
@@ -501,7 +501,7 @@ export default function CreateSessionPage() {
                               className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all border ${
                                 formData.target_pace === p.value
                                   ? 'bg-pink-500 text-white border-pink-500'
-                                  : 'bg-silver-100 text-dark-600 border-silver-300 hover:border-pink-400 dark:bg-dark-600 dark:text-silver-300 dark:border-dark-500'
+                                  : 'bg-silver-100 text-dark-600 border-silver-300 hover:border-pink-400'
                               }`}
                               aria-label={`Allure ${p.label} par km`}
                             >
@@ -531,8 +531,8 @@ export default function CreateSessionPage() {
                                 onClick={() => setFormData({ ...formData, session_type: type.value })}
                                 className={`group relative p-4 rounded-xl border-2 transition-all duration-200 text-left ${
                                   isSelected
-                                    ? 'border-neon-700 bg-neon-50 dark:bg-neon-900/20 shadow-md shadow-neon-700/10'
-                                    : 'border-silver-300 hover:border-neon-400 hover:shadow-md hover:-translate-y-0.5 dark:border-dark-500 dark:hover:border-neon-600'
+                                    ? 'border-neon-700 bg-neon-50 shadow-md shadow-neon-700/10'
+                                    : 'border-silver-300 hover:border-neon-400 hover:shadow-md hover:-translate-y-0.5:border-neon-600'
                                 }`}
                                 aria-pressed={isSelected}
                               >
@@ -579,7 +579,7 @@ export default function CreateSessionPage() {
                         </div>
                       </div>
 
-                      <label className="flex items-center gap-3 p-4 bg-silver-50 dark:bg-dark-800 rounded-xl border border-silver-300 dark:border-dark-600 cursor-pointer hover:border-neon-400 transition-colors">
+                      <label className="flex items-center gap-3 p-4 bg-silver-50 rounded-xl border border-silver-300 cursor-pointer hover:border-neon-400 transition-colors">
                         <input
                           type="checkbox"
                           name="walk_breaks_ok"
@@ -609,13 +609,13 @@ export default function CreateSessionPage() {
                           value={formData.location_name}
                           onChange={handleChange}
                           placeholder="Ex: Entree du parc Monceau"
-                          className="w-full px-4 py-3.5 rounded-xl border border-silver-300 bg-silver-50 dark:bg-dark-800 dark:border-dark-600 focus:border-neon-700 focus:ring-2 focus:ring-neon-700/20 outline-none transition-all text-dark-800 placeholder:text-dark-400"
+                          className="w-full px-4 py-3.5 rounded-xl border border-silver-300 bg-silver-50 focus:border-neon-700 focus:ring-2 focus:ring-neon-700/20 outline-none transition-all text-dark-800 placeholder:text-dark-400"
                           required
                         />
                       </div>
 
                       {/* Mini map preview / placeholder */}
-                      <div className="rounded-xl overflow-hidden border border-silver-300 dark:border-dark-600">
+                      <div className="rounded-xl overflow-hidden border border-silver-300">
                         {formData.latitude != null && formData.longitude != null ? (
                           <div className="relative">
                             <img
@@ -648,7 +648,7 @@ export default function CreateSessionPage() {
                             </button>
                           </div>
                         ) : (
-                          <div className="h-[120px] bg-silver-100 dark:bg-dark-800 flex flex-col items-center justify-center text-center px-4">
+                          <div className="h-[120px] bg-silver-100 flex flex-col items-center justify-center text-center px-4">
                             <MapPin className="w-6 h-6 text-dark-400 mb-1.5" />
                             <p className="text-sm text-dark-400">Ajoute un lieu pour voir la carte</p>
                           </div>
@@ -662,7 +662,7 @@ export default function CreateSessionPage() {
                           type="button"
                           onClick={useCurrentPosition}
                           disabled={geoLocating}
-                          className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl border border-silver-300 text-dark-600 text-sm font-medium hover:border-neon-500 hover:bg-neon-50 hover:text-neon-700 transition-all disabled:opacity-50 dark:border-dark-500 dark:text-silver-300"
+                          className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl border border-silver-300 text-dark-600 text-sm font-medium hover:border-neon-500 hover:bg-neon-50 hover:text-neon-700 transition-all disabled:opacity-50"
                         >
                           <Crosshair className="w-4 h-4" />
                           {geoLocating ? 'Localisation...' : 'Utiliser ma position'}
@@ -676,7 +676,7 @@ export default function CreateSessionPage() {
                             onChange={(e) => setGeoSearchQuery(e.target.value)}
                             onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); searchLocation(geoSearchQuery); } }}
                             placeholder="Rechercher une adresse..."
-                            className="flex-1 px-4 py-2.5 rounded-xl border border-silver-300 bg-silver-50 dark:bg-dark-800 dark:border-dark-600 text-sm focus:border-neon-700 focus:ring-2 focus:ring-neon-700/20 outline-none text-dark-800 placeholder:text-dark-400"
+                            className="flex-1 px-4 py-2.5 rounded-xl border border-silver-300 bg-silver-50 text-sm focus:border-neon-700 focus:ring-2 focus:ring-neon-700/20 outline-none text-dark-800 placeholder:text-dark-400"
                           />
                           <button
                             type="button"
@@ -691,7 +691,7 @@ export default function CreateSessionPage() {
 
                         {/* Search results */}
                         {geoSearchResults.length > 0 && (
-                          <div className="space-y-1 max-h-40 overflow-y-auto rounded-xl border border-silver-300 dark:border-dark-600 p-1">
+                          <div className="space-y-1 max-h-40 overflow-y-auto rounded-xl border border-silver-300 p-1">
                             {geoSearchResults.map((result, i) => (
                               <button
                                 key={i}
@@ -706,7 +706,7 @@ export default function CreateSessionPage() {
                                   setGeoSearchResults([]);
                                   setGeoSearchQuery('');
                                 }}
-                                className="w-full text-left px-3 py-2 rounded-lg text-xs text-dark-700 dark:text-silver-300 hover:bg-neon-50 dark:hover:bg-neon-900/20 transition-colors"
+                                className="w-full text-left px-3 py-2 rounded-lg text-xs text-dark-700 hover:bg-neon-50:bg-neon-900/20 transition-colors"
                               >
                                 {result.display_name}
                               </button>
@@ -732,7 +732,7 @@ export default function CreateSessionPage() {
                             max="20"
                             value={formData.max_participants}
                             onChange={handleChange}
-                            className="w-full h-2 rounded-full appearance-none cursor-pointer bg-silver-300 dark:bg-dark-600 accent-neon-700"
+                            className="w-full h-2 rounded-full appearance-none cursor-pointer bg-silver-300 accent-neon-700"
                             style={{
                               background: `linear-gradient(to right, var(--color-neon-700, #00A86B) 0%, var(--color-neon-700, #00A86B) ${((formData.max_participants - 2) / 18) * 100}%, var(--color-silver-300, #d1d5db) ${((formData.max_participants - 2) / 18) * 100}%, var(--color-silver-300, #d1d5db) 100%)`,
                             }}
@@ -752,7 +752,7 @@ export default function CreateSessionPage() {
                       <div className="flex items-start gap-4">
                         <div className="flex-1">
                           {/* Title + description */}
-                          <div className="p-4 bg-gradient-to-br from-neon-50 to-silver-50 dark:from-neon-900/20 dark:to-dark-800 rounded-xl border border-neon-200 dark:border-neon-800/40">
+                          <div className="p-4 bg-gradient-to-br from-neon-50 to-silver-50 rounded-xl border border-neon-200">
                             <h3 className="text-lg font-bold text-dark-800">{formData.title}</h3>
                             {formData.description && (
                               <p className="text-sm text-dark-500 mt-1">{formData.description}</p>
@@ -761,7 +761,7 @@ export default function CreateSessionPage() {
 
                           {/* Details grid */}
                           <div className="grid grid-cols-2 gap-3 mt-4">
-                            <div className="p-3 bg-silver-50 dark:bg-dark-800 rounded-xl border border-silver-200 dark:border-dark-600">
+                            <div className="p-3 bg-silver-50 rounded-xl border border-silver-200">
                               <div className="flex items-center gap-1.5 mb-1">
                                 <Calendar className="w-3.5 h-3.5 text-neon-700" />
                                 <span className="text-xs text-dark-400 font-medium">Date</span>
@@ -777,7 +777,7 @@ export default function CreateSessionPage() {
                               </div>
                             </div>
 
-                            <div className="p-3 bg-silver-50 dark:bg-dark-800 rounded-xl border border-silver-200 dark:border-dark-600">
+                            <div className="p-3 bg-silver-50 rounded-xl border border-silver-200">
                               <div className="flex items-center gap-1.5 mb-1">
                                 <ArrowRight className="w-3.5 h-3.5 text-pink-500" />
                                 <span className="text-xs text-dark-400 font-medium">Distance</span>
@@ -790,7 +790,7 @@ export default function CreateSessionPage() {
                               </div>
                             </div>
 
-                            <div className="p-3 bg-silver-50 dark:bg-dark-800 rounded-xl border border-silver-200 dark:border-dark-600">
+                            <div className="p-3 bg-silver-50 rounded-xl border border-silver-200">
                               <div className="flex items-center gap-1.5 mb-1">
                                 <Zap className="w-3.5 h-3.5 text-neon-700" />
                                 <span className="text-xs text-dark-400 font-medium">Type</span>
@@ -800,7 +800,7 @@ export default function CreateSessionPage() {
                               </div>
                             </div>
 
-                            <div className="p-3 bg-silver-50 dark:bg-dark-800 rounded-xl border border-silver-200 dark:border-dark-600">
+                            <div className="p-3 bg-silver-50 rounded-xl border border-silver-200">
                               <div className="flex items-center gap-1.5 mb-1">
                                 <Zap className="w-3.5 h-3.5 text-pink-500" />
                                 <span className="text-xs text-dark-400 font-medium">Niveau</span>
@@ -814,7 +814,7 @@ export default function CreateSessionPage() {
                           </div>
 
                           {/* Location row */}
-                          <div className="mt-3 p-3 bg-silver-50 dark:bg-dark-800 rounded-xl border border-silver-200 dark:border-dark-600">
+                          <div className="mt-3 p-3 bg-silver-50 rounded-xl border border-silver-200">
                             <div className="flex items-center gap-1.5 mb-1">
                               <MapPin className="w-3.5 h-3.5 text-neon-700" />
                               <span className="text-xs text-dark-400 font-medium">Lieu</span>
@@ -824,12 +824,12 @@ export default function CreateSessionPage() {
 
                           {/* Participants + walk breaks */}
                           <div className="flex gap-3 mt-3">
-                            <div className="flex-1 p-3 bg-silver-50 dark:bg-dark-800 rounded-xl border border-silver-200 dark:border-dark-600">
+                            <div className="flex-1 p-3 bg-silver-50 rounded-xl border border-silver-200">
                               <div className="text-xs text-dark-400 font-medium mb-1">Participants max</div>
                               <div className="text-sm font-semibold text-dark-800">{formData.max_participants} personnes</div>
                             </div>
                             {formData.walk_breaks_ok && (
-                              <div className="flex-1 p-3 bg-neon-50 dark:bg-neon-900/20 rounded-xl border border-neon-200 dark:border-neon-800/40">
+                              <div className="flex-1 p-3 bg-neon-50 rounded-xl border border-neon-200">
                                 <div className="text-xs text-neon-700 font-medium">Pauses marche</div>
                                 <div className="text-sm font-semibold text-neon-700 mt-1">Autorisees</div>
                               </div>
@@ -850,13 +850,13 @@ export default function CreateSessionPage() {
                 </div>
 
                 {/* ── ACTION BAR ── */}
-                <div className="flex items-center justify-between mt-8 pt-6 border-t border-silver-200 dark:border-dark-600">
+                <div className="flex items-center justify-between mt-8 pt-6 border-t border-silver-200">
                   <div className="flex items-center gap-3">
                     {currentStep > 1 ? (
                       <button
                         type="button"
                         onClick={prevStep}
-                        className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl font-medium text-dark-600 hover:bg-silver-100 dark:hover:bg-dark-600 transition-all text-sm"
+                        className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl font-medium text-dark-600 hover:bg-silver-100:bg-dark-600 transition-all text-sm"
                       >
                         <ChevronLeft className="w-4 h-4" />
                         Precedent
@@ -879,7 +879,7 @@ export default function CreateSessionPage() {
                       className={`inline-flex items-center gap-2 px-6 py-3 rounded-xl font-bold text-sm transition-all duration-200 ${
                         canProceed()
                           ? 'bg-neon-700 text-white hover:bg-neon-600 shadow-lg shadow-neon-700/25 hover:shadow-neon-700/40 hover:-translate-y-0.5'
-                          : 'bg-silver-200 text-dark-400 cursor-not-allowed dark:bg-dark-600 dark:text-dark-500'
+                          : 'bg-silver-200 text-dark-400 cursor-not-allowed'
                       }`}
                     >
                       Continuer

@@ -8,7 +8,6 @@ import { Bell, Loader2 } from 'lucide-react';
 import { useAuth } from '../providers/AuthProvider';
 import { getUnreadCount } from '@/lib/notification-actions';
 import AuthDrawer from '../ui/AuthDrawer';
-import DarkModeToggle from '../ui/DarkModeToggle';
 
 // Pages protégées où on ne doit jamais montrer l'état déconnecté pendant l'initialisation
 // Inclut les pages hybrides (sessions, teams) pour éviter le flash du header guest
@@ -28,14 +27,6 @@ export default function Navbar() {
 
   // Check if we're on a protected page
   const isProtectedPage = PROTECTED_PATHS.some(path => pathname?.startsWith(path));
-
-  // Force light mode when not logged in (guest users)
-  useEffect(() => {
-    if (!loading && !profile) {
-      document.documentElement.classList.remove('dark');
-      localStorage.setItem('pacemate-theme', 'light');
-    }
-  }, [loading, profile]);
 
   // Fetch unread notification count
   useEffect(() => {
@@ -156,9 +147,6 @@ export default function Navbar() {
             </div>
           ) : showAsLoggedIn ? (
             <>
-              {/* Dark mode toggle - only for connected users */}
-              {profile && <DarkModeToggle />}
-
               {/* Notifications */}
               <Link href="/notifications" className={`relative w-9 h-9 rounded-full flex items-center justify-center transition-colors ${
                 onDarkBg ? 'hover:bg-white/15' : 'hover:bg-text-primary/5'
@@ -207,13 +195,13 @@ export default function Navbar() {
                       className="fixed inset-0 z-40"
                       onClick={() => setDropdownOpen(false)}
                     />
-                    <div className="absolute right-0 top-14 w-56 bg-white dark:bg-dark-700 rounded-xl shadow-xl border border-silver-200 dark:border-dark-600 py-2 z-50">
+                    <div className="absolute right-0 top-14 w-56 bg-white rounded-xl shadow-xl border border-silver-200 py-2 z-50">
                       {profile ? (
                         <>
                           <Link
                             href="/profile"
                             onClick={() => setDropdownOpen(false)}
-                            className="flex items-center gap-3 px-4 py-3 text-sm text-text-primary dark:text-silver-200 hover:bg-silver-50 dark:hover:bg-dark-600 transition-colors"
+                            className="flex items-center gap-3 px-4 py-3 text-sm text-text-primary hover:bg-silver-50 transition-colors"
                           >
                             <svg className="w-5 h-5 text-text-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
@@ -223,7 +211,7 @@ export default function Navbar() {
                           <Link
                             href="/profile/stats"
                             onClick={() => setDropdownOpen(false)}
-                            className="flex items-center gap-3 px-4 py-3 text-sm text-text-primary dark:text-silver-200 hover:bg-silver-50 dark:hover:bg-dark-600 transition-colors"
+                            className="flex items-center gap-3 px-4 py-3 text-sm text-text-primary hover:bg-silver-50 transition-colors"
                           >
                             <svg className="w-5 h-5 text-text-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
@@ -233,7 +221,7 @@ export default function Navbar() {
                           <Link
                             href="/settings"
                             onClick={() => setDropdownOpen(false)}
-                            className="flex items-center gap-3 px-4 py-3 text-sm text-text-primary dark:text-silver-200 hover:bg-silver-50 dark:hover:bg-dark-600 transition-colors"
+                            className="flex items-center gap-3 px-4 py-3 text-sm text-text-primary hover:bg-silver-50 transition-colors"
                           >
                             <svg className="w-5 h-5 text-text-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
@@ -241,7 +229,7 @@ export default function Navbar() {
                             </svg>
                             Paramètres
                           </Link>
-                          <div className="my-2 border-t border-silver-200 dark:border-dark-500" />
+                          <div className="my-2 border-t border-silver-200" />
                         </>
                       ) : (
                         <div className="px-4 py-3 text-sm text-text-muted flex items-center gap-2">
@@ -251,7 +239,7 @@ export default function Navbar() {
                       )}
                       <button
                         onClick={handleSignOut}
-                        className="flex items-center gap-3 px-4 py-3 text-sm text-pink-600 hover:bg-pink-50 dark:hover:bg-pink-900/30 w-full transition-colors"
+                        className="flex items-center gap-3 px-4 py-3 text-sm text-pink-600 hover:bg-pink-50 w-full transition-colors"
                       >
                         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />

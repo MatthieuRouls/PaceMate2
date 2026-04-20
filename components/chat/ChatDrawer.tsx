@@ -70,13 +70,13 @@ export default function ChatDrawer() {
       />
 
       {/* Floating Panel */}
-      <div className="fixed bottom-24 right-6 z-50 w-80 max-h-[70vh] bg-white/95 dark:bg-dark-800/95 backdrop-blur-xl rounded-2xl shadow-2xl border border-silver-200/50 dark:border-dark-600/50 flex flex-col overflow-hidden animate-in slide-in-from-bottom-4 fade-in duration-200">
+      <div className="fixed bottom-24 right-6 z-50 w-80 max-h-[70vh] bg-white/95 backdrop-blur-xl rounded-2xl shadow-2xl border border-silver-200/50 flex flex-col overflow-hidden animate-in slide-in-from-bottom-4 fade-in duration-200">
         {/* Header */}
-        <div className="flex items-center justify-between px-4 py-3 border-b border-silver-200/50 dark:border-dark-600/50">
-          <h2 className="text-base font-semibold text-dark-800 dark:text-white">Messages</h2>
+        <div className="flex items-center justify-between px-4 py-3 border-b border-silver-200/50">
+          <h2 className="text-base font-semibold text-dark-800">Messages</h2>
           <button
             onClick={closeDrawer}
-            className="p-1.5 rounded-full hover:bg-silver-100 dark:hover:bg-dark-700 transition-colors"
+            className="p-1.5 rounded-full hover:bg-silver-100:bg-dark-700 transition-colors"
           >
             <X className="w-4 h-4 text-dark-500" />
           </button>
@@ -91,7 +91,7 @@ export default function ChatDrawer() {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Rechercher..."
-              className="w-full pl-9 pr-3 py-2 rounded-xl bg-silver-100/80 dark:bg-dark-700/80 border-0 text-sm text-dark-800 dark:text-white placeholder:text-dark-400 focus:outline-none focus:ring-2 focus:ring-neon-500/30"
+              className="w-full pl-9 pr-3 py-2 rounded-xl bg-silver-100/80 border-0 text-sm text-dark-800 placeholder:text-dark-400 focus:outline-none focus:ring-2 focus:ring-neon-500/30"
             />
           </div>
         </div>
@@ -104,7 +104,7 @@ export default function ChatDrawer() {
             </div>
           ) : filteredConversations.length === 0 ? (
             <div className="text-center py-10 px-4">
-              <div className="w-12 h-12 rounded-full bg-silver-100 dark:bg-dark-700 flex items-center justify-center mx-auto mb-3">
+              <div className="w-12 h-12 rounded-full bg-silver-100 flex items-center justify-center mx-auto mb-3">
                 <MessageCircle className="w-6 h-6 text-dark-400" />
               </div>
               <p className="text-dark-500 text-sm">
@@ -117,7 +117,7 @@ export default function ChatDrawer() {
                 <button
                   key={conv.id}
                   onClick={() => handleConversationClick(conv)}
-                  className="w-full px-3 py-2.5 flex items-center gap-3 hover:bg-silver-100/80 dark:hover:bg-dark-700/80 transition-colors text-left group"
+                  className="w-full px-3 py-2.5 flex items-center gap-3 hover:bg-silver-100/80:bg-dark-700/80 transition-colors text-left group"
                 >
                   {/* Avatar */}
                   <div className="relative flex-shrink-0">
@@ -137,7 +137,7 @@ export default function ChatDrawer() {
                       )}
                     </div>
                     {/* Online indicator - for future use */}
-                    {/* <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-white dark:border-dark-800" /> */}
+                    {/* <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-white" /> */}
                   </div>
 
                   {/* Content */}
@@ -145,8 +145,8 @@ export default function ChatDrawer() {
                     <div className="flex items-center justify-between gap-2">
                       <span className={`font-medium text-sm truncate ${
                         conv.unread_count && conv.unread_count > 0
-                          ? 'text-dark-800 dark:text-white'
-                          : 'text-dark-700 dark:text-silver-300'
+                          ? 'text-dark-800'
+                          : 'text-dark-700'
                       }`}>
                         {getConversationName(conv)}
                       </span>
@@ -157,7 +157,7 @@ export default function ChatDrawer() {
                     <div className="flex items-center gap-2 mt-0.5">
                       <p className={`text-[13px] truncate flex-1 ${
                         conv.unread_count && conv.unread_count > 0
-                          ? 'text-dark-700 dark:text-silver-300 font-medium'
+                          ? 'text-dark-700 font-medium'
                           : 'text-dark-500'
                       }`}>
                         {conv.last_message?.content || 'Aucun message'}
@@ -179,11 +179,11 @@ export default function ChatDrawer() {
         </div>
 
         {/* Footer */}
-        <div className="px-3 py-2 border-t border-silver-200/50 dark:border-dark-600/50">
+        <div className="px-3 py-2 border-t border-silver-200/50">
           <a
             href="/messages"
             onClick={closeDrawer}
-            className="flex items-center justify-center gap-2 w-full py-2 text-sm font-medium text-neon-600 hover:text-neon-700 hover:bg-neon-50/50 dark:hover:bg-dark-700 rounded-xl transition-colors"
+            className="flex items-center justify-center gap-2 w-full py-2 text-sm font-medium text-neon-600 hover:text-neon-700 hover:bg-neon-50/50:bg-dark-700 rounded-xl transition-colors"
           >
             Voir tout
             <ChevronRight className="w-4 h-4" />

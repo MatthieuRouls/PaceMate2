@@ -78,14 +78,6 @@
     -moz-osx-font-smoothing: grayscale;
     background-color: #F0F2F5;
     color: #0B2E26;
-    transition: background-color 0.3s ease, color 0.3s ease;
-  }
-
-  /* Dark mode body */
-  .dark body,
-  body.dark {
-    background-color: #0B2E26;
-    color: #e6e6ea;
   }
 
   /* Smooth transitions */
@@ -122,18 +114,6 @@
     background: #b8c4d4;
   }
 
-  /* Dark mode scrollbar */
-  .dark ::-webkit-scrollbar-track {
-    background: #0B2E26;
-  }
-
-  .dark ::-webkit-scrollbar-thumb {
-    background: #1f4437;
-  }
-
-  .dark ::-webkit-scrollbar-thumb:hover {
-    background: #2d5a4c;
-  }
 }
 
 /* Utilities */
@@ -226,103 +206,6 @@
     color: #0B2E26;
   }
 
-  .dark .neu-tab-active {
-    background: rgba(31, 68, 55, 0.9);
-    box-shadow: inset 3px 3px 6px #051a15, inset -3px -3px 6px #2d5a4c;
-    color: #e6e6ea;
-  }
-
-  /* ============================================
-     DARK MODE STYLES - #0B2E26 based
-     ============================================ */
-
-  /* Dark mode background */
-  .dark .bg-neu-base {
-    background-color: #0B2E26 !important;
-  }
-
-  .dark .bg-white {
-    background-color: #0f3d32 !important;
-  }
-
-  /* Dark mode cards */
-  .dark .card {
-    background: #0f3d32;
-    border-color: rgba(0, 245, 122, 0.1);
-  }
-
-  /* Dark mode neumorphic buttons */
-  .dark .neu-btn {
-    background: #0B2E26;
-    box-shadow: 5px 5px 10px #051a15, -5px -5px 10px #114237;
-  }
-
-  .dark .neu-btn:active,
-  .dark .neu-btn.pressed {
-    background: #0B2E26;
-    box-shadow: inset 5px 5px 10px #051a15, inset -5px -5px 10px #114237;
-  }
-
-  .dark .neu-btn-white {
-    background: #0f3d32;
-    box-shadow: 5px 5px 10px #051a15, -5px -5px 10px #1a5244;
-  }
-
-  .dark .neu-btn-white:active,
-  .dark .neu-btn-white.pressed {
-    background: #0f3d32;
-    box-shadow: inset 5px 5px 10px #051a15, inset -5px -5px 10px #1a5244;
-  }
-
-  /* Dark mode text colors */
-  .dark .text-dark-800 {
-    color: #e6e6ea !important;
-  }
-
-  .dark .text-dark-700 {
-    color: #d6d6dc !important;
-  }
-
-  .dark .text-dark-600 {
-    color: #c6c6d0 !important;
-  }
-
-  .dark .text-dark-500 {
-    color: #a8a8b4 !important;
-  }
-
-  /* Dark mode glass pill */
-  .dark .glass-pill {
-    background: rgba(15, 61, 50, 0.85);
-    border-color: rgba(0, 245, 122, 0.2);
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-  }
-
-  .dark .glass-capsule {
-    background: rgba(15, 61, 50, 0.75);
-    border-color: rgba(0, 245, 122, 0.15);
-    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.25);
-  }
-
-  .dark .glass-capsule-dark {
-    background: rgba(15, 61, 50, 0.5);
-    border-color: rgba(0, 245, 122, 0.1);
-  }
-
-  /* Dark mode inputs */
-  .dark input,
-  .dark textarea,
-  .dark select {
-    background-color: #0B2E26;
-    border-color: rgba(0, 245, 122, 0.2);
-    color: #e6e6ea;
-  }
-
-  .dark input::placeholder,
-  .dark textarea::placeholder {
-    color: #6c6c7c;
-  }
-
   /* Neumorphic toggle switch */
   .neu-toggle {
     isolation: isolate;
@@ -357,163 +240,8 @@
     transform: translate3d(25%, 0, 0);
   }
 
-  /* Dark mode toggle */
-  .dark .neu-toggle {
-    box-shadow: -8px -4px 8px 0px #114237,
-      8px 4px 12px 0px #051a15,
-      4px 4px 4px 0px #051a15 inset,
-      -4px -4px 4px 0px #114237 inset;
-  }
-
-  .dark .neu-toggle-indicator {
-    background: #0B2E26;
-    box-shadow: -8px -4px 8px 0px #114237,
-      8px 4px 12px 0px #051a15;
-  }
-
   /* ============================================
-     DARK MODE - Silver backgrounds
-     ============================================ */
-  .dark .bg-silver-50 {
-    background-color: #0B2E26 !important;
-  }
-
-  .dark .bg-silver-100 {
-    background-color: #0f3d32 !important;
-  }
-
-  .dark .bg-silver-200 {
-    background-color: #1a4a3e !important;
-  }
-
-  .dark .bg-silver-300 {
-    background-color: #1f5547 !important;
-  }
-
-  /* ============================================
-     DARK MODE - Neon backgrounds
-     ============================================ */
-  .dark .bg-neon-50 {
-    background-color: rgba(0, 245, 122, 0.1) !important;
-  }
-
-  .dark .bg-neon-100 {
-    background-color: rgba(0, 245, 122, 0.15) !important;
-  }
-
-  /* ============================================
-     DARK MODE - Pink backgrounds
-     ============================================ */
-  .dark .bg-pink-50 {
-    background-color: rgba(255, 45, 149, 0.1) !important;
-  }
-
-  /* ============================================
-     DARK MODE - Borders
-     ============================================ */
-  .dark .border-silver-300 {
-    border-color: rgba(0, 245, 122, 0.15) !important;
-  }
-
-  .dark .border-silver-400 {
-    border-color: rgba(0, 245, 122, 0.2) !important;
-  }
-
-  .dark .border-neon-300 {
-    border-color: rgba(0, 245, 122, 0.4) !important;
-  }
-
-  .dark .border-neon-700 {
-    border-color: #00F57A !important;
-  }
-
-  .dark .border-pink-300 {
-    border-color: rgba(255, 45, 149, 0.4) !important;
-  }
-
-  /* ============================================
-     DARK MODE - Form elements
-     ============================================ */
-  .dark .bg-white.rounded-xl,
-  .dark .bg-white.rounded-lg {
-    background-color: #0f3d32 !important;
-  }
-
-  .dark .focus\:border-neon-700:focus {
-    border-color: #00F57A !important;
-  }
-
-  .dark .focus\:ring-neon-700\/20:focus {
-    --tw-ring-color: rgba(0, 245, 122, 0.2) !important;
-  }
-
-  /* ============================================
-     DARK MODE - Filter buttons (sessions page)
-     ============================================ */
-  .dark .bg-dark-800 {
-    background-color: #00F57A !important;
-    color: #0B2E26 !important;
-  }
-
-  .dark .hover\:bg-silver-300:hover {
-    background-color: #1f5547 !important;
-  }
-
-  .dark .hover\:bg-silver-200:hover {
-    background-color: #1a4a3e !important;
-  }
-
-  .dark .hover\:bg-silver-100:hover {
-    background-color: #0f3d32 !important;
-  }
-
-  .dark .hover\:bg-silver-50:hover {
-    background-color: #0f3d32 !important;
-  }
-
-  /* ============================================
-     DARK MODE - Text colors
-     ============================================ */
-  .dark .text-dark-600 {
-    color: #c6c6d0 !important;
-  }
-
-  /* ============================================
-     DARK MODE - Border colors for avatars
-     ============================================ */
-  .dark .border-white {
-    border-color: #0f3d32 !important;
-  }
-
-  /* ============================================
-     DARK MODE - Drawer and panels
-     ============================================ */
-  .dark .bg-white.shadow-2xl,
-  .dark .shadow-2xl.bg-white {
-    background-color: #0B2E26 !important;
-  }
-
-  /* Generic white background panels */
-  .dark .fixed.bg-white {
-    background-color: #0B2E26 !important;
-  }
-
-  .dark .sticky.bg-white {
-    background-color: #0B2E26 !important;
-  }
-
-  /* Border for neon */
-  .dark .border-neon-500 {
-    border-color: #00F57A !important;
-  }
-
-  /* Hover border */
-  .dark .hover\:border-neon-500:hover {
-    border-color: #00F57A !important;
-  }
-
-  /* ============================================
-     DASHBOARD DARK PREMIUM
+     DASHBOARD
      ============================================ */
   .dash-card {
     background: rgba(255, 255, 255, 0.03);
@@ -686,12 +414,6 @@
     radial-gradient(ellipse 60% 30% at 100% 100%, rgba(22,199,132,0.04) 0%, transparent 60%),
     #f7faf9;
 }
-.dark .settings-bg {
-  background:
-    radial-gradient(ellipse 80% 40% at 50% -5%, rgba(22,199,132,0.09) 0%, transparent 70%),
-    radial-gradient(ellipse 60% 30% at 100% 100%, rgba(22,199,132,0.05) 0%, transparent 60%),
-    #071a16;
-}
 /* subtle noise overlay */
 .settings-noise::after {
   content: '';
@@ -712,12 +434,6 @@
   box-shadow: 0 2px 12px rgba(0,0,0,0.05), 0 1px 3px rgba(0,0,0,0.04);
   border-radius: 1rem;
 }
-.dark .settings-glass {
-  background: rgba(11,46,38,0.80);
-  border: 1px solid rgba(255,255,255,0.07);
-  box-shadow: 0 2px 16px rgba(0,0,0,0.25);
-}
-
 /* ── Safety glass (green tint) ── */
 .safety-glass {
   background: rgba(22,199,132,0.05);
@@ -727,11 +443,6 @@
   box-shadow: 0 2px 12px rgba(0,0,0,0.04);
   border-radius: 1rem;
 }
-.dark .safety-glass {
-  background: rgba(22,199,132,0.07);
-  border: 1px solid rgba(22,199,132,0.20);
-}
-
 /* ── Safety pulse (active glow) ── */
 .safety-pulse {
   animation: pm-pulse-safety 2.8s ease-in-out infinite;
@@ -744,11 +455,6 @@
   box-shadow: 0 2px 10px rgba(239,68,68,0.05);
   border-radius: 1rem;
 }
-.dark .danger-glass {
-  background: rgba(127,29,29,0.20);
-  border: 1px solid rgba(252,165,165,0.18);
-}
-
 /* ── Glow ── */
 .signal-glow    { box-shadow: 0 0 20px rgba(52,224,161,0.15); }
 .signal-glow-sm { box-shadow: 0 0 10px rgba(52,224,161,0.12); }

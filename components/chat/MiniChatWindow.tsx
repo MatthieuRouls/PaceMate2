@@ -137,7 +137,7 @@ export default function MiniChatWindow({ conversationId, position }: MiniChatWin
 
   return (
     <div
-      className="fixed bottom-0 z-30 w-80 bg-white dark:bg-dark-800 rounded-t-xl shadow-2xl border border-silver-300 dark:border-dark-600 flex flex-col overflow-hidden"
+      className="fixed bottom-0 z-30 w-80 bg-white rounded-t-xl shadow-2xl border border-silver-300 flex flex-col overflow-hidden"
       style={{ right: `${rightOffset}px`, height: isMinimized ? '52px' : '420px' }}
     >
       {/* Header */}
@@ -192,7 +192,7 @@ export default function MiniChatWindow({ conversationId, position }: MiniChatWin
       {/* Messages */}
       {!isMinimized && (
         <>
-          <div className="flex-1 overflow-y-auto p-3 space-y-2 bg-silver-50 dark:bg-dark-900">
+          <div className="flex-1 overflow-y-auto p-3 space-y-2 bg-silver-50">
             {loading ? (
               <div className="flex justify-center py-8">
                 <LoadingSpinner />
@@ -213,7 +213,7 @@ export default function MiniChatWindow({ conversationId, position }: MiniChatWin
                       className={`max-w-[75%] px-3 py-2 rounded-2xl text-sm ${
                         isOwn
                           ? 'bg-neon-500 text-dark-800 rounded-br-md'
-                          : 'bg-white dark:bg-dark-700 text-dark-800 dark:text-white rounded-bl-md shadow-sm'
+                          : 'bg-white text-dark-800 rounded-bl-md shadow-sm'
                       }`}
                     >
                       {message.content}
@@ -226,7 +226,7 @@ export default function MiniChatWindow({ conversationId, position }: MiniChatWin
           </div>
 
           {/* Input */}
-          <div className="p-2 border-t border-silver-200 dark:border-dark-600 bg-white dark:bg-dark-800">
+          <div className="p-2 border-t border-silver-200 bg-white">
             <div className="flex items-center gap-2">
               <input
                 ref={inputRef}
@@ -235,7 +235,7 @@ export default function MiniChatWindow({ conversationId, position }: MiniChatWin
                 onChange={(e) => setNewMessage(e.target.value)}
                 onKeyPress={handleKeyPress}
                 placeholder="Aa"
-                className="flex-1 px-3 py-2 rounded-full bg-silver-100 dark:bg-dark-700 border-0 text-sm text-dark-800 dark:text-white placeholder:text-dark-400 focus:outline-none focus:ring-2 focus:ring-neon-500/50"
+                className="flex-1 px-3 py-2 rounded-full bg-silver-100 border-0 text-sm text-dark-800 placeholder:text-dark-400 focus:outline-none focus:ring-2 focus:ring-neon-500/50"
               />
               <button
                 onClick={handleSend}

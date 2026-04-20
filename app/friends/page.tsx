@@ -226,7 +226,7 @@ export default function FriendsPage() {
         </div>
 
         {/* Content */}
-        <div className="bg-white dark:bg-dark-700 rounded-xl border border-silver-400 p-6">
+        <div className="bg-white rounded-xl border border-silver-400 p-6">
           {/* Search input */}
           {activeTab === 'search' && (
             <div className="mb-6">
@@ -380,7 +380,7 @@ function FriendCard({
   loading: boolean;
 }) {
   return (
-    <div className="flex items-center justify-between p-4 bg-silver-50 dark:bg-dark-600 rounded-lg">
+    <div className="flex items-center justify-between p-4 bg-silver-50 rounded-lg">
       <div className="flex items-center gap-4">
         {profile.avatar_url ? (
           <img
@@ -436,7 +436,7 @@ function RequestCard({
   const profile = type === 'received' ? request.user : request.friend;
 
   return (
-    <div className="flex items-center justify-between p-4 bg-silver-50 dark:bg-dark-600 rounded-lg">
+    <div className="flex items-center justify-between p-4 bg-silver-50 rounded-lg">
       <div className="flex items-center gap-4">
         {profile?.avatar_url ? (
           <img
@@ -500,7 +500,7 @@ function SearchResultCard({
   loading: boolean;
 }) {
   return (
-    <div className="flex items-center justify-between p-4 bg-silver-50 dark:bg-dark-600 rounded-lg">
+    <div className="flex items-center justify-between p-4 bg-silver-50 rounded-lg">
       <div className="flex items-center gap-4">
         {profile.avatar_url ? (
           <img

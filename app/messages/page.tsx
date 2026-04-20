@@ -217,7 +217,7 @@ export default function MessagesPage() {
     <div className="min-h-screen bg-neu-base pt-16">
       <div className="h-[calc(100vh-4rem)] flex">
         {/* Conversations List */}
-        <div className={`w-full md:w-96 bg-white dark:bg-dark-700 border-r border-silver-300 flex flex-col ${
+        <div className={`w-full md:w-96 bg-white border-r border-silver-300 flex flex-col ${
           showMobileChat ? 'hidden md:flex' : 'flex'
         }`}>
           {/* Header */}
@@ -248,8 +248,8 @@ export default function MessagesPage() {
                   <button
                     key={conv.id}
                     onClick={() => handleSelectConversation(conv)}
-                    className={`w-full p-4 flex items-start gap-3 hover:bg-silver-50 dark:hover:bg-dark-600 transition-colors text-left ${
-                      isSelected ? 'bg-neon-50 dark:bg-neon-900/20' : ''
+                    className={`w-full p-4 flex items-start gap-3 hover:bg-silver-50:bg-dark-600 transition-colors text-left ${
+                      isSelected ? 'bg-neon-50' : ''
                     }`}
                   >
                     <div className="w-12 h-12 rounded-full flex-shrink-0 overflow-hidden">
@@ -320,16 +320,16 @@ export default function MessagesPage() {
         </div>
 
         {/* Chat Window */}
-        <div className={`flex-1 flex flex-col bg-silver-50 dark:bg-dark-800 ${
+        <div className={`flex-1 flex flex-col bg-silver-50 ${
           showMobileChat ? 'flex' : 'hidden md:flex'
         }`}>
           {selectedConversation ? (
             <>
               {/* Chat Header */}
-              <div className="p-4 bg-white dark:bg-dark-700 border-b border-silver-300 flex items-center gap-3">
+              <div className="p-4 bg-white border-b border-silver-300 flex items-center gap-3">
                 <button
                   onClick={handleBackToList}
-                  className="md:hidden p-2 hover:bg-silver-100 dark:hover:bg-dark-600 rounded-lg"
+                  className="md:hidden p-2 hover:bg-silver-100:bg-dark-600 rounded-lg"
                 >
                   <ArrowLeft className="w-5 h-5 text-dark-800" />
                 </button>
@@ -372,7 +372,7 @@ export default function MessagesPage() {
                   )}
                 </div>
 
-                <button className="p-2 hover:bg-silver-100 dark:hover:bg-dark-600 rounded-lg">
+                <button className="p-2 hover:bg-silver-100:bg-dark-600 rounded-lg">
                   <MoreVertical className="w-5 h-5 text-dark-600" />
                 </button>
               </div>
@@ -429,7 +429,7 @@ export default function MessagesPage() {
                               ? 'bg-silver-200 text-dark-400 italic'
                               : isOwn
                               ? 'bg-neon-500 text-dark-800'
-                              : 'bg-white dark:bg-dark-600 text-dark-800'
+                              : 'bg-white text-dark-800'
                           }`}>
                             {message.is_deleted ? 'Message supprimé' : message.content}
                           </div>
@@ -446,7 +446,7 @@ export default function MessagesPage() {
               </div>
 
               {/* Input */}
-              <div className="p-4 bg-white dark:bg-dark-700 border-t border-silver-300">
+              <div className="p-4 bg-white border-t border-silver-300">
                 <form onSubmit={handleSendMessage} className="flex items-center gap-3">
                   <input
                     ref={inputRef}
@@ -455,7 +455,7 @@ export default function MessagesPage() {
                     onChange={handleInputChange}
                     onBlur={() => setTyping(false)}
                     placeholder="Écris ton message..."
-                    className="flex-1 px-4 py-3 rounded-full border border-silver-400 focus:border-neon-500 focus:ring-2 focus:ring-neon-500/20 outline-none transition-all bg-silver-50 dark:bg-dark-600"
+                    className="flex-1 px-4 py-3 rounded-full border border-silver-400 focus:border-neon-500 focus:ring-2 focus:ring-neon-500/20 outline-none transition-all bg-silver-50"
                   />
                   <button
                     type="submit"

@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { AuthProvider } from "../components/providers/AuthProvider";
-import { ThemeProvider } from "../components/providers/ThemeProvider";
 import { ChatProvider, ChatContainer } from "../components/chat";
 import Navbar from "../components/layout/Navbar";
 
@@ -66,8 +65,7 @@ export default function RootLayout({
         <meta name="mobile-web-app-capable" content="yes" />
       </head>
       <body>
-        <ThemeProvider>
-          <AuthProvider>
+        <AuthProvider>
             <ChatProvider>
               <Navbar />
               <main className="min-h-screen">
@@ -78,7 +76,6 @@ export default function RootLayout({
               <div id="overlay-root" />
             </ChatProvider>
           </AuthProvider>
-        </ThemeProvider>
       </body>
     </html>
   );

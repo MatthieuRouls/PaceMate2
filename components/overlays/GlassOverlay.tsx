@@ -113,32 +113,32 @@ export default function GlassOverlay({
         aria-modal="true"
         aria-label={title || 'Panel'}
         tabIndex={-1}
-        className={`z-50 bg-white dark:bg-dark-800 shadow-2xl outline-none overflow-hidden ${positionClasses[position]} ${position === 'right' ? 'border-l border-silver-200 dark:border-dark-700' : position === 'center' ? 'rounded-2xl mx-4' : ''}`}
+        className={`z-50 bg-white shadow-2xl outline-none overflow-hidden ${positionClasses[position]} ${position === 'right' ? 'border-l border-silver-200' : position === 'center' ? 'rounded-2xl mx-4' : ''}`}
       >
         {/* Header */}
         {(title || showBackButton || showCloseButton) && (
-          <div className="sticky top-0 z-10 flex items-center gap-3 px-5 py-4 border-b border-silver-200 dark:border-dark-700 bg-white/95 dark:bg-dark-800/95 backdrop-blur-sm">
+          <div className="sticky top-0 z-10 flex items-center gap-3 px-5 py-4 border-b border-silver-200 bg-white/95 backdrop-blur-sm">
             {showBackButton && (
               <button
                 onClick={onClose}
-                className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-silver-100 dark:hover:bg-dark-600 transition-colors -ml-2"
+                className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-silver-100:bg-dark-600 transition-colors -ml-2"
                 aria-label="Retour"
               >
-                <ChevronLeft className="w-6 h-6 text-dark-600 dark:text-silver-300" />
+                <ChevronLeft className="w-6 h-6 text-dark-600" />
               </button>
             )}
 
             {title && (
-              <h2 className="flex-1 text-lg font-bold text-dark-800 dark:text-white">{title}</h2>
+              <h2 className="flex-1 text-lg font-bold text-dark-800">{title}</h2>
             )}
 
             {showCloseButton && (
               <button
                 onClick={onClose}
-                className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-silver-100 dark:hover:bg-dark-600 transition-colors ml-auto"
+                className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-silver-100:bg-dark-600 transition-colors ml-auto"
                 aria-label="Fermer"
               >
-                <X className="w-5 h-5 text-dark-500 dark:text-silver-400" />
+                <X className="w-5 h-5 text-dark-500" />
               </button>
             )}
           </div>

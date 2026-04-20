@@ -62,11 +62,11 @@ export default function SessionDetailsDrawer({ session, isOpen, onClose }: Sessi
 
       {/* Drawer */}
       <div
-        className={`fixed right-0 top-0 h-full w-full md:w-[600px] bg-white dark:bg-dark-800 z-50 shadow-2xl transition-transform duration-300 overflow-y-auto ${
+        className={`fixed right-0 top-0 h-full w-full md:w-[600px] bg-white z-50 shadow-2xl transition-transform duration-300 overflow-y-auto ${
           isOpen ? 'translate-x-0' : 'translate-x-full'
         }`}
       >
-        <div className="sticky top-0 bg-white dark:bg-dark-800 border-b border-silver-300 px-6 py-4 flex items-center justify-between z-10">
+        <div className="sticky top-0 bg-white border-b border-silver-300 px-6 py-4 flex items-center justify-between z-10">
           <h2 className="text-xl font-bold text-dark-800">Details de la session</h2>
           <button
             onClick={onClose}
@@ -94,11 +94,11 @@ export default function SessionDetailsDrawer({ session, isOpen, onClose }: Sessi
               <div className="text-2xl font-bold mb-1">{session.distance_km}</div>
               <div className="text-sm opacity-90">Kilometres</div>
             </div>
-            <div className="bg-white dark:bg-dark-700 border-2 border-neon-500 rounded-lg p-4">
+            <div className="bg-white border-2 border-neon-500 rounded-lg p-4">
               <div className="text-2xl font-bold text-dark-800 mb-1">{session.target_pace || '5\'30"'}</div>
               <div className="text-sm text-dark-500">Allure/km</div>
             </div>
-            <div className="bg-white dark:bg-dark-700 border border-silver-400 rounded-lg p-4">
+            <div className="bg-white border border-silver-400 rounded-lg p-4">
               <div className="text-2xl font-bold text-dark-800 mb-1">{estimatedDuration}</div>
               <div className="text-sm text-dark-500">Minutes</div>
             </div>
@@ -201,11 +201,11 @@ export default function SessionDetailsDrawer({ session, isOpen, onClose }: Sessi
           </div>
 
           {/* Actions */}
-          <div className="sticky bottom-0 bg-white dark:bg-dark-800 pt-4 pb-2 border-t border-silver-300 -mx-6 px-6">
+          <div className="sticky bottom-0 bg-white pt-4 pb-2 border-t border-silver-300 -mx-6 px-6">
             <div className="flex gap-3">
               <Link
                 href={`/sessions/${session.id}`}
-                className="flex-1 py-3.5 rounded-lg bg-white dark:bg-dark-700 border border-silver-400 text-dark-800 font-semibold text-center hover:border-neon-500 hover:bg-silver-50 dark:hover:bg-dark-600 transition-all"
+                className="flex-1 py-3.5 rounded-lg bg-white border border-silver-400 text-dark-800 font-semibold text-center hover:border-neon-500 hover:bg-silver-50:bg-dark-600 transition-all"
               >
                 Voir tous les details
               </Link>
