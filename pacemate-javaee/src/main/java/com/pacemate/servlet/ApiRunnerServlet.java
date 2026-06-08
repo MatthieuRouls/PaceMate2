@@ -1,8 +1,6 @@
 package com.pacemate.servlet;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.pacemate.dao.RunnerDAO;
 import com.pacemate.model.Runner;
 import jakarta.servlet.ServletException;
@@ -10,6 +8,7 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -19,9 +18,7 @@ import java.util.Map;
 public class ApiRunnerServlet extends HttpServlet {
 
     private final RunnerDAO runnerDAO = new RunnerDAO();
-    private final ObjectMapper mapper = new ObjectMapper()
-            .registerModule(new JavaTimeModule())
-            .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+    private final ObjectMapper mapper = new ObjectMapper();
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
@@ -31,15 +28,16 @@ public class ApiRunnerServlet extends HttpServlet {
 
         List<Runner> runners = runnerDAO.findAll();
 
-        // Projection légère — pas de hash de mot de passe exposé
         List<Map<String, Object>> payload = runners.stream()
-                .map(r -> Map.of(
-                        "id", r.getId(),
-                        "username", r.getUsername(),
-                        "level", r.getLevel().getLabel(),
-                        "city", r.getCity() != null ? r.getCity() : "",
-                        "pace", r.getFormattedPace()
-                ))
+                .map(r -> {
+                    Map<String, Object> m = new HashMap<>();
+                    m.put("id", r.getId());
+                    m.put("username", r.getUsername());
+                    m.put("level", r.getLevel().getLabel());
+                    m.put("city", r.getCity() != null ? r.getCity() : "");
+                    m.put("pace", r.getFormattedPace());
+                    return m;
+                })
                 .toList();
 
         mapper.writeValue(resp.getWriter(), payload);
