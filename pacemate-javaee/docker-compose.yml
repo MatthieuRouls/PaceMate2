@@ -1,0 +1,88 @@
+version: "3.9"
+
+services:
+
+  # ── Base de données PostgreSQL ─────────────────────────────────
+  postgres:
+    image: postgres:16-alpine
+    container_name: pacemate-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB:       pacemate
+      POSTGRES_USER:     pacemate
+      POSTGRES_PASSWORD: pacemate
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U pacemate"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ── Tomcat 10 (Jakarta EE) ─────────────────────────────────────
+  tomcat:
+    image: tomcat:10.1-jdk17
+    container_name: pacemate-tomcat
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    ports:
+      - "8080:8080"
+    environment:
+      CATALINA_OPTS: >-
+        -Xms256m -Xmx512m
+        -Dpacemate.pu=pacemate-pu
+    volumes:
+      # WAR déployé automatiquement
+      - ./target/pacemate.war:/usr/local/tomcat/webapps/pacemate.war:ro
+      # Logs Tomcat persistés
+      - tomcat_logs:/usr/local/tomcat/logs
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/pacemate/"]
+      interval: 15s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+
+  # ── Jenkins ────────────────────────────────────────────────────
+  jenkins:
+    image: jenkins/jenkins:lts-jdk17
+    container_name: pacemate-jenkins
+    restart: unless-stopped
+    ports:
+      - "8090:8080"
+      - "50000:50000"
+    environment:
+      JAVA_OPTS: "-Djenkins.install.runSetupWizard=false"
+    volumes:
+      - jenkins_home:/var/jenkins_home
+      - /var/run/docker.sock:/var/run/docker.sock
+
+  # ── SonarQube ──────────────────────────────────────────────────
+  sonarqube:
+    image: sonarqube:community
+    container_name: pacemate-sonar
+    restart: unless-stopped
+    depends_on:
+      - postgres
+    ports:
+      - "9000:9000"
+    environment:
+      SONAR_JDBC_URL:      jdbc:postgresql://postgres:5432/sonarqube
+      SONAR_JDBC_USERNAME: pacemate
+      SONAR_JDBC_PASSWORD: pacemate
+    volumes:
+      - sonar_data:/opt/sonarqube/data
+      - sonar_extensions:/opt/sonarqube/extensions
+      - sonar_logs:/opt/sonarqube/logs
+
+volumes:
+  postgres_data:
+  tomcat_logs:
+  jenkins_home:
+  sonar_data:
+  sonar_extensions:
+  sonar_logs:

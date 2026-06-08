@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    context.xml Tomcat — surcharge la configuration JPA pour la prod.
+    Copier dans $CATALINA_HOME/conf/Catalina/localhost/pacemate.xml
+    ou laisser ici pour inclusion automatique.
+-->
+<Context path="/pacemate" reloadable="false">
+
+    <!-- DataSource JNDI — PostgreSQL -->
+    <Resource name="jdbc/pacemate"
+              auth="Container"
+              type="javax.sql.DataSource"
+              factory="org.apache.tomcat.jdbc.pool.DataSourceFactory"
+              driverClassName="org.postgresql.Driver"
+              url="jdbc:postgresql://localhost:5432/pacemate"
+              username="pacemate"
+              password="pacemate"
+              initialSize="5"
+              maxActive="20"
+              maxIdle="10"
+              minIdle="5"
+              maxWait="10000"
+              validationQuery="SELECT 1"
+              testOnBorrow="true"
+              removeAbandoned="true"
+              removeAbandonedTimeout="60"
+              logAbandoned="true"/>
+</Context>
