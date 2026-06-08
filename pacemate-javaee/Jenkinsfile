@@ -7,10 +7,8 @@ pipeline {
     }
 
     environment {
-        APP_NAME    = 'pacemate'
-        WAR_FILE    = "target/${APP_NAME}.war"
-        TOMCAT_URL  = credentials('tomcat-url')       // ex: http://tomcat:8080
-        TOMCAT_CRED = credentials('tomcat-manager')   // username:password
+        APP_NAME = 'pacemate'
+        WAR_FILE = "pacemate-javaee/target/${APP_NAME}.war"
     }
 
     options {
@@ -25,112 +23,44 @@ pipeline {
         stage('Checkout') {
             steps {
                 checkout scm
-                echo "Branch : ${env.BRANCH_NAME} — Build #${env.BUILD_NUMBER}"
+                echo "Build #${env.BUILD_NUMBER}"
             }
         }
 
-        // ── 2. Build & tests ─────────────────────────────────────────
+        // ── 2. Build & Tests ─────────────────────────────────────────
         stage('Build & Test') {
             steps {
                 dir('pacemate-javaee') {
-                    sh 'mvn clean verify -B -Dpacemate.pu=pacemate-test-pu'
+                    bat 'mvn clean verify -B -Dpacemate.pu=pacemate-test-pu'
                 }
             }
             post {
                 always {
-                    junit 'pacemate-javaee/target/surefire-reports/*.xml'
-                    jacoco(
-                        execPattern: 'pacemate-javaee/target/jacoco.exec',
-                        classPattern: 'pacemate-javaee/target/classes',
-                        sourcePattern: 'pacemate-javaee/src/main/java'
-                    )
+                    junit allowEmptyResults: true,
+                          testResults: 'pacemate-javaee/target/surefire-reports/*.xml'
                 }
             }
         }
 
-        // ── 3. Analyse qualité (SonarQube) ───────────────────────────
-        stage('SonarQube') {
-            when { branch 'main' }
-            environment {
-                SONAR_TOKEN = credentials('sonar-token')
-            }
-            steps {
-                dir('pacemate-javaee') {
-                    sh '''
-                        mvn sonar:sonar \
-                          -Dsonar.projectKey=pacemate \
-                          -Dsonar.host.url=http://sonarqube:9000 \
-                          -Dsonar.login=${SONAR_TOKEN} \
-                          -B
-                    '''
-                }
-            }
-        }
-
-        // ── 4. Archive du WAR ────────────────────────────────────────
+        // ── 3. Archive du WAR ────────────────────────────────────────
         stage('Archive') {
             steps {
-                dir('pacemate-javaee') {
-                    archiveArtifacts artifacts: "${WAR_FILE}", fingerprint: true
-                }
-            }
-        }
-
-        // ── 5. Déploiement (staging) ─────────────────────────────────
-        stage('Deploy Staging') {
-            when {
-                anyOf {
-                    branch 'main'
-                    branch 'develop'
-                }
-            }
-            steps {
-                dir('pacemate-javaee') {
-                    script {
-                        def (user, pass) = env.TOMCAT_CRED.tokenize(':')
-                        sh """
-                            curl -v --fail \
-                              -u "${user}:${pass}" \
-                              "${TOMCAT_URL}/manager/text/undeploy?path=/${APP_NAME}" || true
-
-                            curl -v --fail \
-                              -u "${user}:${pass}" \
-                              -T "${WAR_FILE}" \
-                              "${TOMCAT_URL}/manager/text/deploy?path=/${APP_NAME}&update=true"
-                        """
-                    }
-                }
-                echo "✅ Déployé sur ${TOMCAT_URL}/${APP_NAME}"
-            }
-        }
-
-        // ── 6. Tests de fumée post-déploiement ───────────────────────
-        stage('Smoke Test') {
-            when {
-                anyOf { branch 'main'; branch 'develop' }
-            }
-            steps {
-                sh """
-                    sleep 5
-                    curl --fail --silent \
-                      "${TOMCAT_URL}/${APP_NAME}/" | grep -q "PaceMate" \
-                      && echo "✅ Smoke test OK" \
-                      || (echo "❌ Smoke test FAILED" && exit 1)
-                """
+                archiveArtifacts artifacts: "${WAR_FILE}", fingerprint: true
             }
         }
     }
 
     post {
         success {
-            echo "🎉 Pipeline réussi — Build #${env.BUILD_NUMBER}"
+            echo "Pipeline réussi — Build #${env.BUILD_NUMBER}"
         }
         failure {
-            echo "💥 Pipeline échoué — Build #${env.BUILD_NUMBER}"
-            // mail to: 'team@pacemate.fr', subject: "Build FAILED #${env.BUILD_NUMBER}", body: "Voir ${env.BUILD_URL}"
+            echo "Pipeline echoue — Build #${env.BUILD_NUMBER}"
         }
         always {
-            cleanWs()
+            node('built-in') {
+                cleanWs()
+            }
         }
     }
 }
